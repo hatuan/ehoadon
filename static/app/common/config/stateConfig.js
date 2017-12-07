@@ -23,7 +23,7 @@ define(['angularAMD'], function (angularAMD) {
                 }
             })
             .state('logoff', {
-                url: '/',
+                url: '/logoff',
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/main/home.html',
