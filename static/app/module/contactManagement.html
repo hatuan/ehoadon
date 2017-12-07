@@ -1,0 +1,60 @@
+<div ng-init="initializeController()">
+    <div class="page-header">
+        <h2>Master</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 col-xs-2">
+            <ul class="nav nav-pills nav-stacked">
+                <li title="Contact Management" ng-class="{'active' : activeTab == 1}"><a href="" data-toggle="tab" ng-click="activeTab = 1"><b>1.</b> <span class="hidden-xs">Contact Management </span></a></li>
+                <li title="Reports" ng-class="{'active' : activeTab == 2}"><a href="" data-toggle="tab" ng-click="activeTab = 2"><b>2.</b> <span class="hidden-xs">Reports</span></a></li>
+            </ul>
+        </div>
+
+        <div class="col-sm-9 col-xs-10"> <!-- left panes -->
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane" id="ContactManagement" class="tab-pane" ng-class="{'active': activeTab === 1}">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Contact Management</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li><a ui-sref="#">Leads</a></li>
+                                        <li><a ui-sref="#">Business Relations</a></li>
+                                        <li><a ui-sref="#">Contacts</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li><a ui-sref="#">Oppotunities</a></li>
+                                        <li><a ui-sref="#">Campaigns</a></li>
+                                        <li><a ui-sref="#">Activities</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="Reports" class="tab-pane" ng-class="{'active': activeTab === 2}">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Reports</div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li><a href="#">11111</a></li>
+                                        <li><a href="#">22222</a></li>
+                                        <li><a href="#">33333</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- left panes -->
+    </div>
+</div>

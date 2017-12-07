@@ -1,0 +1,6 @@
+production:
+    driver: postgres
+    open: user=postgres dbname=ehoadon port=5432 sslmode=disable
+development:
+    driver: postgres
+    open: user=postgres dbname=ehoadon port=5432 sslmode=disable

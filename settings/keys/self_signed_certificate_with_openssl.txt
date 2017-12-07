@@ -1,0 +1,9 @@
+//http://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
+
+openssl.exe genrsa -out server.key 2048
+
+openssl.exe req -new -x509 -sha256 -key server.key -out server.crt -days 3650
+
+
+//Create public key
+openssl.exe rsa -in server.key -pubout -out server.key.pub

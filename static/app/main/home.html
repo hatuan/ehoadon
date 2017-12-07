@@ -1,0 +1,66 @@
+<!--BEGIN NAVBAR
+<div id="wrap">
+    <div class="navbar navbar-inverse navbar-static-top">
+        <div class="container-fluid body-content">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" ui-sref="home">MyERP</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown" ng-if="isAuthenticated()">
+                        <a data-toggle="dropdown" href="#" id="dropdownMenu1">Modules <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li role="presentation"><a role="menuitem" tabIndex="-1">Contact Management</a>
+                            </li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation">
+                                <a role="menuitem" tabIndex="-1">Master Setup</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" ng-if="isAuthenticated()">
+                        <a data-toggle="dropdown" href="#" id="dropdownBookmarks">Bookmarks <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownBookmarks">
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation"><a href="#" id="add-bookmark-link" role="menuitem" tabindex=-1>
+                                <span class="glyphicon glyphicon-plus"></span> Add Bookmark</a></li>
+                        </ul>
+                    </li>
+                    <li><a ui-sref="home.about">About</a></li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search" onsubmit="return false;" ng-if="isAuthenticated()">
+                    <div class="form-group">
+                        <input autocomplete="off" class="form-control" id="navbar-search-header"
+                               name="navbar-search-header" placeholder="Search or type a command"
+                               style="font-size:85%;min-width:230px;" type="text" value="">
+                    </div>
+                </form>
+                <ul class="nav navbar-nav navbar-right" ng-if="isAuthenticated()">
+                    <li>
+                        <a id="preferenceLink" title="Preference" ui-sref="preference">Preference</a>
+                    </li>
+                    <li class="dropdown">
+                        <a data-toggle="dropdown" href="#" id="dropdownUser">{{currentUser().name}} <b class="caret"></b></a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownUser">
+                            <li role="presentation"><a role="menuitem" , tabIndex="-1" ui-sref="managerUser">Manage User</a></li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation"><a role="menuitem" tabindex=-1 ui-sref="logoff">Log off</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right" ng-if="!isAuthenticated()">>
+                    <li><a id = "registerLink">Register</a></li>
+                    <li><a id = "loginLink" ui-sref="login">Log in</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div> <!--END NAVBAR-->
+
+<div ui-view="main"></div>

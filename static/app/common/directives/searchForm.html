@@ -1,0 +1,25 @@
+<div class="row" ng-repeat="searchCondition in searchConditions">
+    <div class="form-group" ng-class="{'has-error': searchCondition.HasError}">
+        <div class="col-xs-2">
+            <select class="form-control valid" ng-model="searchCondition.Object" ng-options="searchConditionObject.Name for searchConditionObject in searchCondition.Objects">
+            </select>
+        </div>
+        <div class="col-xs-3">
+            <div class="input-group">
+                <input type="text" class="form-control" ng-model="searchCondition.Object.Value" placeholder="Search for..."/>
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-default" ng-disabled="searchCondition.Object.Type == 'FREE'"><span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span></button>
+                </span>
+            </div>
+        </div>
+    
+        <button type="button" class="btn btn-danger" ng-show="$index > 0" ng-click="removeSearchCondition($index)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+        <button type="button" class="btn btn-default" ng-show="$index == 0" ng-click="addSearchCondition()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+    </div>   
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <button type="button" class="btn btn-default" ng-click="startSearch()"><i class="fa fa-search" aria-hidden="true"></i> Search</button>
+        <button type="button" class="btn btn-default" ng-click="clearSearch()"><i class="fa fa-eraser" aria-hidden="true"></i> Clear</button>
+    </div>
+</div>

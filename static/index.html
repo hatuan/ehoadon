@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>eInvoice</title>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/bower_components/angular-block-ui/dist/angular-block-ui.min.css"/>
+    <link rel="stylesheet" href="/bower_components/angular-toastr/dist/angular-toastr.min.css"/>
+    <!-- <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2016.2.504/styles/kendo.common-bootstrap.min.css"> -->
+    <!-- <link rel="stylesheet" href="http://kendo.cdn.telerik.com/2016.2.504/styles/kendo.bootstrap.min.css"> -->
+    <link rel="stylesheet" href="/styles/kendo.common-bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/kendo.bootstrap.min.css">
+    <link rel="stylesheet" href="/bower_components/jquery-ui/themes/base/jquery-ui.min.css">
+    <link rel="stylesheet" href="/bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css">
+    <link rel="stylesheet" href="/bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css">
+
+    <link rel="stylesheet" href="/styles/site.css">
+    <link rel='stylesheet' href="/styles/roboto.css">
+    <style type="text/css">
+        /**
+         * Hide when Angular is not yet loaded and initialized
+         */
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+</head>
+<body ng-controller="indexController" ng-init="initializeController()" ng-cloak>
+    <div ng-include="'/app/main/navbar.html'"></div>
+    <div ui-view="master" class="container-fluid body-content"></div>
+
+    <script src="/bower_components/cldrjs/dist/cldr.js"></script>
+    <script src="/bower_components/cldrjs/dist/cldr/event.js"></script>
+    <script src="/bower_components/cldrjs/dist/cldr/supplemental.js"></script>
+
+    <script src="/bower_components/globalize/dist/globalize.js"></script>
+    <script src="/bower_components/globalize/dist/globalize/message.js"></script>
+    <script src="/bower_components/globalize/dist/globalize/number.js"></script>
+    <script src="/bower_components/globalize/dist/globalize/plural.js"></script>
+    <script src="/bower_components/globalize/dist/globalize/currency.js"></script>
+    <script src="/bower_components/globalize/dist/globalize/date.js"></script>
+    <script data-main="main.js" src="/bower_components/requirejs/require.js"></script>
+</body>
+</html>
