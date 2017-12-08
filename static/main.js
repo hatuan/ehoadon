@@ -50,7 +50,8 @@ require.config({
         'organizationsService': 'app/organization/organizationsService',
         'usersService': 'app/user/usersService',
         'myApp.autoComplete': 'app/common/directives/autoComplete',
-        'eInvoiceCustomerService': 'app/eInvoice/customerService'
+        'eInvoiceCustomerService': 'app/eInvoice/customerService',
+        'eInvoiceItemUomService': 'app/eInvoice/itemUomService'
     },
     // Add angular modules that does not support AMD out of the box, put it in a shim
     shim: {

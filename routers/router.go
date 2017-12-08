@@ -97,6 +97,20 @@ func InitRoutes() *mux.Router {
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.API_eInvoiceCustomer_Id),
 		))
+
+	//eInvoiceItemUom api
+	api.Handle("/einvoiceitemuoms",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_eInvoiceItemUoms),
+		))
+
+	api.Handle("/einvoiceitemuom",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_eInvoiceItemUom_Id),
+		))
+
 	// Setup static file serving
 	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./static/"))))
 

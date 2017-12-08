@@ -4,12 +4,12 @@
             <div class="panel-body">
                 <h2 class="text-center">Log in</h2>
                 <form ng-submit="login()" name="loginForm">
-                    <div class="form-group has-feedback">
+                    <div class="form-group">
                         <input class="form-control input-lg" type="text" name="email" ng-model="UserName"
                                placeholder="Email" required autofocus ng-class="{'validation-error': UserNameInputError}">
                         <span class="ion-at form-control-feedback"></span>
                     </div>
-                    <div class="form-group has-feedback">
+                    <div class="form-group">
                         <input class="form-control input-lg" type="password" name="password" ng-model="Password"
                                placeholder="Password" required ng-class="{'validation-error': PasswordInputError}">
                         <span class="ion-key form-control-feedback"></span>
