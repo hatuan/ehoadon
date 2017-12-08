@@ -43,12 +43,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceItemUom
                 },
                 "Description": {
                     required: true
-                },
-                "Address": {
-                    required: true
-                },
-                "Email": {
-                    email: true
                 }
             }
         };

@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-sm-8">
                 <h2 class="pull-left">
-                    Danh mục đơn vị tính
+                    Danh mục hàng hóa
                 </h2>
             </div>
         </div>
@@ -22,24 +22,32 @@
 		<div class="well" search-form search-condition-objects="searchConditionObjects" search-callback="getCustomers(param)"/>
 	</div>
     <div class="row">
-        <div class="col-md-6 margin-bottom-15">
+        <div class="col-md-12 margin-bottom-15">
             <div class="table-responsive constrained">
                 <table class="table table-bordered table-striped" style="table-layout: fixed;">
                     <thead>
                         <th class="col-md-1" style="text-align: center"></th>
                         <th class="col-md-2">Code</th>
                         <th class="col-md-3">Description</th>
+                        <th class="col-md-1">UOM</th>
+                        <th class="col-md-1">Price</th>
+                        <th class="col-md-1">Vat</th>
+                        <th class="col-md-1">Discount</th>
                         <th class="col-md-1">Status</th>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="eInvoiceItemUom in (FilteredItems = (eInvoiceItemUoms|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
-                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceItemUom.ID)">
-                                <input type="checkbox" id="{{eInvoiceItemUom.ID}}" value="{{eInvoiceItemUom.ID}}" ng-checked="Selection.indexOf(eInvoiceItemUom.ID) > -1"/>
+                        <tr ng-repeat="eInvoiceItem in (FilteredItems = (eInvoiceItems|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
+                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceItem.ID)">
+                                <input type="checkbox" id="{{eInvoiceItem.ID}}" value="{{eInvoiceItem.ID}}" ng-checked="Selection.indexOf(eInvoiceItem.ID) > -1"/>
                             </td>
-                            <td><a ng-click="edit(eInvoiceItemUom)">{{eInvoiceItemUom.Code}}</a></td>
-                            <td>{{eInvoiceItemUom.Description}}</td>
+                            <td><a ng-click="edit(eInvoiceItem)">{{eInvoiceItem.Code}}</a></td>
+                            <td>{{eInvoiceItem.Description}}</td>
+                            <td>{{eInvoiceItem.UomCode}}</td>
+                            <td>{{eInvoiceItem.UnitPrice}}</td>
+                            <td>{{eInvoiceItem.Vat}}</td>
+                            <td>{{eInvoiceItem.Discount}}</td>
                             <td>
-                                <div ng-repeat="status in Constants.Status|filter:{Code:eInvoiceItemUom.Status}">{{status.Name}}</div>
+                                <div ng-repeat="status in Constants.Status|filter:{Code:eInvoiceItem.Status}">{{status.Name}}</div>
                             </td>
                         </tr>
                     </tbody>

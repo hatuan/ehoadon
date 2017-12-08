@@ -98,7 +98,23 @@ define(['angularAMD'], function (angularAMD) {
                     })
                 },
                 params: {
-                    customerID: null
+                    itemUomID: null
+                },
+                resolve: {
+                    redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
+                }
+            })
+            .state('eInvoiceItems', {
+                url: "/eInvoiceItems",
+                views: {
+                    "master": angularAMD.route({
+                        templateUrl: 'app/eInvoice/items.html',
+                        controller: 'eInvoiceItemsController',
+                        controllerUrl: 'app/eInvoice/itemsController',
+                    })
+                },
+                params: {
+                    itemID: null
                 },
                 resolve: {
                     redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
