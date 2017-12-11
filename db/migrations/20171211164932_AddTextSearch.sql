@@ -38,8 +38,8 @@ BEGIN
                 RETURN OLD;
             ELSE
                 INSERT INTO textsearch(id, textsearch_object, textsearch_value, client_id, organization_id) VALUES
-                (NEW.id, TG_TABLE_NAME, to_tsvector(coalesce(NEW.code, '') || ' ' || coalesce(NEW.description, '')), NEW.client_id, NEW.organization_id)
-                ON CONFLICT ON CONSTRAINT pk_textsearch DO UPDATE SET textsearch_value = to_tsvector(coalesce(NEW.code, '') || ' ' || coalesce(NEW.description, ''));   
+                (NEW.id, TG_TABLE_NAME, to_tsvector('simple', coalesce(NEW.code, '') || ' ' || coalesce(NEW.description, '')), NEW.client_id, NEW.organization_id)
+                ON CONFLICT ON CONSTRAINT pk_textsearch DO UPDATE SET textsearch_value = to_tsvector('simple', coalesce(NEW.code, '') || ' ' || coalesce(NEW.description, ''));   
                 
                 RETURN NEW;
             END IF;    

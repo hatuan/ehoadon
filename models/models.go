@@ -201,7 +201,7 @@ func AutoComplete(object, term string, orgID int64) ([]AutoCompleteDTO, error) {
 	for _, org := range orgs {
 		orgIDs = append(orgIDs, *org.ID)
 	}
-	strSQL := fmt.Sprintf("SELECT id, code, description FROM %s WHERE id IN (SELECT id FROM textsearch WHERE textsearch_object=? AND organization_id IN (?)  AND client_id = ? AND textsearch_value @@ to_tsquery(?))", object)
+	strSQL := fmt.Sprintf("SELECT id, code, description FROM %s WHERE id IN (SELECT id FROM textsearch WHERE textsearch_object=? AND organization_id IN (?)  AND client_id = ? AND textsearch_value @@ to_tsquery('simple', ?))", object)
 
 	query, args, err := sqlx.In(strSQL, object, orgIDs, orgs[0].ClientID, term)
 
