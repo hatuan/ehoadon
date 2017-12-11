@@ -76,6 +76,13 @@ html, body {
 select.custom::-ms-expand {
     padding: 0px;
 }
+/*********************************/
+
+/*fix kendo ui with bootstrap */
+.k-numeric-wrap::before {
+    content: none !important;
+}
+/******************************/
 
 .signup-or-separator {
   position: relative;

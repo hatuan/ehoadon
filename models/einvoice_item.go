@@ -106,7 +106,6 @@ func GetEInvoiceItems(orgID int64, searchCondition string, infiniteScrollingInfo
 		" COALESCE(ehd_item_group.code, '') as item_group_code " +
 		" FROM ehd_item " +
 		" INNER JOIN user_profile as user_created ON ehd_item.rec_created_by = user_created.id " +
-		" INNER JOIN user_profile as user_created ON ehd_item.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_item.rec_modified_by = user_modified.id " +
 		" INNER JOIN organization as organization ON ehd_item.organization_id = organization.id " +
 		" LEFT JOIN ehd_item_group as ehd_item_group ON ehd_item.item_group_id = ehd_item_group.id " +

@@ -11,7 +11,12 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label class="control-label" for="Uom">UOM</label>
-                    <input type="text" class="form-control" name="Uom" id="Uom" ng-model="EditItem.UomCode" capitalize required/>
+                    <ui-select name="Uom" id="Uom" ng-model="EditItem.UomID">
+                        <ui-select-match>{{$select.selected.value.Code}}</ui-select-match>
+                        <ui-select-choices refresh="searchUoms($select)" refresh-delay="300" repeat="uom.value.ID as (key, uom) in SearchUoms">
+                            <div>{{uom.value.Code}}</div>
+                        </ui-select-choices>
+                    </ui-select>
                 </div>
             </div>    
             <div class="form-group">
@@ -21,21 +26,21 @@
             <div class="row">
                 <div class="form-group col-md-6">
                     <label class="control-label" for="Quantity">Quantity</label>
-                    <input type="text" class="form-control" name="Quantity" id="Quantity" ng-model="EditItem.Quantity"/>
+                    <input class="form-control" name="Quantity" id="Quantity" ng-model="EditItem.Quantity" awnum="quantity"/>
                 </div>
                 <div class="form-group col-md-6">
                     <label class="control-label" for="UnitPrice">Unit Price</label>
-                    <input type="text" class="form-control" name="UnitPrice" id="UnitPrice" ng-model="EditItem.UnitPrice"/>
+                    <input class="form-control" name="UnitPrice" id="UnitPrice" ng-model="EditItem.UnitPrice" awnum="price"/>
                 </div>
             </div>   
             <div class="row">
                 <div class="form-group col-md-6">
                     <label class="control-label" for="Vat">Vat</label>
-                    <input type="text" class="form-control" name="Vat" id="Vat" ng-model="EditItem.Vat"/>
+                    <select class="form-control" id="Vat" name="Vat" ng-model="EditItem.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes"/>
                 </div>
                 <div class="form-group col-md-6">
-                    <label class="control-label" for="Discount">Discount</label>
-                    <input type="text" class="form-control" name="Discount" id="Discount" ng-model="EditItem.Discount"/>
+                    <label class="control-label" for="Discount">Discount %</label>
+                    <input class="form-control" name="Discount" id="Discount" ng-model="EditItem.Discount" awnum="discount"/>
                 </div>
             </div> 
             <div class="row">

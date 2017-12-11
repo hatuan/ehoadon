@@ -2,10 +2,10 @@
  * Created by tuanha-01 on 5/6/2016.
  */
 "use strict";
+//'kendo.core.min', 'kendo.angular.min', 'kendo.numerictextbox.min', 'kendo.culture.en', 'kendo.culture.us', 'kendo.culture.vi', 'kendo.culture.vn',
+define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'angular-ui-select', 'myApp.navBar', 'myApp.Capitalize', 'myApp.Constants'], function(angularAMD) {
 
-define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap', 'kendo.core.min', 'kendo.angular.min', 'kendo.culture.en', 'kendo.culture.us', 'kendo.culture.vi', 'kendo.culture.vn', 'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'myApp.navBar', 'myApp.Capitalize', 'myApp.Constants'], function(angularAMD) {
-
-    var app = angular.module("myApp", ['ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'kendo.directives', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'myApp.NavBar', 'myApp.Capitalize', 'myApp.Constants']);
+    var app = angular.module("myApp", ['ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'ui.select', 'myApp.NavBar', 'myApp.Capitalize', 'myApp.Constants']);
 
     app.config(function(blockUIConfig) {
 
@@ -91,6 +91,54 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
         ]);
     }]);
 
+    app.config(['dynamicNumberStrategyProvider', function(dynamicNumberStrategyProvider){
+    
+        dynamicNumberStrategyProvider.addStrategy('price', {
+          numInt: 9,
+          numFract: 0,
+          numSep: ',',
+          numPos: true,
+          numNeg: true,
+          numRound: 'round',
+          numThousand: true
+        });
+    
+        dynamicNumberStrategyProvider.addStrategy('amount', {
+            numInt: 18,
+            numFract: 0,
+            numSep: ',',
+            numPos: true,
+            numNeg: true,
+            numRound: 'round',
+            numThousand: true
+        });
+        
+        dynamicNumberStrategyProvider.addStrategy('quantity', {
+            numInt: 6,
+            numFract: 0,
+            numSep: ',',
+            numPos: true,
+            numNeg: true,
+            numRound: 'round',
+            numThousand: true
+        });  
+
+        dynamicNumberStrategyProvider.addStrategy('discount', {
+            numInt: 2,
+            numFract: 0,
+            numSep: ',',
+            numPos: true,
+            numNeg: true,
+            numRound: 'round',
+            numThousand: true
+        });
+
+    }]);
+    
+    app.config(function(uiSelectConfig) {
+        uiSelectConfig.theme = 'bootstrap';
+      });
+      
     app.controller('indexController', ['$scope', '$rootScope', '$http', 'blockUI', function($scope, $rootScope, $http, blockUI) {
 
         $scope.initializeController = function() {
@@ -163,8 +211,9 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
             }
             return _isAuthenticated;
         };
-
-        globalizeWrapper.loadLocales(['vi', 'en']);
+        
+        //You can switch locale at any time, just call globalizeWrapper.setLocale('foo') in your controller.
+        globalizeWrapper.loadLocales(['vi', 'en']); // the first one is activated
 
         $rootScope.$on('GlobalizeLoadSuccess', function() {
             //console.log("GlobalizeLoadSuccess"); 
