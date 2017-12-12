@@ -14,41 +14,54 @@ import (
 )
 
 type EInvoice struct {
-	ID                *int64          `db:"id" json:",string"`
-	Code              string          `db:"code"`
-	Description       string          `db:"description"`
-	GroupID           *int64          `db:"item_group_id" json:",string"`
-	GroupCode         string          `db:"item_group_code"`
-	UomID             *int64          `db:"item_uom_id" json:",string"`
-	UomCode           string          `db:"item_uom_code"`
-	Vat               int8            `db:"vat"`
-	Discount          int8            `db:"discount"`
-	Quantity          decimal.Decimal `db:"quantity"`
-	UnitPrice         decimal.Decimal `db:"unit_price"`
-	RecCreatedByID    int64           `db:"rec_created_by" json:",string"`
-	RecCreatedByUser  string          `db:"rec_created_by_user"`
-	RecCreated        *Timestamp      `db:"rec_created_at"`
-	RecModifiedByID   int64           `db:"rec_modified_by" json:",string"`
-	RecModifiedByUser string          `db:"rec_modified_by_user"`
-	RecModified       *Timestamp      `db:"rec_modified_at"`
-	Status            int8            `db:"status"`
-	Version           int16           `db:"version"`
-	ClientID          int64           `db:"client_id" json:",string"`
-	OrganizationID    int64           `db:"organization_id" json:",string"`
-	Organization      string          `db:"organization"`
+	ID                       *int64          `db:"id" json:",string"`
+	FormReleaseID            int64           `db:"form_release_id" json:",string"`
+	OriginalInvoiceID        *int64          `db:"original_invoice_id" json:",string"`
+	CreatedDate              *Timestamp      `db:"created_date"`
+	InvoiceDate              *Timestamp      `db:"invoice_date"`
+	InvoiceNo                string          `db:"invoice_no"`
+	PayType                  string          `db:"pay_type"`
+	CurrencyID               int64           `db:"currency_id" json:",string"`
+	ExchangeRateAmount       decimal.Decimal `db:"exchange_rate_amount"`
+	RelationalExchRateAmount decimal.Decimal `db:"relational_exch_rate_amount"`
+	CustomerID               *int64          `db:"customer_id"`
+	CustomerVatNumber        string          `db:"customer_vat_number"`
+	CustomerName             string          `db:"customer_name"`
+	CustomerAddress          string          `db:"customer_address"`
+	CustomerContactName      string          `db:"customer_contact_name"`
+	CustomerBankAccount      string          `db:"customer_bank_account"`
+	CustomerBankName         string          `db:"customer_bank_name"`
+	ProcessInvoiceStatus     int8            `db:"process_invoice_status"`
+	ProcessAdjustedForm      int8            `db:"process_adjusted_form"`
+	ProcessAdjustedType      int8            `db:"process_adjusted_type"`
+	Total                    decimal.Decimal `db:"total"`
+	TotalDiscount            decimal.Decimal `db:"total_discount"`
+	TotalVat5                decimal.Decimal `db:"total_vat5"`
+	TotalVat10               decimal.Decimal `db:"total_vat10"`
+	TotalOther               decimal.Decimal `db:"total_other"`
+	TotalPayment             decimal.Decimal `db:"total_payment"`
+	TotalPaymentWords        decimal.Decimal `db:"total_payment_words"`
+	RecCreatedByID           int64           `db:"rec_created_by" json:",string"`
+	RecCreatedByUser         string          `db:"rec_created_by_user"`
+	RecCreated               *Timestamp      `db:"rec_created_at"`
+	RecModifiedByID          int64           `db:"rec_modified_by" json:",string"`
+	RecModifiedByUser        string          `db:"rec_modified_by_user"`
+	RecModified              *Timestamp      `db:"rec_modified_at"`
+	Status                   int8            `db:"status"`
+	Version                  int16           `db:"version"`
+	ClientID                 int64           `db:"client_id" json:",string"`
+	OrganizationID           int64           `db:"organization_id" json:",string"`
+	Organization             string          `db:"organization"`
 }
 
 // ErrEInvoiceNotFound indicates there was no EInvoice
 var ErrEInvoiceNotFound = errors.New("EInvoice not found")
 
-// ErrEInvoiceDescriptionNotSpecified indicates there was no name given by the user
-var ErrEInvoiceDescriptionNotSpecified = errors.New("EInvoice's description not specified")
+// ErrEInvoiceCustomerAddressNotSpecified indicates there was no name given by the user
+var ErrEInvoiceCustomerAddressNotSpecified = errors.New("EInvoice's Customer Address Not Specified")
 
-// ErrEInvoiceCodeNotSpecified indicates there was no code given by the user
-var ErrEInvoiceCodeNotSpecified = errors.New("EInvoice's code not specified")
-
-// ErrEInvoiceCodeDuplicate indicates there was duplicate of code given by the user
-var ErrEInvoiceCodeDuplicate = errors.New("EInvoice's code is duplicate")
+// ErrEInvoiceCustomerNameNotSpecified indicates there was no Customer Name given by the user
+var ErrEInvoiceCustomerNameNotSpecified = errors.New("EInvoice's Customer Name Not Specified")
 
 // ErrEInvoiceFatal indicates there was fatal error
 var ErrEInvoiceFatal = errors.New("EInvoice has fatal error")
@@ -60,32 +73,11 @@ var ErrEInvoiceValidate = errors.New("EInvoice has validate error")
 func (c *EInvoice) Validate() map[string]InterfaceArray {
 	validationErrors := make(map[string]InterfaceArray)
 
-	if c.Code == "" {
-		validationErrors["Code"] = append(validationErrors["Code"], ErrEInvoiceCodeNotSpecified.Error())
+	if c.CustomerName == "" {
+		validationErrors["CustomerName"] = append(validationErrors["CustomerName"], ErrEInvoiceCustomerNameNotSpecified.Error())
 	}
-	if c.Description == "" {
-		validationErrors["Description"] = append(validationErrors["Description"], ErrEInvoiceDescriptionNotSpecified.Error())
-	}
-	if c.Code != "" {
-		db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
-		if err != nil {
-			log.Error(err)
-			validationErrors["Fatal"] = append(validationErrors["Fatal"], ErrEInvoiceFatal.Error())
-		}
-		defer db.Close()
-		var otherID string
-		ID := int64(0)
-		if c.ID != nil {
-			ID = *c.ID
-		}
-		err = db.Get(&otherID, "SELECT id FROM ehd_invoice WHERE code = $1 AND id != $2 AND client_id = $3", c.Code, ID, c.ClientID)
-		if err != nil && err != sql.ErrNoRows {
-			log.Error(err)
-			validationErrors["Fatal"] = append(validationErrors["Fatal"], ErrEInvoiceFatal.Error())
-		}
-		if otherID != "" && err != sql.ErrNoRows {
-			validationErrors["Code"] = append(validationErrors["Code"], ErrEInvoiceCodeDuplicate.Error())
-		}
+	if c.CustomerAddress == "" {
+		validationErrors["CustomerAddress"] = append(validationErrors["CustomerAddress"], ErrEInvoiceCustomerAddressNotSpecified.Error())
 	}
 	return validationErrors
 }

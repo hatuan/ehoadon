@@ -13,7 +13,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceCustome
         if($scope.EditCustomer.ID == null) {
             $scope.EditCustomer.Code = "";
             $scope.EditCustomer.Description = "";
-            $scope.EditCustomer.VatCode = "";
+            $scope.EditCustomer.VatNumber = "";
             $scope.EditCustomer.Address = "";
             $scope.EditCustomer.AddressTransition = "";
             $scope.EditCustomer.RepresentativeName = "";

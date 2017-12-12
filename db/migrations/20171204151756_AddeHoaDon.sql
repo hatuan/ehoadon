@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS ehd_customer
     description character varying NOT NULL,
     address character varying NOT NULL,
     address_transition character varying NOT NULL,
-    vat_code character varying NOT NULL,
+    vat_number character varying NOT NULL,
     mobile character varying NOT NULL,
     fax character varying NOT NULL,
     telephone character varying NOT NULL,
@@ -135,6 +135,8 @@ CREATE TABLE IF NOT EXISTS ehd_form_type
     symbol character varying NOT NULL, /* Ky hieu : EY/17E (E : invoice_form) */
     form_file_name character varying NOT NULL,
     form_file character varying NOT NULL,
+    client_id bigint NOT NULL,
+    organization_id bigint NOT NULL,
     version bigint NOT NULL,
     status smallint NOT NULL,
     rec_modified_by bigint NOT NULL,
@@ -143,6 +145,7 @@ CREATE TABLE IF NOT EXISTS ehd_form_type
     rec_created_at timestamp with time zone NOT NULL,
     CONSTRAINT pk_ehd_form_type PRIMARY KEY (id)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ehd_form_type_number_form ON ehd_form_type USING btree (client_id, number_form);
 
 /***** Phat hanh hoa don *****/
 CREATE TABLE IF NOT EXISTS ehd_form_release
@@ -156,6 +159,8 @@ CREATE TABLE IF NOT EXISTS ehd_form_release
     release_date date NOT NULL,
     start_date date NOT NULL, /* ngay bat dau su dung phai cach ngay thong bao phat hanh 2 ngay */
     tax_authorities_status smallint NOT NULL, /* 0 : Cho phat hanh, 1 : Da phat hanh */
+    client_id bigint NOT NULL,
+    organization_id bigint NOT NULL,
     version bigint NOT NULL,
     status smallint NOT NULL,
     rec_modified_by bigint NOT NULL,
@@ -177,9 +182,16 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
     currency_id bigint,
     exchange_rate_amount numeric(38, 20) NOT NULL,
     relational_exch_rate_amount numeric(38, 20) NOT NULL,
+    customer_id bigint,
+    customer_vat_number character varying NOT NULL,
+    customer_name character varying NOT NULL,
+    customer_address character varying NOT NULL,
+    customer_contact_name character varying NOT NULL,
+    customer_bank_account character varying NOT NULL,
+    customer_bank_name character varying NOT NULL,
     process_invoice_status smallint NOT NULL, /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh  */
-    process_adjusted_form smallint, /* Hinh thuc dieu chinh */
-    process_adjusted_type smallint, /* Loai dieu chinh */
+    process_adjusted_form smallint, /* Hinh thuc dieu chinh null: khong dieu chinh, 1: Dieu chinh tang, 2: Dieu chinh giam, 3: Dieu chinh khong thay doi tien, 4: Dieu chinh khac */
+    process_adjusted_type smallint, /* Loai dieu chinh Neu process_adjusted_form = 1,2 => 1: Hang hoa dich vu; process_adjusted_form = 3 => 2: Ma so thue, 3: Tien chu, 4: Ten khach, Dia chi; Neu process_adjusted_form = 4 => 5: Khac*/
     total numeric(38, 20) NOT NULL,
     total_discount numeric(38, 20) NOT NULL,
     total_vat5 numeric(38, 20) NOT NULL,
@@ -205,7 +217,9 @@ CREATE TABLE IF NOT EXISTS ehd_invoice_line
     id bigint NOT NULL DEFAULT id_generator(),
     invoice_id bigint NOT NULL,
     item_id bigint,
+    item_code character varying NOT NULL,
     uom_id bigint,
+    uom_code character varying NOT NULL,
     description character varying NOT NULL,
     quantity numeric(38, 20) NOT NULL,
     unit_price numeric(38, 20) NOT NULL,

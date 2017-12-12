@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-sm-8">
                 <h2 class="pull-left">
-                    Danh mục hàng hóa
+                    Danh sách mẫu hóa đơn
                 </h2>
             </div>
         </div>
@@ -27,30 +27,30 @@
                 <table class="table table-bordered table-striped" style="table-layout: fixed;">
                     <thead>
                         <th class="col-md-1" style="text-align: center"></th>
-                        <th class="col-md-2">Code</th>
-                        <th class="col-md-3">Description</th>
-                        <th class="col-md-1">UOM</th>
-                        <th class="col-md-1">Price</th>
-                        <th class="col-md-1">Vat</th>
-                        <th class="col-md-1">Discount</th>
-                        <th class="col-md-1">Status</th>
+                        <th class="col-md-1" style="text-align: center"></th>
+                        <th class="col-md-2">Date Created</th>
+                        <th class="col-md-3">Inv Form</th>
+                        <th class="col-md-1">Inv Type</th>
+                        <th class="col-md-1">Number Form</th>
+                        <th class="col-md-1">Symbol</th>
+                        <th class="col-md-1">Report</th>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="eInvoiceItem in (FilteredItems = (eInvoiceItems|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
-                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceItem.ID)">
-                                <input type="checkbox" id="{{eInvoiceItem.ID}}" value="{{eInvoiceItem.ID}}" ng-checked="Selection.indexOf(eInvoiceItem.ID) > -1"/>
+                        <tr ng-repeat="eInvoiceFormType in (FilteredItems = (eInvoiceFormTypes|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
+                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceFormType.ID)">
+                                <input type="checkbox" id="{{eInvoiceFormType.ID}}" value="{{eInvoiceFormType.ID}}" ng-checked="Selection.indexOf(eInvoiceFormType.ID) > -1"/>
                             </td>
-                            <td><a ng-click="edit(eInvoiceItem)">{{eInvoiceItem.Code}}</a></td>
-                            <td>{{eInvoiceItem.Description}}</td>
-                            <td>{{eInvoiceItem.UomCode}}</td>
-                            <td>{{eInvoiceItem.UnitPrice | awnum:'price'}}</td>
+                            <td><a ng-click="edit(eInvoiceFormType)">Edit</a></td>
+                            <td>{{eInvoiceFormType.RecCreated}}</td>
                             <td>
-                                <div ng-repeat="vatType in Constants.VatTypes|filter:{Code:eInvoiceItem.Vat}">{{vatType.Name}}</div>
+                                <div ng-repeat="invFormType in Constants.InvoiceFormTypes|filter:{Code:eInvoiceFormType.InvoiceForm}">{{invFormType.Name}}</div>
                             </td>
-                            <td>{{eInvoiceItem.Discount | awnum:'discount'}}</td>
                             <td>
-                                <div ng-repeat="status in Constants.Status|filter:{Code:eInvoiceItem.Status}">{{status.Name}}</div>
+                                <div ng-repeat="invType in Constants.InvoiceTypes|filter:{Code:eInvoiceFormType.InvoiceType}">{{invFormType.invType}}</div>
                             </td>
+                            <td>{{eInvoiceFormType.NumberForm}}></td>
+                            <td>{{eInvoiceFormType.Symbol}}</td>
+                            <td><a ng-click="viewReport(eInvoiceFormType)">View Report</a></td>
                         </tr>
                     </tbody>
                 </table>

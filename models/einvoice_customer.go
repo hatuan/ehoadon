@@ -18,7 +18,7 @@ type EInvoiceCustomer struct {
 	Description            string     `db:"description"`
 	Address                string     `db:"address"`
 	AddressTransition      string     `db:"address_transition"`
-	VatCode                string     `db:"vat_code"`
+	VatNumber                string     `db:"vat_number"`
 	Mobile                 string     `db:"mobile"`
 	Fax                    string     `db:"fax"`
 	Telephone              string     `db:"telephone"`
@@ -166,7 +166,7 @@ func PostEInvoiceCustomer(postData EInvoiceCustomer) (EInvoiceCustomer, Transact
 			"description, " +
 			"address," +
 			"address_transition," +
-			"vat_code," +
+			"vat_number," +
 			"mobile," +
 			"fax," +
 			"telephone," +
@@ -189,7 +189,7 @@ func PostEInvoiceCustomer(postData EInvoiceCustomer) (EInvoiceCustomer, Transact
 			":description, " +
 			":address," +
 			":address_transition," +
-			":vat_code," +
+			":vat_number," +
 			":mobile," +
 			":fax," +
 			":telephone," +
@@ -221,7 +221,7 @@ func PostEInvoiceCustomer(postData EInvoiceCustomer) (EInvoiceCustomer, Transact
 			"description = :description," +
 			"address = :address," +
 			"address_transition = :address_transition," +
-			"vat_code = :vat_code," +
+			"vat_number = :vat_number," +
 			"mobile = :mobile," +
 			"fax = :fax," +
 			"telephone = :telephone," +

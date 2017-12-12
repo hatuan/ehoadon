@@ -53,6 +53,18 @@ $BODY$
 
 CREATE TRIGGER textsearch_udate
   AFTER INSERT OR UPDATE OR DELETE
+  ON ehd_customer
+  FOR EACH ROW
+  EXECUTE PROCEDURE textsearch_udate_trigger();
+
+CREATE TRIGGER textsearch_udate
+  AFTER INSERT OR UPDATE OR DELETE
+  ON ehd_tax_authorities
+  FOR EACH ROW
+  EXECUTE PROCEDURE textsearch_udate_trigger();
+
+CREATE TRIGGER textsearch_udate
+  AFTER INSERT OR UPDATE OR DELETE
   ON ehd_item_uom
   FOR EACH ROW
   EXECUTE PROCEDURE textsearch_udate_trigger();
@@ -72,6 +84,8 @@ CREATE TRIGGER textsearch_udate
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 DROP TABLE textsearch;
+DROP TRIGGER IF EXISTS textsearch_udate ON ehd_customer;
+DROP TRIGGER IF EXISTS textsearch_udate ON ehd_tax_authorities;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_uom;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_group;

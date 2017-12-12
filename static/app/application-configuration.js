@@ -130,7 +130,8 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
             numPos: true,
             numNeg: true,
             numRound: 'round',
-            numThousand: true
+            numThousand: true,
+            numAppend: '%'
         });
 
     }]);

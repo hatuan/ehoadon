@@ -1,0 +1,42 @@
+{
+    "Invoice": {
+        "ID":"",
+        "CreatedDate":"",
+        "InvoiceDate":"",
+        "InvoiceNo":"",
+        "PayType":"",
+        "CurrencyID":"",
+        "ExchangeRateAmount":"",
+        "RelationalExchRateAmount":"",
+        "CustomerID":"",
+        "CustomerVatNumber":"",
+        "CustomerName":"",
+        "CustomerAddress":"",
+        "CustomerContactName":"",
+        "CustomerBankAccount":"",
+        "CustomerBankName":"",
+        "Total":"",
+        "TotalDiscount":"",
+        "TotalVat5":"",
+        "TotalVat10":"",
+        "TotalOther":"",
+        "TotalPayment":"",
+        "TotalPaymentWords":""
+    },
+    "InvoiceLines": [{
+        "ID":"",
+        "InvoiceID":"",
+        "ItemCode":"",
+        "UomCode":"",
+        "Description":"",
+        "Quantity":"",
+        "UnitPrice":"",
+        "Amount":"",
+        "Vat":"",
+        "AmountVat":"",
+        "Discount":"",
+        "AmountDiscount":"",
+        "AmountPayment":"",
+        "LineNo":""
+    }]
+}

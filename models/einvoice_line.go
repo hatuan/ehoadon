@@ -15,16 +15,20 @@ import (
 
 type EInvoiceLine struct {
 	ID                *int64          `db:"id" json:",string"`
-	Code              string          `db:"code"`
+	InvoiceID         *int64          `db:"invoice_id" json:",string"`
+	ItemID            *int64          `db:"item_id" json:",string"`
+	ItemCode          string          `db:"item_code"`
+	UomID             *int64          `db:"uom_id" json:",string"`
+	UomCode           string          `db:"uom_code"`
 	Description       string          `db:"description"`
-	GroupID           *int64          `db:"item_group_id" json:",string"`
-	GroupCode         string          `db:"item_group_code"`
-	UomID             *int64          `db:"item_uom_id" json:",string"`
-	UomCode           string          `db:"item_uom_code"`
-	Vat               int8            `db:"vat"`
-	Discount          int8            `db:"discount"`
 	Quantity          decimal.Decimal `db:"quantity"`
 	UnitPrice         decimal.Decimal `db:"unit_price"`
+	Amount            decimal.Decimal `db:"amount"`
+	Vat               int8            `db:"vat"`
+	AmountVat         decimal.Decimal `db:"amount_vat"`
+	Discount          int8            `db:"discount"`
+	AmountDiscount    decimal.Decimal `db:"amount_discount"`
+	AmountPayment     decimal.Decimal `db:"amount_payment"`
 	RecCreatedByID    int64           `db:"rec_created_by" json:",string"`
 	RecCreatedByUser  string          `db:"rec_created_by_user"`
 	RecCreated        *Timestamp      `db:"rec_created_at"`
@@ -60,32 +64,8 @@ var ErrEInvoiceLineValidate = errors.New("EInvoiceLine has validate error")
 func (c *EInvoiceLine) Validate() map[string]InterfaceArray {
 	validationErrors := make(map[string]InterfaceArray)
 
-	if c.Code == "" {
-		validationErrors["Code"] = append(validationErrors["Code"], ErrEInvoiceLineCodeNotSpecified.Error())
-	}
 	if c.Description == "" {
 		validationErrors["Description"] = append(validationErrors["Description"], ErrEInvoiceLineDescriptionNotSpecified.Error())
-	}
-	if c.Code != "" {
-		db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
-		if err != nil {
-			log.Error(err)
-			validationErrors["Fatal"] = append(validationErrors["Fatal"], ErrEInvoiceLineFatal.Error())
-		}
-		defer db.Close()
-		var otherID string
-		ID := int64(0)
-		if c.ID != nil {
-			ID = *c.ID
-		}
-		err = db.Get(&otherID, "SELECT id FROM ehd_invoice_line WHERE code = $1 AND id != $2 AND client_id = $3", c.Code, ID, c.ClientID)
-		if err != nil && err != sql.ErrNoRows {
-			log.Error(err)
-			validationErrors["Fatal"] = append(validationErrors["Fatal"], ErrEInvoiceLineFatal.Error())
-		}
-		if otherID != "" && err != sql.ErrNoRows {
-			validationErrors["Code"] = append(validationErrors["Code"], ErrEInvoiceLineCodeDuplicate.Error())
-		}
 	}
 	return validationErrors
 }

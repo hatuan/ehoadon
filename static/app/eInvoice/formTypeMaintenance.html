@@ -1,0 +1,60 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title" >Item Maintenance</h3>
+</div>
+<div class="modal-body row" id="modal-body">
+    <div class="col-xs-12">
+        <form id="ItemMaintenanceForm" name="ItemMaintenanceForm" role="form" ng-validate="validationOptions">
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="Code">Code</label>
+                    <input type="text" class="form-control" name="Code" id="Code" ng-model="EditItem.Code" capitalize required/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="Uom">UOM</label>
+                    <ui-select name="Uom" id="Uom" ng-model="EditItem.UomID">
+                        <ui-select-match>{{$select.selected.value.Code}}</ui-select-match>
+                        <ui-select-choices refresh="searchUoms($select)" refresh-delay="300" repeat="uom.value.ID as (key, uom) in SearchUoms">
+                            <div>{{uom.value.Code}}</div>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+            </div>    
+            <div class="form-group">
+                <label class="control-label" for="Description">Description</label>
+                <input type="text" class="form-control" name="Description" id="Description" ng-model="EditItem.Description" required/>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="Quantity">Quantity</label>
+                    <input class="form-control" name="Quantity" id="Quantity" ng-model="EditItem.Quantity" awnum="quantity"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="UnitPrice">Unit Price</label>
+                    <input class="form-control" name="UnitPrice" id="UnitPrice" ng-model="EditItem.UnitPrice" awnum="price"/>
+                </div>
+            </div>   
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="Vat">Vat</label>
+                    <select class="form-control" id="Vat" name="Vat" ng-model="EditItem.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label" for="Discount">Discount %</label>
+                    <input class="form-control" name="Discount" id="Discount" ng-model="EditItem.Discount" awnum="discount"/>
+                </div>
+            </div> 
+            <div class="row">
+                <div class="column col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="Status">Status</label>
+                        <select class="form-control" id="Status" name="Status" ng-model="EditItem.Status" ng-options="s.Code as s.Name for s in Constants.Status"/>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok(ItemMaintenanceForm)">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
