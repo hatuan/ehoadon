@@ -192,10 +192,15 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
     process_invoice_status smallint NOT NULL, /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh  */
     process_adjusted_form smallint, /* Hinh thuc dieu chinh null: khong dieu chinh, 1: Dieu chinh tang, 2: Dieu chinh giam, 3: Dieu chinh khong thay doi tien, 4: Dieu chinh khac */
     process_adjusted_type smallint, /* Loai dieu chinh Neu process_adjusted_form = 1,2 => 1: Hang hoa dich vu; process_adjusted_form = 3 => 2: Ma so thue, 3: Tien chu, 4: Ten khach, Dia chi; Neu process_adjusted_form = 4 => 5: Khac*/
-    total numeric(38, 20) NOT NULL,
+    total_amount numeric(38, 20) NOT NULL,
+    total_amount_no_vat numeric(38, 20) NOT NULL,
+    total_amount_vat0 numeric(38, 20) NOT NULL,
+    total_amount_vat5 numeric(38, 20) NOT NULL,
+    total_amount_vat10 numeric(38, 20) NOT NULL,
     total_discount numeric(38, 20) NOT NULL,
     total_vat5 numeric(38, 20) NOT NULL,
     total_vat10 numeric(38, 20) NOT NULL,
+    total_vat numeric(38, 20) NOT NULL,
     total_other numeric(38, 20) NOT NULL,
     total_payment numeric(38, 20) NOT NULL,
     total_payment_words character varying NOT NULL,

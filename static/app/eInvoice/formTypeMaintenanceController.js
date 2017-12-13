@@ -3,7 +3,7 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTypeService'], function(angularAMD, $) {
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTypeService', 'reportjs-report', 'reportjs-viewer'], function(angularAMD, $) {
     var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editFormType'];
 
     var formTypeMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editFormType) {
@@ -83,6 +83,41 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
         $scope.formTypeUpdateError = function() {
             alertsService.RenderErrorMessage(response.Error);
         };
+
+        var reportDesign = '';
+        $scope.viewReport = function() {
+            ajaxService.AjaxGet("/reports/01GTKT_001.mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction); 
+        };
+
+        $scope.getReportDesignSuccessFunction = function(response, status) {
+            reportDesign = response;
+            ajaxService.AjaxGet("/reports/invoice.json", $scope.getReportDataSuccessFunction, $scope.getReportDataErrorFunction); 
+        };
+
+        $scope.getReportDesignErrorFunction = function(response, status) {
+            alertsService.RenderErrorMessage(response.Error);   
+        };
+
+        $scope.getReportDataSuccessFunction = function(response, status) {
+            var dataSet = new Stimulsoft.System.Data.DataSet("Invoice");
+            dataSet.readJson(response);
+
+            var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
+            var report = new $window.Stimulsoft.Report.StiReport();
+            report.load(reportDesign);
+            report.regData(dataSet.dataSetName, "", dataSet);
+
+            viewer.options.toolbar.visible = false;
+            viewer.options.appearance.scrollbarsMode = true;
+            viewer.options.width = "100%";
+            viewer.options.height = $("#modal-body").height() + "px";
+            viewer.report = report;
+            viewer.renderHtml('reportviewer');
+        };
+
+        $scope.getReportDataErrorFunction = function(response, status) {
+            alertsService.RenderErrorMessage(response.Error); 
+        }
     };
 
     formTypeMaintenanceController.$inject = injectParams;

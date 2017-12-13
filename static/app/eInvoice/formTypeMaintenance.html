@@ -1,60 +1,47 @@
 <div class="modal-header">
-    <h3 class="modal-title" id="modal-title" >Item Maintenance</h3>
+    <h3 class="modal-title" id="modal-title" >Form Type Maintenance</h3>
 </div>
 <div class="modal-body row" id="modal-body">
-    <div class="col-xs-12">
-        <form id="ItemMaintenanceForm" name="ItemMaintenanceForm" role="form" ng-validate="validationOptions">
-            <div class="row">
-                <div class="form-group col-md-6">
-                    <label class="control-label" for="Code">Code</label>
-                    <input type="text" class="form-control" name="Code" id="Code" ng-model="EditItem.Code" capitalize required/>
+    <div class="col-xs-3">
+        <form id="FormTypeMaintenanceForm" name="FormTypeMaintenanceForm" role="form" ng-validate="validationOptions">
+            <div class="col">
+                <div class="form-group">
+                    <label class="control-label" for="InvoiceForm">Invoice Form</label>
+                    <input type="text" class="form-control" name="InvoiceForm" id="InvoiceForm" ng-model="EditItem.InvoiceForm" required/>
                 </div>
-                <div class="form-group col-md-6">
-                    <label class="control-label" for="Uom">UOM</label>
-                    <ui-select name="Uom" id="Uom" ng-model="EditItem.UomID">
-                        <ui-select-match>{{$select.selected.value.Code}}</ui-select-match>
-                        <ui-select-choices refresh="searchUoms($select)" refresh-delay="300" repeat="uom.value.ID as (key, uom) in SearchUoms">
-                            <div>{{uom.value.Code}}</div>
-                        </ui-select-choices>
-                    </ui-select>
+                <div class="form-group">
+                    <label class="control-label" for="InvoiceType">Invoice Type</label>
+                    <input type="text" class="form-control" name="InvoiceType" id="InvoiceType" ng-model="EditItem.InvoiceType" required/>
                 </div>
-            </div>    
-            <div class="form-group">
-                <label class="control-label" for="Description">Description</label>
-                <input type="text" class="form-control" name="Description" id="Description" ng-model="EditItem.Description" required/>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-6">
-                    <label class="control-label" for="Quantity">Quantity</label>
-                    <input class="form-control" name="Quantity" id="Quantity" ng-model="EditItem.Quantity" awnum="quantity"/>
-                </div>
-                <div class="form-group col-md-6">
-                    <label class="control-label" for="UnitPrice">Unit Price</label>
-                    <input class="form-control" name="UnitPrice" id="UnitPrice" ng-model="EditItem.UnitPrice" awnum="price"/>
-                </div>
-            </div>   
-            <div class="row">
-                <div class="form-group col-md-6">
-                    <label class="control-label" for="Vat">Vat</label>
-                    <select class="form-control" id="Vat" name="Vat" ng-model="EditItem.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes"/>
-                </div>
-                <div class="form-group col-md-6">
-                    <label class="control-label" for="Discount">Discount %</label>
-                    <input class="form-control" name="Discount" id="Discount" ng-model="EditItem.Discount" awnum="discount"/>
-                </div>
-            </div> 
-            <div class="row">
-                <div class="column col-md-6">
-                    <div class="form-group">
-                        <label class="control-label" for="Status">Status</label>
-                        <select class="form-control" id="Status" name="Status" ng-model="EditItem.Status" ng-options="s.Code as s.Name for s in Constants.Status"/>
+                <div class="row"> <!-- NumberForm = InvoiceType + "0" + "/" + NumberFormPart3 -->
+                     <div class="form-group col-xs-6">
+                        <label class="control-label" for="NumberForm2" >NumberForm</label>
+                        <input type="text" class="form-control" name="NumberForm2" id="NumberForm2" ng-model="EditItem.NumberForm2" required disabled/>
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <label class="control-label">&nbsp;</label>
+                        <input type="text" class="form-control" name="NumberForm3" id="NumberForm3" ng-model="EditItem.NumberForm3" required/>
                     </div>
                 </div>
-            </div>
+                <div class="row"> <!-- Symbol = SymbolPart1 + SymbolPart2 + InvoiceForm -->
+                    <div class="form-group col-xs-6">
+                        <label class="control-label" for="SymbolPart1">Symbol</label>
+                        <input type="text" class="form-control" name="SymbolPart1" id="SymbolPart1" ng-model="EditItem.SymbolPart1" required/>
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <label class="control-label">&nbsp;</label>
+                        <input type="text" class="form-control" name="SymbolPart2" id="SymbolPart2" ng-model="EditItem.SymbolPart2" required/>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" ng-click="viewReport()">View Report</button>
+            </div>    
         </form>
+    </div>
+    <div class="col-xs-9" id="reportviewer">
+
     </div>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" type="button" ng-click="ok(ItemMaintenanceForm)">OK</button>
+    <button class="btn btn-primary" type="button" ng-click="ok(FormTypeMaintenanceForm)">OK</button>
     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 </div>

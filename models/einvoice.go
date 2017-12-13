@@ -34,10 +34,15 @@ type EInvoice struct {
 	ProcessInvoiceStatus     int8            `db:"process_invoice_status"`
 	ProcessAdjustedForm      int8            `db:"process_adjusted_form"`
 	ProcessAdjustedType      int8            `db:"process_adjusted_type"`
-	Total                    decimal.Decimal `db:"total"`
+	TotalAmount              decimal.Decimal `db:"total_amount"`
+	TotalAmountNoVat         decimal.Decimal `db:"total_amount_no_vat"`
+	TotalAmountVat0          decimal.Decimal `db:"total_amount_vat0"`
+	TotalAmountVat5          decimal.Decimal `db:"total_amount_vat5"`
+	TotalAmountVat10         decimal.Decimal `db:"total_amount_vat10"`
 	TotalDiscount            decimal.Decimal `db:"total_discount"`
 	TotalVat5                decimal.Decimal `db:"total_vat5"`
 	TotalVat10               decimal.Decimal `db:"total_vat10"`
+	TotalVat                 decimal.Decimal `db:"total_vat"`
 	TotalOther               decimal.Decimal `db:"total_other"`
 	TotalPayment             decimal.Decimal `db:"total_payment"`
 	TotalPaymentWords        decimal.Decimal `db:"total_payment_words"`
