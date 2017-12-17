@@ -85,6 +85,19 @@ func InitRoutes() *mux.Router {
 			negroni.HandlerFunc(controllers.API_NumberSequence_Id),
 		))
 
+	//report api
+	api.Handle("/reports",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_Reports),
+		))
+
+	api.Handle("/report",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_Report_Code),
+		))
+
 	//eInvoiceFormType api
 	api.Handle("/einvoiceformtypes",
 		negroni.New(

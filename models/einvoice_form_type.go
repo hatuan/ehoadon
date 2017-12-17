@@ -48,6 +48,9 @@ var ErrEInvoiceFormNotSpecified = errors.New("EInvoice's InvoiceForm not specifi
 // ErrEInvoiceSymbolNotSpecified indicates there was no Symbol given by the user
 var ErrEInvoiceSymbolNotSpecified = errors.New("EInvoice's Symbol not specified")
 
+// ErrEInvoiceNumberFormDuplicate indicates there was duplicate of NumberForm given by the user
+var ErrEInvoiceNumberFormDuplicate = errors.New("EInvoiceFormType's NumberForm is duplicate")
+
 // ErrEInvoiceFormTypeFatal indicates there was fatal error
 var ErrEInvoiceFormTypeFatal = errors.New("EInvoiceFormType has fatal error")
 
@@ -70,6 +73,28 @@ func (c *EInvoiceFormType) Validate() map[string]InterfaceArray {
 	if c.Symbol == "" {
 		validationErrors["Symbol"] = append(validationErrors["Symbol"], ErrEInvoiceSymbolNotSpecified.Error())
 	}
+
+	if c.NumberForm != "" {
+		db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
+		if err != nil {
+			log.Error(err)
+			validationErrors["Fatal"] = append(validationErrors["Fatal"], ErrEInvoiceFormTypeFatal.Error())
+		}
+		defer db.Close()
+		var otherID string
+		ID := int64(0)
+		if c.ID != nil {
+			ID = *c.ID
+		}
+		err = db.Get(&otherID, "SELECT id FROM ehd_form_type WHERE number_form = $1 AND id != $2 AND client_id = $3", c.NumberForm, ID, c.ClientID)
+		if err != nil && err != sql.ErrNoRows {
+			log.Error(err)
+			validationErrors["Fatal"] = append(validationErrors["Fatal"], ErrEInvoiceFormTypeFatal.Error())
+		}
+		if otherID != "" && err != sql.ErrNoRows {
+			validationErrors["NumberForm"] = append(validationErrors["NumberForm"], ErrEInvoiceNumberFormDuplicate.Error())
+		}
+	}
 	return validationErrors
 }
 
@@ -86,7 +111,6 @@ func GetEInvoiceFormTypes(orgID int64, searchCondition string, infiniteScrolling
 		" user_modified.name as rec_modified_by_user, " +
 		" organization.name as organization " +
 		" FROM ehd_form_type " +
-		" INNER JOIN user_profile as user_created ON ehd_form_type.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_created ON ehd_form_type.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_form_type.rec_modified_by = user_modified.id " +
 		" INNER JOIN organization as organization ON ehd_form_type.organization_id = organization.id "
@@ -207,6 +231,7 @@ func PostEInvoiceFormType(postData EInvoiceFormType) (EInvoiceFormType, Transact
 			return EInvoiceFormType{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceFormTypeNotFound.Error()}}
 		}
 	}
+
 	postData, _ = GetEInvoiceFormTypeByID(*postData.ID)
 	return postData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Updated/Created successfully"}}
 }

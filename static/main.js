@@ -8,6 +8,8 @@ require.config({
 
     baseUrl: "",
 
+    urlArgs: "bust=" + (new Date()).getTime(),
+    
     // alias libraries paths
     paths: {
         'application-configuration': 'app/application-configuration',
@@ -55,6 +57,7 @@ require.config({
         'myApp.Capitalize': 'app/common/capitalize',
         'myApp.Search': 'app/common/directives/searchForm',
         'myApp.navBar': 'app/main/navBarController',
+        'reportService': 'app/common/services/reportService',
         'organizationsService': 'app/organization/organizationsService',
         'usersService': 'app/user/usersService',
         'myApp.autoComplete': 'app/common/directives/autoComplete',

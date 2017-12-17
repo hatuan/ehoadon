@@ -3,7 +3,7 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceFormTypeService', 'app/eInvoice/formTypeMaintenanceController'], function (angularAMD, $) {
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceFormTypeService', 'app/eInvoice/formTypeMaintenanceController', 'app/eInvoice/formTypeReportsController', 'app/eInvoice/formTypeViewReportController'], function (angularAMD, $) {
     var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceFormTypeService'];
 
     var einvoiceFormTypesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceFormTypeService) {
@@ -16,8 +16,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
 
             $scope.Search = "";
             $scope.isSearched = false;
-            $scope.SortExpression = "Code";
-            $scope.SortDirection = "ASC";
+            $scope.SortExpression = "rec_created_at";
+            $scope.SortDirection = "DESC";
             $scope.FetchSize = 100;
             $scope.CurrentPage = 1;
             $scope.PageSize = 9;
@@ -25,6 +25,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.Selection=[];
 
             $scope.searchConditionObjects = [];
+            /*
             $scope.searchConditionObjects.push({
                 ID: "ehd_form_type.code",
                 Name: "Code",
@@ -39,9 +40,10 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 ValueIn: "",
                 Value: ""
             });
-
+            */
             $scope.eInvoiceFormTypes = [];
             $scope.FilteredFormTypes = [];
+            $scope.selectReports = false;
             $scope.getFormTypes();
         };
 
@@ -93,6 +95,10 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.einvoiceFormTypesInquiryCompleted = function (response, status) {
             alertsService.RenderSuccessMessage(response.ReturnMessage);
             $scope.eInvoiceFormTypes = response.Data.eInvoiceFormTypes;
+            for (var i = 0, len = $scope.eInvoiceFormTypes.length; i < len; i++) {
+                $scope.eInvoiceFormTypes[i].RecCreated = new moment.unix($scope.eInvoiceFormTypes[i].RecCreated).toDate();
+                $scope.eInvoiceFormTypes[i].RecModified = new moment.unix($scope.eInvoiceFormTypes[i].RecModified).toDate();
+            }
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];
             $scope.FilteredFormTypes = [];
@@ -141,12 +147,78 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
-                
-            }, function() {
+
+                _formType = _result.EditFormType;
+                $scope.selectReports = _result.SelectReports;
+
+                if($scope.selectReports) {
+                    $scope.showSelectReports(_formType);
+                }
+
+            }, function(_result) {
                 //dismissed 
             })['finally'](function() {
                 modalInstance = undefined;
             });    
+        };
+
+        $scope.showSelectReports = function(_formType) {
+            var modalSelectReportInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                size:'lg',
+                templateUrl: 'app/eInvoice/formTypeReports.html',
+                controller: 'eInvoiceFormTypeReportsController',
+                resolve: {
+                    editFormType: function() {
+                        var __formType = $.extend({}, _formType);
+                        return __formType;
+                    }
+                }
+            });
+            modalSelectReportInstance.rendered.then(function(result) {
+                $('.modal .modal-body').css('overflow-y', 'auto');
+                $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
+                $('.modal .modal-body').css('height', $(window).height() * 0.7);
+                $('.modal .modal-body').css('margin-right', 0);
+            });
+            modalSelectReportInstance.result.then(function(_result) {
+                $scope.edit(_result.EditFormType);
+            }, function(_result) { //dismiss
+                $scope.edit(_result.EditFormType);
+            })['finally'](function() {
+                modalSelectReportInstance = undefined;
+                $scope.selectReports = false;
+            });
+        };
+        
+        $scope.viewReport = function(_formType) {
+            var modalViewReportInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                size:'lg',
+                templateUrl: 'app/eInvoice/formTypeViewReport.html',
+                controller: 'eInvoiceFormTypeViewReportController',
+                resolve: {
+                    editFormType: function() {
+                        var __formType = $.extend({}, _formType);
+                        return __formType;
+                    }
+                }
+            });
+            modalViewReportInstance.rendered.then(function(result) {
+                $('.modal .modal-body').css('overflow-y', 'auto');
+                $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
+                $('.modal .modal-body').css('height', $(window).height() * 0.7);
+                $('.modal .modal-body').css('margin-right', 0);
+            });
+            modalViewReportInstance.result.then(function(_result) {
+            }, function(_result) { //dismiss
+            })['finally'](function() {
+                modalViewReportInstance = undefined;
+            });
         };
     };
 

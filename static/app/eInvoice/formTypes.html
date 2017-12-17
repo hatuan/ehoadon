@@ -41,14 +41,14 @@
                                 <input type="checkbox" id="{{eInvoiceFormType.ID}}" value="{{eInvoiceFormType.ID}}" ng-checked="Selection.indexOf(eInvoiceFormType.ID) > -1"/>
                             </td>
                             <td><a ng-click="edit(eInvoiceFormType)">Edit</a></td>
-                            <td>{{eInvoiceFormType.RecCreated}}</td>
+                            <td>{{eInvoiceFormType.RecCreated | date:'dd/MM/yyyy'}}</td>
                             <td>
-                                <div ng-repeat="invFormType in Constants.InvoiceFormTypes|filter:{Code:eInvoiceFormType.InvoiceForm}">{{invFormType.Name}}</div>
+                                <div ng-repeat="invFormType in Constants.InvoiceForms|filter:{Code:eInvoiceFormType.InvoiceForm}">{{invFormType.Name}}</div>
                             </td>
                             <td>
-                                <div ng-repeat="invType in Constants.InvoiceTypes|filter:{Code:eInvoiceFormType.InvoiceType}">{{invFormType.invType}}</div>
+                                <div ng-repeat="invType in Constants.InvoiceTypes|filter:{Code:eInvoiceFormType.InvoiceType}">{{invType.Name}}</div>
                             </td>
-                            <td>{{eInvoiceFormType.NumberForm}}></td>
+                            <td>{{eInvoiceFormType.NumberForm}}</td>
                             <td>{{eInvoiceFormType.Symbol}}</td>
                             <td><a ng-click="viewReport(eInvoiceFormType)">View Report</a></td>
                         </tr>

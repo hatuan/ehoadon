@@ -20,13 +20,11 @@ define(['angular'], function (angular) {
             {Code : 5, Name : '5%' },
             {Code : 10, Name : '10%' },
         ],
-        InvoiceFormTypes: [
-            {Code : '', Name : 'All'},
+        InvoiceForms: [
             {Code : 'E', Name : 'HĐ Điện tử (TT32)'},
         ],
         //01GTKT : Hoa don GTGT, 02GTTT : Hoa don ban hang, 03XNKNB : Xuat kho noi bo , 04HGDL : Hang gui dai ly , 07KPTQ : Khu phi thue quan
         InvoiceTypes: [
-            {Code : '', Name : 'All'},
             {Code : '01GTKT', Name : 'Hóa đơn GTGT'},
             {Code : '02GTTT', Name : 'Hóa đơn bán hàng'},
         ],

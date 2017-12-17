@@ -7,39 +7,61 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
     var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editFormType'];
 
     var formTypeMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editFormType) {
-        $scope.Constants = Constants;
-        $scope.EditFormType = editFormType;
-      
-        if($scope.EditFormType.ID == null) {
-            
-            $scope.EditFormType.Status = $scope.Constants.Status[1].Code;
-            $scope.EditFormType.RecCreatedByID = $rootScope.currentUser.ID;
-            $scope.EditFormType.RecCreatedByUser = $rootScope.currentUser.Name;
-            $scope.EditFormType.RecCreated = new Date();
-            $scope.EditFormType.RecModifiedByID = $rootScope.currentUser.ID;
-            $scope.EditFormType.RecModifiedByUser = $rootScope.currentUser.Name;
-            $scope.EditFormType.RecModified = new Date();
-        } 
-        
+       
+        $scope.initializeController = function() {
+            $scope.Constants = Constants;
+            $scope.EditFormType = editFormType;
+          
+            if($scope.EditFormType.ID == null) {
+                $scope.EditFormType.ID = "";
+                $scope.EditFormType.InvoiceType = '';
+                $scope.EditFormType.NumberForm = '';
+                $scope.EditFormType.NumberForm2 = '0';
+                $scope.EditFormType.NumberForm3 = '';
+                $scope.EditFormType.InvoiceForm = '';
+                $scope.EditFormType.Symbol = ''; 
+                $scope.EditFormType.SymbolPart1 = '';
+                $scope.EditFormType.SymbolPart2 = ("" + (new Date()).getFullYear()).substring(2,4);
+                $scope.EditFormType.FormFileName = '';
+
+                $scope.EditFormType.Status = $scope.Constants.Status[1].Code;
+                $scope.EditFormType.RecCreatedByID = $rootScope.currentUser.ID;
+                $scope.EditFormType.RecCreatedByUser = $rootScope.currentUser.Name;
+                $scope.EditFormType.RecCreated = new Date();
+                $scope.EditFormType.RecModifiedByID = $rootScope.currentUser.ID;
+                $scope.EditFormType.RecModifiedByUser = $rootScope.currentUser.Name;
+                $scope.EditFormType.RecModified = new Date();
+            } else {
+                var indexOfslash = $scope.EditFormType.NumberForm.indexOf("/");
+                $scope.EditFormType.NumberForm2 = $scope.EditFormType.NumberForm.substring($scope.EditFormType.InvoiceType.length, indexOfslash);
+                $scope.EditFormType.NumberForm3 = $scope.EditFormType.NumberForm.substring(indexOfslash + 1);
+
+                indexOfslash = $scope.EditFormType.Symbol.indexOf("/");
+                $scope.EditFormType.SymbolPart1 = $scope.EditFormType.Symbol.substring(0, indexOfslash);
+                $scope.EditFormType.SymbolPart2 = $scope.EditFormType.Symbol.substring(indexOfslash + 1, $scope.EditFormType.Symbol.length - 1);
+            }
+
+            $scope.displayReport($scope.EditFormType.FormFileName, $scope.EditFormType.FormFile);
+        }
+
         $scope.validationOptions = {
             rules: {
-                "Code": {
-                    required: true,
-                    remote: {
-                        url: "api/check-unique",
-                        type: "post",
-                        data: {
-                            UserID: function() {
-                                return $rootScope.currentUser.ID
-                            },
-                            Table: "ehd_formType",
-                            RecID: function() {
-                                return $scope.EditFormType.ID
-                            }
-                        }
-                    }
+                "InvoiceType": {
+                    required: true
                 },
-                "Description": {
+                "NumberForm2": {
+                    required: true
+                },
+                "NumberForm3": {
+                    required: true
+                },
+                "SymbolPart1": {
+                    required: true
+                },
+                "SymbolPart2": {
+                    required: true
+                },
+                "InvoiceForm": {
                     required: true
                 },
             }
@@ -48,8 +70,12 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
         $scope.ok = function(form) {
             if (form.validate()) {
                 var _postFormType = new Object();
+                $scope.EditFormType.NumberForm3 = ("000" + $scope.EditFormType.NumberForm3).substring($scope.EditFormType.NumberForm3.length);
+                $scope.EditFormType.NumberForm = $scope.EditFormType.InvoiceType + $scope.EditFormType.NumberForm2 + "/" + $scope.EditFormType.NumberForm3;
+                $scope.EditFormType.Symbol = $scope.EditFormType.SymbolPart1 + "/" + $scope.EditFormType.SymbolPart2 + $scope.EditFormType.InvoiceForm;
 
-                if(editFormType.ID == null) {
+                if($scope.EditFormType.ID == "") {
+                    $scope.EditFormType.ID = null;
                     $scope.EditFormType.RecCreatedByID = $rootScope.currentUser.ID;
                     $scope.EditFormType.RecCreated = new Date();
                     $scope.EditFormType.RecModifiedByID = $rootScope.currentUser.ID;
@@ -63,9 +89,11 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
                     $scope.EditFormType.RecModified = new Date();
 
                     _postFormType = $scope.EditFormType;
+                    _postFormType.RecCreated = new moment($scope.EditFormType.RecCreated).unix();
                     _postFormType.RecModifiedByID = $rootScope.currentUser.ID;
                     _postFormType.RecModified = new moment($scope.EditFormType.RecModified).unix();
                 }
+                
                 eInvoiceFormTypeService.updateFormType(_postFormType, $scope.formTypeUpdateCompleted, $scope.formTypeUpdateError)
             }
         };
@@ -74,23 +102,28 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
             $uibModalInstance.dismiss('cancel');
         };
 
-        $scope.formTypeUpdateCompleted = function() {
+        $scope.formTypeUpdateCompleted = function(response, status) {
             var _result = new Object();
+            _result.SelectReports = false;
             _result.EditFormType = $scope.EditFormType;
+
             $uibModalInstance.close(_result);
         };
 
-        $scope.formTypeUpdateError = function() {
+        $scope.formTypeUpdateError = function(response, status) {
             alertsService.RenderErrorMessage(response.Error);
         };
 
-        var reportDesign = '';
-        $scope.viewReport = function() {
-            ajaxService.AjaxGet("/reports/01GTKT_001.mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction); 
-        };
+        $scope.displayReport = function(formFileName, formFile){
+            if(!angular.isUndefinedOrNull(formFile)) {
+                ajaxService.AjaxGet("/reports/invoice.json", $scope.getReportDataSuccessFunction, $scope.getReportDataErrorFunction);     
+            } else if(!angular.isUndefinedOrNull(formFileName)) {
+                ajaxService.AjaxGet("/reports/" + formFileName + ".mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction);
+            }
+        }
 
         $scope.getReportDesignSuccessFunction = function(response, status) {
-            reportDesign = response;
+            $scope.EditFormType.FormFile = response;
             ajaxService.AjaxGet("/reports/invoice.json", $scope.getReportDataSuccessFunction, $scope.getReportDataErrorFunction); 
         };
 
@@ -104,10 +137,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
 
             var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
             var report = new $window.Stimulsoft.Report.StiReport();
-            report.load(reportDesign);
+            report.load($scope.EditFormType.FormFile);
+            $scope.EditFormType.FormFile = report.saveToJsonString();
+            report.load($scope.EditFormType.FormFile);
             report.regData(dataSet.dataSetName, "", dataSet);
 
             viewer.options.toolbar.visible = false;
+            viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
+            viewer.options.toolbar.zoom = 50;
             viewer.options.appearance.scrollbarsMode = true;
             viewer.options.width = "100%";
             viewer.options.height = $("#modal-body").height() + "px";
@@ -118,6 +155,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
         $scope.getReportDataErrorFunction = function(response, status) {
             alertsService.RenderErrorMessage(response.Error); 
         }
+
+        $scope.selectReports = function() {
+            var _result = new Object();
+            _result.EditFormType = $scope.EditFormType;
+            _result.SelectReports = true;
+
+            $uibModalInstance.close(_result);
+        };
     };
 
     formTypeMaintenanceController.$inject = injectParams;

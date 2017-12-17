@@ -1,39 +1,48 @@
 <div class="modal-header">
     <h3 class="modal-title" id="modal-title" >Form Type Maintenance</h3>
 </div>
-<div class="modal-body row" id="modal-body">
+<div class="modal-body row" id="modal-body" ng-init="initializeController()">
     <div class="col-xs-3">
         <form id="FormTypeMaintenanceForm" name="FormTypeMaintenanceForm" role="form" ng-validate="validationOptions">
             <div class="col">
-                <div class="form-group">
-                    <label class="control-label" for="InvoiceForm">Invoice Form</label>
-                    <input type="text" class="form-control" name="InvoiceForm" id="InvoiceForm" ng-model="EditItem.InvoiceForm" required/>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="InvoiceType">Invoice Type</label>
-                    <input type="text" class="form-control" name="InvoiceType" id="InvoiceType" ng-model="EditItem.InvoiceType" required/>
-                </div>
-                <div class="row"> <!-- NumberForm = InvoiceType + "0" + "/" + NumberFormPart3 -->
-                     <div class="form-group col-xs-6">
-                        <label class="control-label" for="NumberForm2" >NumberForm</label>
-                        <input type="text" class="form-control" name="NumberForm2" id="NumberForm2" ng-model="EditItem.NumberForm2" required disabled/>
-                    </div>
-                    <div class="form-group col-xs-6">
-                        <label class="control-label">&nbsp;</label>
-                        <input type="text" class="form-control" name="NumberForm3" id="NumberForm3" ng-model="EditItem.NumberForm3" required/>
-                    </div>
-                </div>
-                <div class="row"> <!-- Symbol = SymbolPart1 + SymbolPart2 + InvoiceForm -->
-                    <div class="form-group col-xs-6">
-                        <label class="control-label" for="SymbolPart1">Symbol</label>
-                        <input type="text" class="form-control" name="SymbolPart1" id="SymbolPart1" ng-model="EditItem.SymbolPart1" required/>
-                    </div>
-                    <div class="form-group col-xs-6">
-                        <label class="control-label">&nbsp;</label>
-                        <input type="text" class="form-control" name="SymbolPart2" id="SymbolPart2" ng-model="EditItem.SymbolPart2" required/>
+                <div class="panel panel-default" >
+                    <div class="panel-heading">
+                        <span class="help-block text-muted small-font" > Invoice Form</span>
+                        <div class="form-group">
+                            <select class="form-control" id="InvoiceType" name="InvoiceType" ng-model="EditFormType.InvoiceType" ng-options="s.Code as s.Name for s in Constants.InvoiceTypes" style="margin-bottom:15px;" required>
+                                <option value="">--Select--</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-xs-6">
+                                <input type="text" class="form-control" name="NumberForm2" id="NumberForm2" ng-model="EditFormType.NumberForm2" required readonly capitalize/>
+                            </div>
+                            <div class="form-group col-xs-6">
+                                <input type="text" class="form-control" name="NumberForm3" id="NumberForm3" ng-model="EditFormType.NumberForm3" maxlength="3" required capitalize/>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary" ng-click="viewReport()">View Report</button>
+
+                <div class="panel panel-default" > <!-- Symbol = SymbolPart1 + SymbolPart2 + InvoiceForm -->
+                    <div class="panel-heading">
+                        <span class="help-block text-muted small-font" > Symbol</span>
+                        <div class="row" style="margin-bottom:15px;">
+                            <div class="form-group col-xs-6">
+                                <input type="text" class="form-control" name="SymbolPart1" id="SymbolPart1" ng-model="EditFormType.SymbolPart1" maxlength="2" required capitalize/>
+                            </div>
+                            <div class="form-group col-xs-6">
+                                <input type="text" class="form-control" name="SymbolPart2" id="SymbolPart2" ng-model="EditFormType.SymbolPart2" required readonly capitalize/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" id="InvoiceForm" name="InvoiceForm" ng-model="EditFormType.InvoiceForm" ng-options="s.Code as s.Name for s in Constants.InvoiceForms" required>
+                                <option value="">--Select --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" ng-click="selectReports()" ng-disabled="EditFormType.InvoiceType==undefined || EditFormType.InvoiceType==''" >Select Report</button>
             </div>    
         </form>
     </div>

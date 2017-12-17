@@ -84,6 +84,16 @@ select.custom::-ms-expand {
 }
 /******************************/
 
+span .small-font { font-size:9px; }
+
+.thumbnail .selected {
+    border: 2px solid black;
+}
+
+.thumbnail .no-selected {
+    border: 0px;
+}
+
 .signup-or-separator {
   position: relative;
   height: 34px;
