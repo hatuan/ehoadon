@@ -4,9 +4,9 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceFormReleaseService', 'app/eInvoice/formReleaseMaintenanceController'], function (angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceFormReleaseService'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$filter', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceFormReleaseService'];
 
-    var einvoiceFormReleasesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceFormReleaseService) {
+    var einvoiceFormReleasesController = function ($scope, $rootScope, $state, $filter, moment, $uibModal, alertsService, Constants, eInvoiceFormReleaseService) {
 
         $scope.initializeController = function () {
             $rootScope.applicationModule = "eInvoiceFormReleases";
@@ -93,7 +93,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $scope.eInvoiceFormReleases[i].StartDate = new moment.unix($scope.eInvoiceFormReleases[i].StartDate).toDate();
 
                 $scope.eInvoiceFormReleases[i].NumberFormDescription = $filter('filter')($scope.Constants.InvoiceTypes, {Code:$scope.eInvoiceFormReleases[i].FormTypeInvoiceType})[0].Name + " - " + $scope.eInvoiceFormReleases[i].FormTypeNumberForm + " - " + $scope.eInvoiceFormReleases[i].FormTypeSymbol;
-                $scope.eInvoiceFormReleases[i].NumberReleaseDescription = "Total Release : " +  $scope.eInvoiceFormReleases[i].ReleaseTotal + "(From : " + $scope.eInvoiceFormReleases[i].ReleaseForm + " - To : " + $scope.eInvoiceFormReleases[i].ReleaseTo + ")";
+                $scope.eInvoiceFormReleases[i].NumberReleaseDescription = "Total Release : " +  $scope.eInvoiceFormReleases[i].ReleaseTotal + " (From : " + $scope.eInvoiceFormReleases[i].ReleaseFrom + " - To : " + $scope.eInvoiceFormReleases[i].ReleaseTo + ")";
             }
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];

@@ -25,6 +25,16 @@
                 </div>
             </div>
             <div class="row">
+                <div class="form-group col-xs-6">
+                    <label class="control-label" for="ReleaseDate">Release Date </label>
+                    <input type="text" class="form-control" name="ReleaseDate" id="ReleaseDate" ng-model="EditFormRelease.ReleaseDate" required uib-datepicker-popup="dd/MM/yyyy"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label class="control-label" for="StartDate">Start Date</label>
+                    <input type="text" class="form-control" name="StartDate" id="StartDate" ng-model="EditFormRelease.StartDate" required uib-datepicker-popup="dd/MM/yyyy"/>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-xs-6">
                     <input type="radio" ng-model="EditFormRelease.TaxAuthoritiesStatus" value="0" name="TaxAuthoritiesStatusWait">
                     <label for="TaxAuthoritiesStatusWait"> Tax Authorities Wait </label>

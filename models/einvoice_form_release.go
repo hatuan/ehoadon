@@ -18,13 +18,13 @@ type EInvoiceFormRelease struct {
 	FormTypeInvoiceType  string     `db:"form_type_invoice_type"`
 	FormTypeNumberForm   string     `db:"form_type_number_form"`
 	FormTypeSymbol       string     `db:"form_type_symbol"`
-	ReleaseTotal         *int32     `db:"release_total" json:",string"`
-	ReleaseFrom          *int32     `db:"release_from" json:",string"`
-	ReleaseTo            *int32     `db:"release_to" json:",string"`
-	ReleaseUsed          *int32     `db:"release_used" json:",string"`
+	ReleaseTotal         int32      `db:"release_total"`
+	ReleaseFrom          int32      `db:"release_from"`
+	ReleaseTo            int32      `db:"release_to"`
+	ReleaseUsed          int32      `db:"release_used"`
 	ReleaseDate          *Timestamp `db:"release_date"`
 	StartDate            *Timestamp `db:"start_date"`
-	TaxAuthoritiesStatus int8       `db:"tax_authorities_status"`
+	TaxAuthoritiesStatus int8       `db:"tax_authorities_status" json:",string"`
 	RecCreatedByID       int64      `db:"rec_created_by" json:",string"`
 	RecCreatedByUser     string     `db:"rec_created_by_user"`
 	RecCreated           *Timestamp `db:"rec_created_at"`
@@ -72,15 +72,17 @@ func (c *EInvoiceFormRelease) Validate() map[string]InterfaceArray {
 	if c.FormTypeID == nil {
 		validationErrors["FormTypeID"] = append(validationErrors["FormTypeID"], ErrEInvoiceFormReleaseFormTypeNotSpecified.Error())
 	}
-	if c.ReleaseTotal == nil {
-		validationErrors["ReleaseTotal"] = append(validationErrors["ReleaseTotal"], ErrEInvoicFormReleaseReleaseTotalNotSpecified.Error())
-	}
-	if c.ReleaseFrom == nil {
-		validationErrors["ReleaseFrom"] = append(validationErrors["NumberForm"], ErrEInvoiceFormReleaseReleaseFromNotSpecified.Error())
-	}
-	if c.ReleaseTo == nil {
-		validationErrors["ReleaseTo"] = append(validationErrors["ReleaseTo"], ErrEInvoiceFormReleaseReleaseToNotSpecified.Error())
-	}
+	/*
+		if c.ReleaseTotal == nil {
+			validationErrors["ReleaseTotal"] = append(validationErrors["ReleaseTotal"], ErrEInvoicFormReleaseReleaseTotalNotSpecified.Error())
+		}
+		if c.ReleaseFrom == nil {
+			validationErrors["ReleaseFrom"] = append(validationErrors["NumberForm"], ErrEInvoiceFormReleaseReleaseFromNotSpecified.Error())
+		}
+		if c.ReleaseTo == nil {
+			validationErrors["ReleaseTo"] = append(validationErrors["ReleaseTo"], ErrEInvoiceFormReleaseReleaseToNotSpecified.Error())
+		}
+	*/
 	if c.ReleaseDate == nil {
 		validationErrors["ReleaseDate"] = append(validationErrors["ReleaseDate"], ErrEInvoiceFormReleaseReleaseDateNotSpecified.Error())
 	}
@@ -205,13 +207,13 @@ func PostEInvoiceFormRelease(postData EInvoiceFormRelease) (EInvoiceFormRelease,
 		postData.ID = &id
 	} else {
 		stmt, _ := db.PrepareNamed("UPDATE ehd_form_release SET " +
-			" form_type_id = :form_type_id, " +
+			" form_type_id 	= :form_type_id, " +
 			" release_total = :release_total, " +
-			" release_from = :release_from, " +
-			" release_to = :release_to, " +
-			" release_used = :release_used, " +
-			" release_date = :release_date, " +
-			" start_date = :start_date, " +
+			" release_from 	= :release_from, " +
+			" release_to 	= :release_to, " +
+			" release_used 	= :release_used, " +
+			" release_date 	= :release_date, " +
+			" start_date 	= :start_date, " +
 			" tax_authorities_status = :tax_authorities_status, " +
 			" status		= :status, " +
 			" version		= :version + 1, " +

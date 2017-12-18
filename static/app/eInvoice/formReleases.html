@@ -45,7 +45,7 @@
                             <td>{{eInvoiceFormRelease.NumberFormDescription}}</td>
                             <td>{{eInvoiceFormRelease.NumberReleaseDescription}}</td>
                             <td>
-                                <div ng-repeat="status in Constants.TaxAuthoritiesStatus|filter:{Code:eInvoiceFormRelease.Status}">{{status.Name}}</div>
+                                <div ng-repeat="status in Constants.TaxAuthoritiesStatus|filter:{Code:eInvoiceFormRelease.TaxAuthoritiesStatus}">{{status.Name}}</div>
                             </td>
                         </tr>
                     </tbody>

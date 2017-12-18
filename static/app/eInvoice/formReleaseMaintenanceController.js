@@ -21,8 +21,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
                 $scope.EditFormRelease.ReleaseFrom = 0; 
                 $scope.EditFormRelease.ReleaseTo = 0;
                 $scope.EditFormRelease.ReleaseUsed = 0;
-                $scope.EditFormRelease.ReleaseDate = new Date();
-                $scope.EditFormRelease.StartDate = null;
+                $scope.EditFormRelease.ReleaseDate = new moment().toDate();
+                $scope.EditFormRelease.StartDate = new moment().add(1, 'M').toDate();
                 $scope.EditFormRelease.TaxAuthoritiesStatus = "0";
 
                 $scope.EditFormRelease.Status = $scope.Constants.Status[1].Code;
