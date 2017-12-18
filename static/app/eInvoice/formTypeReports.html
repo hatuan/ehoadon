@@ -2,11 +2,12 @@
     <h3 class="modal-title" id="modal-title" >Report Select</h3>
 </div>
 <div class="modal-body row" id="modal-body" ng-init="initializeController()">
-    <div class="col-xs-6 col-md-3 col" ng-repeat="report in Reports" ng-click="$parent.ReportFile=report.ReportFile">
+    <div class="col-xs-6 col-md-3 col" ng-repeat="report in Reports" ng-click="$parent.ReportFile=report.ReportFile" align="center">
         <a class="thumbnail">
             <img src="/reports/{{report.ReportFile}}.png" alt="{{report.ReportFile}}" ng-class="{selected: $parent.ReportFile==report.ReportFile}">
         </a>
-        <input type="radio" ng-model="$parent.ReportFile" value="{{report.ReportFile}}" name="reportFile"> {{report.ReportFile}}</input> <!--Because ng-repeat creates its own scope use $parent.ReportFile -->
+        <label for="reportFile">{{report.ReportFile}} </label>
+        <input type="radio" ng-model="$parent.ReportFile" value="{{report.ReportFile}}" name="reportFile"><!--Because ng-repeat creates its own scope use $parent.ReportFile -->
     </div>
 </div>
 <div class="modal-footer">

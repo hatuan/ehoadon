@@ -186,7 +186,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             modalSelectReportInstance.result.then(function(_result) {
                 $scope.edit(_result.EditFormType);
             }, function(_result) { //dismiss
-                $scope.edit(_result.EditFormType);
+                $scope.edit(_formType);
             })['finally'](function() {
                 modalSelectReportInstance = undefined;
                 $scope.selectReports = false;

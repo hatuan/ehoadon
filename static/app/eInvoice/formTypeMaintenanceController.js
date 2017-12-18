@@ -42,7 +42,21 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
             }
 
             $scope.displayReport($scope.EditFormType.FormFileName, $scope.EditFormType.FormFile);
-        }
+        };
+
+        $scope.$watch(function(scope) {
+            var _numberForm3 = ("000" + scope.EditFormType.NumberForm3).substring(scope.EditFormType.NumberForm3.length);
+            var _return = scope.EditFormType.InvoiceType + scope.EditFormType.NumberForm2 + "/" + _numberForm3; 
+            return _return; 
+        }, function(newValue, oldValue) {
+            $scope.EditFormType.NumberForm = newValue;
+        });
+
+        $scope.$watch(function(scope) {
+            return scope.EditFormType.SymbolPart1 + "/" + scope.EditFormType.SymbolPart2 + scope.EditFormType.InvoiceForm; 
+        }, function(newValue, oldValue, scope) {
+            scope.EditFormType.Symbol = newValue;
+        });
 
         $scope.validationOptions = {
             rules: {
