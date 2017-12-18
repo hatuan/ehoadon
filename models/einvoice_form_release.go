@@ -17,7 +17,6 @@ type EInvoiceFormRelease struct {
 	FormTypeID           *int64     `db:"form_type_id" json:",string"`
 	FormTypeInvoiceType  string     `db:"form_type_invoice_type"`
 	FormTypeNumberForm   string     `db:"form_type_number_form"`
-	FormTypeInvoiceForm  string     `db:"form_type_invoice_form"`
 	FormTypeSymbol       string     `db:"form_type_symbol"`
 	ReleaseTotal         *int32     `db:"release_total" json:",string"`
 	ReleaseFrom          *int32     `db:"release_from" json:",string"`
@@ -100,14 +99,17 @@ func GetEInvoiceFormReleases(orgID int64, searchCondition string, infiniteScroll
 	defer db.Close()
 
 	sqlString := "SELECT ehd_form_release.*, " +
+		" ehd_form_type.invoice_type as form_type_invoice_type, " +
+		" ehd_form_type.number_form as form_type_number_form, " +
+		" ehd_form_type.symbol as form_type_symbol, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
 		" organization.name as organization " +
 		" FROM ehd_form_release " +
 		" INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id " +
-		" INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_form_release.rec_modified_by = user_modified.id " +
-		" INNER JOIN organization as organization ON ehd_form_release.organization_id = organization.id "
+		" INNER JOIN organization as organization ON ehd_form_release.organization_id = organization.id " +
+		" INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "
 
 	sqlWhere := " WHERE ehd_form_release.organization_id = $1"
 	if len(searchCondition) > 0 {
@@ -247,6 +249,9 @@ func GetEInvoiceFormReleaseByID(id int64) (EInvoiceFormRelease, TransactionalInf
 
 	getData := EInvoiceFormRelease{}
 	err = db.Get(&getData, "SELECT ehd_form_release.*, "+
+		" ehd_form_type.invoice_type as form_type_invoice_type, "+
+		" ehd_form_type.number_form as form_type_number_form, "+
+		" ehd_form_type.symbol as form_type_symbol, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" organization.name as organization "+
@@ -254,6 +259,7 @@ func GetEInvoiceFormReleaseByID(id int64) (EInvoiceFormRelease, TransactionalInf
 		"		INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_form_release.rec_modified_by = user_modified.id "+
 		"		INNER JOIN organization as organization ON ehd_form_release.organization_id = organization.id "+
+		" 		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
 		"	WHERE ehd_form_release.id=$1", id)
 	if err != nil && err == sql.ErrNoRows {
 		return EInvoiceFormRelease{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceFormReleaseNotFound.Error()}}
@@ -264,9 +270,9 @@ func GetEInvoiceFormReleaseByID(id int64) (EInvoiceFormRelease, TransactionalInf
 	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
 
-// GetEInvoiceFormReleaseByCode returns the EInvoiceFormRelease that the given id corresponds to.
+// GetEInvoiceFormReleaseByMaxReleaseTo returns the EInvoiceFormRelease that the given id corresponds to.
 // If no EInvoiceFormRelease is found, an error is thrown.
-func GetEInvoiceFormReleaseByCode(code string, orgID int64) (EInvoiceFormRelease, TransactionalInformation) {
+func GetEInvoiceFormReleaseByMaxReleaseTo(formTypeID int64) (EInvoiceFormRelease, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -274,10 +280,15 @@ func GetEInvoiceFormReleaseByCode(code string, orgID int64) (EInvoiceFormRelease
 	}
 	defer db.Close()
 
-	org, _ := GetOrganizationByID(orgID)
-
 	getData := EInvoiceFormRelease{}
-	err = db.Get(&getData, "SELECT ehd_form_release.*, "+
+	err = db.Get(&getData, "WITH last_form_release AS ("+
+		" 	SELECT form_type_id, COALESCE(MAX(release_to), 0) as release_to "+
+		" 	FROM ehd_form_release "+
+		" 	GROUP BY form_type_id )"+
+		" SELECT ehd_form_release.*, "+
+		" ehd_form_type.invoice_type as form_type_invoice_type, "+
+		" ehd_form_type.number_form as form_type_number_form, "+
+		" ehd_form_type.symbol as form_type_symbol, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" organization.name as organization "+
@@ -285,7 +296,9 @@ func GetEInvoiceFormReleaseByCode(code string, orgID int64) (EInvoiceFormRelease
 		"		INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_form_release.rec_modified_by = user_modified.id "+
 		"		INNER JOIN organization as organization ON ehd_form_release.organization_id = organization.id "+
-		"	WHERE ehd_form_release.code=$1 and ehd_form_release.client_id=$2", code, org.ClientID)
+		" 		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
+		" 		INNER JOIN last_form_release as last_form_release ON ehd_form_release.form_type_id = last_form_release.form_type_id "+
+		"	WHERE ehd_form_release.form_type_id=$1 ", formTypeID)
 
 	if err != nil && err == sql.ErrNoRows {
 		return EInvoiceFormRelease{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceFormReleaseNotFound.Error()}}

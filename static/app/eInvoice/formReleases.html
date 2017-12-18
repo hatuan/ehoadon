@@ -1,0 +1,62 @@
+<div ng-init="initializeController()">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-sm-8">
+                <h2 class="pull-left">
+                    Danh sách phát hành hóa đơn
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="btn-toolbar margin-bottom-15" role="toolbar" aria-label="Toolbar">
+        <div class="btn-group" role="group" aria-label="First group">
+            <a class="btn btn-default" role="button" id="btn-toolbar-refresh" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></a>
+            <a class="btn btn-default" role="button" id="btn-toolbar-add" ng-click="edit()"><span class="glyphicon glyphicon-plus"></span></a>
+            <a class="btn btn-default" role="button" id="btn-toolbar-search" ng-class="{'active':Search!=''}" aria-pressed="Search!=''"  ng-click="showSearch()"><span class="glyphicon glyphicon-search"></span></a>
+            <a class="btn btn-default" role="button" id="btn-toolbar-delete" ng-click="delete()"><span class="glyphicon glyphicon-remove"></span></a>
+            <a class="btn btn-default" role="button" id="btn-toolbar-check-all" ng-click="selectAll()"><span class="glyphicon glyphicon-ok"></span></a>
+            <a class="btn btn-default" role="button" id="btn-toolbar-help"><span class="glyphicon glyphicon-question-sign"></span></a>
+        </div>
+    </div>
+    <div class="margin-bottom-15" uib-collapse="!isSearched">
+		<div class="well" search-form search-condition-objects="searchConditionObjects" search-callback="getCustomers(param)"/>
+	</div>
+    <div class="row">
+        <div class="col-md-12 margin-bottom-15">
+            <div class="table-responsive constrained">
+                <table class="table table-bordered table-striped" style="table-layout: fixed;">
+                    <thead>
+                        <th class="col-md-1" style="text-align: center"></th>
+                        <th class="col-md-1" style="text-align: center"></th>
+                        <th class="col-md-1">Date Release</th>
+                        <th class="col-md-1">Date Start</th>
+                        <th class="col-md-3">Number Form</th>
+                        <th class="col-md-3">Number Release</th>
+                        <th class="col-md-2">Status</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="eInvoiceFormRelease in (FilteredItems = (eInvoiceFormReleases|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
+                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceFormRelease.ID)">
+                                <input type="checkbox" id="{{eInvoiceFormRelease.ID}}" value="{{eInvoiceFormRelease.ID}}" ng-checked="Selection.indexOf(eInvoiceFormRelease.ID) > -1"/>
+                            </td>
+                            <td><a ng-click="edit(eInvoiceFormRelease)">Edit</a></td>
+                            <td>{{eInvoiceFormRelease.ReleaseDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{eInvoiceFormRelease.StartDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{eInvoiceFormRelease.NumberFormDescription}}</td>
+                            <td>{{eInvoiceFormRelease.NumberReleaseDescription}}</td>
+                            <td>
+                                <div ng-repeat="status in Constants.TaxAuthoritiesStatus|filter:{Code:eInvoiceFormRelease.Status}">{{status.Name}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <ul uib-pagination class="margin-bottom-15" total-items="TotalRows" ng-model="CurrentPage" items-per-page='PageSize'></ul>
+    <div class="margin-bottom-15">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">
+            <div ng-bind-html="MessageBox"></div>
+        </alert>
+    </div>
+</div>

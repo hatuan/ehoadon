@@ -124,6 +124,11 @@ func InitRoutes() *mux.Router {
 			negroni.HandlerFunc(controllers.API_eInvoiceFormRelease_Id),
 		))
 
+	api.Handle("/einvoiceformrelease_max_release_to",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_eInvoiceFormRelease_MaxReleaseTo),
+		))
 	//eInvoiceCustomer api
 	api.Handle("/einvoicecustomers",
 		negroni.New(

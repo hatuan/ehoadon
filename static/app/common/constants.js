@@ -28,5 +28,9 @@ define(['angular'], function (angular) {
             {Code : '01GTKT', Name : 'Hóa đơn GTGT'},
             {Code : '02GTTT', Name : 'Hóa đơn bán hàng'},
         ],
+        TaxAuthoritiesStatus: [
+            {Code : 0, Name : 'Chờ phát hành'},
+            {Code : 1, Name : 'Đã phát hành'},
+        ],
     })
 });

@@ -1,0 +1,43 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title" >Form Release Maintenance</h3>
+</div>
+<div class="modal-body row" id="modal-body" ng-init="initializeController()">
+    <div class="col-xs-12">
+        <form id="FormReleaseMaintenanceForm" name="FormReleaseMaintenanceForm" role="form" ng-validate="validationOptions">
+            <div class="form-group">
+                <label class="control-label" for="FormNumber">Form Number</label>
+                <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditFormRelease.FormTypeID" ng-options="s.ID as s.Name for s in eInvoiceFormTypes" required>
+                    <option value="">--Select --</option>
+                </select>
+            </div>
+            <div class="row">
+                <div class="form-group col-xs-4">
+                    <label class="control-label" for="ReleaseTotal">Release Total</label>
+                    <input type="text" class="form-control" name="ReleaseTotal" id="ReleaseTotal" ng-model="EditFormRelease.ReleaseTotal" required awnum="quantity"/>
+                </div>
+                <div class="form-group col-xs-4">
+                    <label class="control-label" for="ReleaseFrom">Release From</label>
+                    <input type="text" class="form-control" name="ReleaseFrom" id="ReleaseFrom" ng-model="EditFormRelease.ReleaseFrom" readonly required awnum="quantity"/>
+                </div>
+                <div class="form-group col-xs-4">
+                    <label class="control-label" for="ReleaseTo">Release To</label>
+                    <input type="text" class="form-control" name="ReleaseTo" id="ReleaseTo" ng-model="EditFormRelease.ReleaseTo" readonly required awnum="quantity"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <input type="radio" ng-model="EditFormRelease.TaxAuthoritiesStatus" value="0" name="TaxAuthoritiesStatusWait">
+                    <label for="TaxAuthoritiesStatusWait"> Tax Authorities Wait </label>
+                </div>
+                <div class="col-xs-6">
+                    <input type="radio" ng-model="EditFormRelease.TaxAuthoritiesStatus" value="1" name="TaxAuthoritiesStatusOk">
+                    <label for="TaxAuthoritiesStatusOk"> Tax Authorities Ok </label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok(FormReleaseMaintenanceForm)">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

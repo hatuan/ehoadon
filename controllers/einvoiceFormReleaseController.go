@@ -107,3 +107,20 @@ func API_eInvoiceFormRelease_Id(w http.ResponseWriter, r *http.Request, next htt
 		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoiceFormRelease": getData}, IsAuthenticated: true}, http.StatusOK)
 	}
 }
+
+func API_eInvoiceFormRelease_MaxReleaseTo(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	switch {
+	case r.Method == "GET":
+		FormTypeID, err := strconv.ParseInt(r.URL.Query().Get("FormTypeID"), 10, 64)
+		if err != nil {
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{ErrIDParameterNotFound.Error()}, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormRelease": models.EInvoiceFormRelease{}}}, http.StatusBadRequest)
+			return
+		}
+		getData, tranInfo := models.GetEInvoiceFormReleaseByMaxReleaseTo(FormTypeID)
+		if !tranInfo.ReturnStatus {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormRelease": models.EInvoiceFormRelease{}}}, http.StatusBadRequest)
+			return
+		}
+		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoiceFormRelease": getData}, IsAuthenticated: true}, http.StatusOK)
+	}
+}
