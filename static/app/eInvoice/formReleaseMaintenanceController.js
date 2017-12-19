@@ -36,32 +36,19 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
                 
             }
 
+            $.validator.addMethod("validStartDate", function(value, element, params) {
+                if (this.optional(element))
+                    return true;
+                return $scope.validStartDate(value);
+              }, "Please specify the correct StartDate");
+
             $scope.getInvoiceForms();
         };
 
         $scope.$watch(function(scope) {
             return scope.EditFormRelease.ReleaseTotal; 
         }, function(newValue, oldValue) {
-            //Update ReleaseFrom, ReleaseTo
-            if ($scope.EditFormRelease.FormTypeID == '' || angular.isUndefinedOrNull($scope.EditFormRelease.FormTypeID))
-                return;
-
-            var eInvoiceFormReleaseInquiry = new Object();
-            eInvoiceFormReleaseInquiry.FormTypeID = $scope.EditFormRelease.FormTypeID;
-            eInvoiceFormReleaseService.getFormReleaseByMaxReleaseTo(eInvoiceFormReleaseInquiry,
-                function (response, status) { //success
-                    var _eInvoiceFormRelease = response.Data.eInvoiceFormRelease;
-
-                    if (angular.isUndefinedOrNull(_eInvoiceFormRelease.ReleaseTo))
-                        _eInvoiceFormRelease.ReleaseTo = 0;
-
-                    $scope.EditFormRelease.ReleaseFrom = _eInvoiceFormRelease.ReleaseTo + 1;
-                    $scope.EditFormRelease.ReleaseTo = $scope.EditFormRelease.ReleaseFrom + newValue;
-                }, 
-                function (response, status) { //fail
-                    $scope.EditFormRelease.ReleaseFrom = 1;
-                    $scope.EditFormRelease.ReleaseTo = $scope.EditFormRelease.ReleaseFrom + newValue;
-                });
+            $scope.EditFormRelease.ReleaseTo = $scope.EditFormRelease.ReleaseFrom + newValue;
         });
 
         $scope.validationOptions = {
@@ -70,15 +57,37 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
                     required: true
                 },
                 "ReleaseTotal": {
-                    required: true
+                    required: true,
+                    min: 1,
+                    number: true
                 },
                 "ReleaseFrom": {
-                    required: true
+                    required: true,
+                    min: 1,
+                    number: true
                 },
                 "ReleaseTo": {
-                    required: true
+                    required: true,
+                    min: 1,
+                    number: true
                 },
+                "ReleaseDate": {
+                    required: true,
+                    date: true
+                },
+                "StartDate": {
+                    required: true,
+                    date: true,
+                    validStartDate: true
+                }
             }
+        };
+
+        $scope.validStartDate = function(value) {
+            var _startDate = new moment($scope.EditFormRelease.StartDate);
+            var _validDate = new moment($scope.EditFormRelease.ReleaseDate).add(1, 'M');
+
+            return _startDate >= _validDate;
         };
 
         $scope.ok = function(form) {
@@ -146,6 +155,34 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
         $scope.einvoiceFormTypesInquiryError = function(response, status) {
             alertsService.RenderErrorMessage(response.Error);
         };
+
+        $scope.updateFormType = function() {
+            $scope.updateReleaseFrom();
+        };
+
+        $scope.updateReleaseFrom = function() {
+            if (!angular.isUndefinedOrNull($scope.EditFormRelease.ID)) return; //if Edit don't allow change ReleaseFrom
+            
+            var eInvoiceFormReleaseInquiry = new Object();
+            eInvoiceFormReleaseInquiry.ID = 0; //angular.isUndefinedOrNull($scope.EditFormRelease.ID) ? 0 : $scope.EditFormRelease.ID;
+            eInvoiceFormReleaseInquiry.FormTypeID = $scope.EditFormRelease.FormTypeID;
+
+            eInvoiceFormReleaseService.getFormReleaseByMaxReleaseTo(eInvoiceFormReleaseInquiry,
+                function (response, status) { //success
+                    var _releaseTo = response.Data.ReleaseTo;
+
+                    if (angular.isUndefinedOrNull(_releaseTo)) 
+                        _releaseTo = 0;
+
+                    $scope.EditFormRelease.ReleaseFrom = _releaseTo + 1;
+                    $scope.EditFormRelease.ReleaseTo = $scope.EditFormRelease.ReleaseFrom + $scope.EditFormRelease.ReleaseTotal;
+                }, 
+                function (response, status) { //fail
+                    alertsService.RenderErrorMessage(response.Error);
+                    $scope.EditFormRelease.ReleaseFrom = 0;
+                    $scope.EditFormRelease.ReleaseTo = 0;
+                });
+        }
     };
 
     formReleaseMaintenanceController.$inject = injectParams;

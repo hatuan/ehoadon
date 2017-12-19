@@ -6,9 +6,19 @@
         <form id="FormReleaseMaintenanceForm" name="FormReleaseMaintenanceForm" role="form" ng-validate="validationOptions">
             <div class="form-group">
                 <label class="control-label" for="FormNumber">Form Number</label>
-                <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditFormRelease.FormTypeID" ng-options="s.ID as s.Name for s in eInvoiceFormTypes" required>
+                <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditFormRelease.FormTypeID" ng-options="s.ID as s.Name for s in eInvoiceFormTypes" ng-change="updateFormType()" required>
                     <option value="">--Select --</option>
                 </select>
+            </div>
+            <div class="row">
+                <div class="form-group col-xs-6">
+                    <label class="control-label" for="ReleaseDate">Release Date </label>
+                    <input type="text" class="form-control" name="ReleaseDate" id="ReleaseDate" ng-model="EditFormRelease.ReleaseDate" required uib-datepicker-popup="dd/MM/yyyy"/>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label class="control-label" for="StartDate">Start Date</label>
+                    <input type="text" class="form-control" name="StartDate" id="StartDate" ng-model="EditFormRelease.StartDate" required uib-datepicker-popup="dd/MM/yyyy"/>
+                </div>
             </div>
             <div class="row">
                 <div class="form-group col-xs-4">
@@ -22,16 +32,6 @@
                 <div class="form-group col-xs-4">
                     <label class="control-label" for="ReleaseTo">Release To</label>
                     <input type="text" class="form-control" name="ReleaseTo" id="ReleaseTo" ng-model="EditFormRelease.ReleaseTo" readonly required awnum="quantity"/>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-xs-6">
-                    <label class="control-label" for="ReleaseDate">Release Date </label>
-                    <input type="text" class="form-control" name="ReleaseDate" id="ReleaseDate" ng-model="EditFormRelease.ReleaseDate" required uib-datepicker-popup="dd/MM/yyyy"/>
-                </div>
-                <div class="form-group col-xs-6">
-                    <label class="control-label" for="StartDate">Start Date</label>
-                    <input type="text" class="form-control" name="StartDate" id="StartDate" ng-model="EditFormRelease.StartDate" required uib-datepicker-popup="dd/MM/yyyy"/>
                 </div>
             </div>
             <div class="row">

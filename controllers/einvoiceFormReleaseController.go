@@ -111,16 +111,23 @@ func API_eInvoiceFormRelease_Id(w http.ResponseWriter, r *http.Request, next htt
 func API_eInvoiceFormRelease_MaxReleaseTo(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	switch {
 	case r.Method == "GET":
+		ID, err := strconv.ParseInt(r.URL.Query().Get("ID"), 10, 64)
+		if err != nil {
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{ErrIDParameterNotFound.Error()}, IsAuthenticated: true, Data: map[string]interface{}{}}, http.StatusBadRequest)
+			return
+		}
+
 		FormTypeID, err := strconv.ParseInt(r.URL.Query().Get("FormTypeID"), 10, 64)
 		if err != nil {
-			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{ErrIDParameterNotFound.Error()}, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormRelease": models.EInvoiceFormRelease{}}}, http.StatusBadRequest)
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{ErrIDParameterNotFound.Error()}, IsAuthenticated: true, Data: map[string]interface{}{}}, http.StatusBadRequest)
 			return
 		}
-		getData, tranInfo := models.GetEInvoiceFormReleaseByMaxReleaseTo(FormTypeID)
+
+		getData, tranInfo := models.GetEInvoiceFormReleaseByMaxReleaseTo(ID, FormTypeID)
 		if !tranInfo.ReturnStatus {
-			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormRelease": models.EInvoiceFormRelease{}}}, http.StatusBadRequest)
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{}}, http.StatusBadRequest)
 			return
 		}
-		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoiceFormRelease": getData}, IsAuthenticated: true}, http.StatusOK)
+		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"ReleaseTo": getData}, IsAuthenticated: true}, http.StatusOK)
 	}
 }

@@ -274,39 +274,24 @@ func GetEInvoiceFormReleaseByID(id int64) (EInvoiceFormRelease, TransactionalInf
 
 // GetEInvoiceFormReleaseByMaxReleaseTo returns the EInvoiceFormRelease that the given id corresponds to.
 // If no EInvoiceFormRelease is found, an error is thrown.
-func GetEInvoiceFormReleaseByMaxReleaseTo(formTypeID int64) (EInvoiceFormRelease, TransactionalInformation) {
+func GetEInvoiceFormReleaseByMaxReleaseTo(id int64, formTypeID int64) (int64, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
-		return EInvoiceFormRelease{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+		return 0, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 	}
 	defer db.Close()
 
-	getData := EInvoiceFormRelease{}
-	err = db.Get(&getData, "WITH last_form_release AS ("+
-		" 	SELECT form_type_id, COALESCE(MAX(release_to), 0) as release_to "+
+	var getData int64
+	err = db.Get(&getData, "SELECT COALESCE(MAX(release_to), 0) as release_to "+
 		" 	FROM ehd_form_release "+
-		" 	GROUP BY form_type_id )"+
-		" SELECT ehd_form_release.*, "+
-		" ehd_form_type.invoice_type as form_type_invoice_type, "+
-		" ehd_form_type.number_form as form_type_number_form, "+
-		" ehd_form_type.symbol as form_type_symbol, "+
-		" user_created.name as rec_created_by_user, "+
-		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization "+
-		"	FROM ehd_form_release "+
-		"		INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id "+
-		"		INNER JOIN user_profile as user_modified ON ehd_form_release.rec_modified_by = user_modified.id "+
-		"		INNER JOIN organization as organization ON ehd_form_release.organization_id = organization.id "+
-		" 		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
-		" 		INNER JOIN last_form_release as last_form_release ON ehd_form_release.form_type_id = last_form_release.form_type_id "+
-		"	WHERE ehd_form_release.form_type_id=$1 ", formTypeID)
+		" 	WHERE ehd_form_release.form_type_id = $1", formTypeID)
 
-	if err != nil && err == sql.ErrNoRows {
-		return EInvoiceFormRelease{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceFormReleaseNotFound.Error()}}
-	} else if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		log.Error(err)
-		return EInvoiceFormRelease{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+		return 0, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	} else if err == sql.ErrNoRows {
+		return 0, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 	}
 	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
