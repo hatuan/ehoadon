@@ -22,7 +22,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
                 $scope.EditFormRelease.ReleaseTo = 0;
                 $scope.EditFormRelease.ReleaseUsed = 0;
                 $scope.EditFormRelease.ReleaseDate = new moment().toDate();
-                $scope.EditFormRelease.StartDate = new moment().add(1, 'M').toDate();
+                $scope.EditFormRelease.StartDate = new moment().add(2, 'days').toDate();
                 $scope.EditFormRelease.TaxAuthoritiesStatus = "0";
 
                 $scope.EditFormRelease.Status = $scope.Constants.Status[1].Code;
@@ -85,7 +85,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
 
         $scope.validStartDate = function(value) {
             var _startDate = new moment($scope.EditFormRelease.StartDate);
-            var _validDate = new moment($scope.EditFormRelease.ReleaseDate).add(1, 'M');
+            var _validDate = new moment($scope.EditFormRelease.ReleaseDate).add(2, 'days');
 
             return _startDate >= _validDate;
         };
