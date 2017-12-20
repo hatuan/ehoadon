@@ -146,6 +146,19 @@ define(['angularAMD'], function (angularAMD) {
                     redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
                 }
             })
+            .state('eInvoices', {
+                url: "/eInvoices",
+                views: {
+                    "master": angularAMD.route({
+                        templateUrl: 'app/eInvoice/invoices.html',
+                        controller: 'eInvoicesController',
+                        controllerUrl: 'app/eInvoice/invoicesController',
+                    })
+                },
+                resolve: {
+                    redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
+                }
+            })
             ;
 
         function _skipIfAuthenticated($q, $state, $auth) {

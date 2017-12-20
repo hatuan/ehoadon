@@ -22,7 +22,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
                 $scope.EditFormRelease.ReleaseTo = 0;
                 $scope.EditFormRelease.ReleaseUsed = 0;
                 $scope.EditFormRelease.ReleaseDate = new moment().toDate();
-                $scope.EditFormRelease.StartDate = new moment().add(1, 'M').toDate();
+                $scope.EditFormRelease.StartDate = new moment().add(2, 'days').toDate();
                 $scope.EditFormRelease.TaxAuthoritiesStatus = "0";
 
                 $scope.EditFormRelease.Status = $scope.Constants.Status[1].Code;
@@ -85,13 +85,33 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
 
         $scope.validStartDate = function(value) {
             var _startDate = new moment($scope.EditFormRelease.StartDate);
-            var _validDate = new moment($scope.EditFormRelease.ReleaseDate).add(1, 'M');
+            var _validDate = new moment($scope.EditFormRelease.ReleaseDate).add(2, 'days');
 
             return _startDate >= _validDate;
         };
 
         $scope.ok = function(form) {
-            if (form.validate()) {
+            if (form.validate({
+                /*
+                showErrors: function(errorMap, errorList) {
+                    // Clean up any tooltips for valid elements
+                    $.each(this.validElements(), function (index, element) {
+                        var $element = $(element);
+                        $element.data("title", "") // Clear the title - there is no error associated anymore
+                            .removeClass("error")
+                            .tooltip("destroy");
+                    });
+          
+                    // Create new tooltips for invalid elements
+                    $.each(errorList, function (index, error) {
+                        var $element = $(error.element);
+                        $element.tooltip("destroy") // Destroy any pre-existing tooltip so we can repopulate with new tooltip content
+                            .data("title", error.message)
+                            .addClass("error")
+                            .tooltip(); // Create a new tooltip based on the error messsage we just set in the title
+                    });
+                },*/
+            })) {
                 var _postFormRelease = new Object();
 
                 if($scope.EditFormRelease.ID == null) {

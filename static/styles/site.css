@@ -86,6 +86,21 @@ select.custom::-ms-expand {
 
 span .small-font { font-size:9px; }
 
+/* Modal Full Screen*/
+@media (min-width: 1400px) {
+    .my-modal-fullscreen .modal-lg {
+        width: 1308px;
+    }
+}
+
+#InvoiceMaintenanceForm .form-group {
+    margin-bottom: 0px;
+}
+
+.invoice-lines {
+    margin-top: 15px;
+}
+
 .thumbnail .selected {
     border: 2px solid black;
 }

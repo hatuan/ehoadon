@@ -46,6 +46,7 @@ type EInvoice struct {
 	TotalOther               decimal.Decimal `db:"total_other"`
 	TotalPayment             decimal.Decimal `db:"total_payment"`
 	TotalPaymentWords        decimal.Decimal `db:"total_payment_words"`
+	InvoiceLines             []EInvoiceLine  `db:"-"`
 	RecCreatedByID           int64           `db:"rec_created_by" json:",string"`
 	RecCreatedByUser         string          `db:"rec_created_by_user"`
 	RecCreated               *Timestamp      `db:"rec_created_at"`
@@ -84,6 +85,13 @@ func (c *EInvoice) Validate() map[string]InterfaceArray {
 	if c.CustomerAddress == "" {
 		validationErrors["CustomerAddress"] = append(validationErrors["CustomerAddress"], ErrEInvoiceCustomerAddressNotSpecified.Error())
 	}
+
+	for key, line := range c.InvoiceLines {
+		if lineValidateErrs := line.Validate(); len(lineValidateErrs) != 0 {
+			validationErrors["InvoiceLine"+strconv.Itoa(key)] = append(validationErrors["InvoiceLine"+strconv.Itoa(key)], lineValidateErrs)
+		}
+	}
+
 	return validationErrors
 }
 
@@ -98,16 +106,11 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 	sqlString := "SELECT ehd_invoice.*, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.name as organization, " +
-		" COALESCE(ehd_invoice_uom.code, '') as item_uom_code, " +
-		" COALESCE(ehd_invoice_group.code, '') as item_group_code " +
+		" organization.name as organization " +
 		" FROM ehd_invoice " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
-		" INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id " +
-		" INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id " +
-		" LEFT JOIN ehd_invoice_group as ehd_invoice_group ON ehd_invoice.item_group_id = ehd_invoice_group.id " +
-		" LEFT JOIN ehd_invoice_uom as ehd_invoice_uom ON ehd_invoice.item_uom_id = ehd_invoice_uom.id "
+		" INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "
 
 	sqlWhere := " WHERE ehd_invoice.organization_id = $1"
 	if len(searchCondition) > 0 {
@@ -159,78 +162,236 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 	}
 	defer db.Close()
+	tx := db.MustBegin()
 
-	if postData.ID == nil {
-		postData.Version = 1
-		stmt, _ := db.PrepareNamed("INSERT INTO ehd_invoice(code," +
-			"description, " +
-			"item_group_id, " +
-			"item_uom_id, " +
-			"vat, " +
-			"discount, " +
-			"unit_price, " +
-			"quantity, " +
-			"rec_created_by," +
-			"rec_created_at," +
-			"rec_modified_by," +
-			"rec_modified_at," +
-			"status," +
-			"version," +
-			"client_id," +
-			"organization_id)" +
-			" VALUES (:code, " +
-			":description, " +
-			":item_group_id, " +
-			":item_uom_id, " +
-			":vat, " +
-			":discount, " +
-			":unit_price, " +
-			":quantity, " +
-			":rec_created_by," +
-			":rec_created_at," +
-			":rec_modified_by," +
-			":rec_modified_at," +
-			":status," +
-			":version," +
-			":client_id," +
-			":organization_id) RETURNING id")
-		id := int64(0)
-		err := stmt.Get(&id, postData)
-		if err != nil {
-			log.Error(err)
-			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
-		}
-		postData.ID = &id
-	} else {
-		stmt, _ := db.PrepareNamed("UPDATE ehd_invoice SET " +
-			" code			= :code," +
-			" description	= :description," +
-			" item_group_id	= :item_group_id, " +
-			" item_uom_id	= :item_uom_id, " +
-			" vat			= :vat, " +
-			" discount		= :discount, " +
-			" unit_price	= :unit_price, " +
-			" quantity		= :quantity, " +
-			" status		= :status," +
-			" version		= :version + 1," +
-			" rec_modified_by	= :rec_modified_by, " +
-			" rec_modified_at	= :rec_modified_at " +
-			" WHERE id = :id AND version = :version")
+	stmt, _ := tx.PrepareNamed("INSERT INTO ehd_invoice as invoice(id " +
+		" form_release_id, " +
+		" original_invoice_id, " +
+		" created_date, " +
+		" invoice_date, " +
+		" invoice_no, " +
+		" pay_type, " +
+		" currency_id, " +
+		" exchange_rate_amount, " +
+		" customer_id, " +
+		" customer_vat_number, " +
+		" customer_name, " +
+		" customer_address, " +
+		" customer_contact_name, " +
+		" customer_bank_account, " +
+		" customer_bank_name, " +
+		" process_invoice_status, " +
+		" process_adjusted_form, " +
+		" process_adjusted_type, " +
+		" total_amount, " +
+		" total_amount_no_vat, " +
+		" total_amount_vat0, " +
+		" total_amount_vat5, " +
+		" total_amount_vat10, " +
+		" total_discount, " +
+		" total_vat5, " +
+		" total_vat10, " +
+		" total_vat, " +
+		" total_other, " +
+		" total_payment, " +
+		" total_payment_words, " +
+		" total_payment_words, " +
+		" rec_created_by, " +
+		" rec_created_at, " +
+		" rec_modified_by, " +
+		" rec_modified_at, " +
+		" status, " +
+		" version, " +
+		" client_id, " +
+		" organization_id) " +
+		" VALUES ( COALESCE(:id, id_generator()), " +
+		" :form_release_id, " +
+		" :original_invoice_id, " +
+		" :created_date, " +
+		" :invoice_date, " +
+		" :invoice_no, " +
+		" :pay_type, " +
+		" :currency_id, " +
+		" :exchange_rate_amount, " +
+		" :customer_id, " +
+		" :customer_vat_number, " +
+		" :customer_name, " +
+		" :customer_address, " +
+		" :customer_contact_name, " +
+		" :customer_bank_account, " +
+		" :customer_bank_name, " +
+		" :process_invoice_status, " +
+		" :process_adjusted_form, " +
+		" :process_adjusted_type, " +
+		" :total_amount, " +
+		" :total_amount_no_vat, " +
+		" :total_amount_vat0, " +
+		" :total_amount_vat5, " +
+		" :total_amount_vat10, " +
+		" :total_discount, " +
+		" :total_vat5, " +
+		" :total_vat10, " +
+		" :total_vat, " +
+		" :total_other, " +
+		" :total_payment, " +
+		" :total_payment_words, " +
+		" :rec_created_by, " +
+		" :rec_created_at, " +
+		" :rec_modified_by, " +
+		" :rec_modified_at, " +
+		" :status, " +
+		" COALESCE(:version, 1), " +
+		" :client_id, " +
+		" :organization_id) " +
+		" ON CONFLICT ON CONSTRAINT pk_ehd_invoice DO UPDATE SET " +
+		" form_release_id		= EXCLUDED.form_release_id," +
+		" original_invoice_id	= EXCLUDED.original_invoice_id, " +
+		" created_date			= EXCLUDED.created_date, " +
+		" invoice_date			= EXCLUDED.invoice_date, " +
+		" invoice_no			= EXCLUDED.invoice_no, " +
+		" pay_type				= EXCLUDED.pay_type, " +
+		" currency_id			= EXCLUDED.currency_id, " +
+		" exchange_rate_amount	= EXCLUDED.exchange_rate_amount, " +
+		" customer_id			= EXCLUDED.customer_id, " +
+		" customer_vat_number	= EXCLUDED.customer_vat_number, " +
+		" customer_name			= EXCLUDED.customer_name, " +
+		" customer_address		= EXCLUDED.customer_address, " +
+		" customer_contact_name	= EXCLUDED.customer_contact_name, " +
+		" customer_bank_account	= EXCLUDED.customer_bank_account, " +
+		" customer_bank_name	= EXCLUDED.customer_bank_name, " +
+		" process_invoice_status	= EXCLUDED.process_invoice_status, " +
+		" process_adjusted_form	= EXCLUDED.process_adjusted_form, " +
+		" process_adjusted_type	= EXCLUDED.process_adjusted_type, " +
+		" total_amount			= EXCLUDED.total_amount, " +
+		" total_amount_no_vat	= EXCLUDED.total_amount_no_vat, " +
+		" total_amount_vat0		= EXCLUDED.total_amount_vat0, " +
+		" total_amount_vat5		= EXCLUDED.total_amount_vat5, " +
+		" total_amount_vat10	= EXCLUDED.total_amount_vat10, " +
+		" total_discount		= EXCLUDED.total_discount, " +
+		" total_vat5			= EXCLUDED.total_vat5, " +
+		" total_vat10			= EXCLUDED.total_vat10, " +
+		" total_vat				= EXCLUDED.total_vat, " +
+		" total_other			= EXCLUDED.total_other, " +
+		" total_payment			= EXCLUDED.total_payment, " +
+		" total_payment_words	= EXCLUDED.total_payment_words, " +
+		" status				= EXCLUDED.status," +
+		" version				= :version + 1," +
+		" rec_modified_by		= EXCLUDED.rec_modified_by, " +
+		" rec_modified_at		= EXCLUDED.rec_modified_at " +
+		" WHERE invoice.version = :version " +
+		" RETURNING id")
 
-		result, err := stmt.Exec(postData)
-		if err != nil {
-			log.Error(err)
-			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	id := int64(0)
+	err = stmt.Get(&id, postData)
+	if err != nil {
+		tx.Rollback()
+		log.Error(err)
+		return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+	postData.ID = &id
+
+	_line_ids := []int64{}
+	if postData.InvoiceLines != nil && len(postData.InvoiceLines) > 0 {
+		for _, invoiceLine := range postData.InvoiceLines {
+			stmt, _ := tx.PrepareNamed("INSERT INTO ehd_invoice_line AS invoice_line(id, " +
+				" invoice_id, " +
+				" item_id, " +
+				" item_code, " +
+				" uom_id, " +
+				" uom_code, " +
+				" description, " +
+				" quantity, " +
+				" unit_price, " +
+				" amount, " +
+				" vat, " +
+				" amount_vat, " +
+				" discount, " +
+				" amount_discount, " +
+				" amount_payment, " +
+				" rec_created_by, " +
+				" rec_created_at, " +
+				" rec_modified_by, " +
+				" rec_modified_at, " +
+				" status, " +
+				" version, " +
+				" client_id, " +
+				" organization_id) " +
+				" VALUES (COALESCE(:id, id_generator()), " +
+				" :invoice_id, " +
+				" :item_id, " +
+				" :item_code, " +
+				" :uom_id, " +
+				" :uom_code," +
+				" :description, " +
+				" :quantity, " +
+				" :unit_price, " +
+				" :amount, " +
+				" :vat, " +
+				" :amount_vat, " +
+				" :discount, " +
+				" :amount_discount, " +
+				" :amount_payment, " +
+				" :rec_created_by, " +
+				" :rec_created_at, " +
+				" :rec_modified_by, " +
+				" :rec_modified_at, " +
+				" :status, " +
+				" COALESCE(:version, 1), " +
+				" :client_id, " +
+				" :organization_id) " +
+				" ON CONFLICT ON CONSTRAINT pk_ehd_invoice_line DO UPDATE SET " +
+				" invoice_id	=	EXCLUDED.invoice_id, " +
+				" item_id	=	EXCLUDED.item_id, " +
+				" item_code	=	EXCLUDED.item_code, " +
+				" uom_id	=	EXCLUDED.uom_id, " +
+				" uom_code	=	EXCLUDED.uom_code," +
+				" description	=	EXCLUDED.description," +
+				" quantity	=	EXCLUDED.quantity, " +
+				" unit_price	=	EXCLUDED.unit_price, " +
+				" amount	=	EXCLUDED.amount, " +
+				" vat	=	EXCLUDED.vat, " +
+				" amount_vat	=	EXCLUDED.amount_vat, " +
+				" discount	=	EXCLUDED.discount, " +
+				" amount_discount	=	EXCLUDED.amount_discount, " +
+				" amount_payment	=	EXCLUDED.amount_payment, " +
+				" rec_modified_by	=	EXCLUDED.rec_modified_by," +
+				" rec_modified_at	=	EXCLUDED.rec_modified_at," +
+				" status	=	EXCLUDED.status," +
+				" version	=	:version + 1" +
+				" WHERE invoice_line.version = :version RETURNING id")
+
+			var line_id int64
+			err := stmt.Get(&line_id, invoiceLine)
+
+			if err != nil {
+				tx.Rollback()
+				log.Error(err)
+				return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+			}
+
+			_line_ids = append(_line_ids, line_id)
 		}
-		changes, err := result.RowsAffected()
-		if err != nil {
-			log.Error(err)
-			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+
+		if len(_line_ids) == 0 { //neu xoa het line thi phai gan gia tri mac dinh cho _ids => xoa het trong bang line
+			_line_ids = append(_line_ids, 0)
 		}
-		if changes == 0 {
-			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
+
+		query, args, err := sqlx.In("DELETE FROM ehd_invoice_line WHERE invoice_id = ? AND id NOT IN (?)", postData.ID, _line_ids)
+		if err != nil {
+			tx.Rollback()
+			log.Error(err)
+			return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+		}
+		query = sqlx.Rebind(sqlx.DOLLAR, query)
+		_, err = tx.Exec(query, args...)
+		if err != nil {
+			tx.Rollback()
+			log.Error(err)
+			return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 		}
 	}
+	tx.Commit()
+
 	postData, _ = GetEInvoiceByID(*postData.ID)
 	return postData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Updated/Created successfully"}}
 }
@@ -249,51 +410,12 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 	err = db.Get(&getData, "SELECT ehd_invoice.*, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization, "+
-		" COALESCE(ehd_invoice_uom.code, '') as item_uom_code, "+
-		" COALESCE(ehd_invoice_group.code, '') as item_group_code "+
+		" organization.name as organization "+
 		"	FROM ehd_invoice "+
 		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+
 		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "+
-		"		LEFT JOIN ehd_invoice_group as ehd_invoice_group ON ehd_invoice.item_group_id = ehd_invoice_group.id "+
-		"		LEFT JOIN ehd_invoice_uom as ehd_invoice_uom ON ehd_invoice.item_uom_id = ehd_invoice_uom.id "+
 		"	WHERE ehd_invoice.id=$1", id)
-	if err != nil && err == sql.ErrNoRows {
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
-	} else if err != nil {
-		log.Error(err)
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
-	}
-	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
-}
-
-// GetEInvoiceByCode returns the EInvoice that the given id corresponds to.
-// If no EInvoice is found, an error is thrown.
-func GetEInvoiceByCode(code string, orgID int64) (EInvoice, TransactionalInformation) {
-	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
-	if err != nil {
-		log.Error(err)
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
-	}
-	defer db.Close()
-
-	org, _ := GetOrganizationByID(orgID)
-
-	getData := EInvoice{}
-	err = db.Get(&getData, "SELECT ehd_invoice.*, "+
-		" user_created.name as rec_created_by_user, "+
-		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization, "+
-		" COALESCE(ehd_invoice_uom.code, '') as item_uom_code, "+
-		" COALESCE(ehd_invoice_group.code, '') as item_group_code "+
-		"	FROM ehd_invoice "+
-		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id "+
-		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+
-		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "+
-		"		LEFT JOIN ehd_invoice_group as ehd_invoice_group ON ehd_invoice.item_group_id = ehd_invoice_group.id "+
-		"		LEFT JOIN ehd_invoice_uom as ehd_invoice_uom ON ehd_invoice.item_uom_id = ehd_invoice_uom.id "+
-		"	WHERE ehd_invoice.code=$1 and ehd_invoice.client_id=$2", code, org.ClientID)
 
 	if err != nil && err == sql.ErrNoRows {
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
@@ -301,6 +423,14 @@ func GetEInvoiceByCode(code string, orgID int64) (EInvoice, TransactionalInforma
 		log.Error(err)
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 	}
+
+	invoiceLines, transInfo := GetEInvoiceLinesByHeaderID(id)
+	if !transInfo.ReturnStatus {
+		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
+	}
+
+	getData.InvoiceLines = invoiceLines
+
 	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
 
@@ -312,8 +442,8 @@ func DeleteEInvoiceById(orgID int64, ids []string) TransactionalInformation {
 	}
 	defer db.Close()
 
-	query, args, err := sqlx.In("DELETE FROM ehd_invoice "+
-		" WHERE ehd_invoice.id IN (?) and ehd_invoice.organization_id=?", ids, orgID)
+	query, args, err := sqlx.In("DELETE FROM ehd_invoice WHERE ehd_invoice.id IN (?) and ehd_invoice.organization_id=?;"+
+		"DELETE FROM ehd_invoice_line WHERE invoice_id IN (?)", ids, orgID, ids)
 
 	query = sqlx.Rebind(sqlx.DOLLAR, query)
 
