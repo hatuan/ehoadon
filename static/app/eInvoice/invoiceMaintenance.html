@@ -89,6 +89,21 @@
                             <input type="text" class="form-control" name="CustomerBankName" id="CustomerBankName" ng-model="EditInvoice.CustomerBankName"/>
                         </div>
                     </div>
+                    <hr>
+                    <div class="row">
+                        <div class="form-group col-xs-3">
+                            <label class="control-label" for="TotalAmount">Total Amount</label>
+                            <input type="text" class="form-control" name="TotalAmount" id="TotalAmount" ng-model="EditInvoice.TotalAmount" awnum="amount" readonly/>
+                        </div>
+                        <div class="form-group col-xs-3">
+                            <label class="control-label" for="TotalVat">Total Vat</label>
+                            <input type="text" class="form-control" name="TotalVat" id="TotalVat" ng-model="EditInvoice.TotalVat" awnum="amount" readonly/>
+                        </div>
+                        <div class="form-group col-xs-3">
+                            <label class="control-label" for="TotalPayment">Total Payment</label>
+                            <input type="text" class="form-control" name="TotalPayment" id="TotalPayment" ng-model="EditInvoice.TotalPayment" awnum="amount" readonly/>
+                        </div>
+                    </div>
                 </div>
             </div>
             <hr>
@@ -113,72 +128,73 @@
                     </div>
                     <div class="grid-body" style="width: 1610px;">
                         <div class="rows" ng-show="EditInvoice.InvoiceLines.length != 0">
-                            <form ng-submit="update(EditInvoice.InvoiceLinesMaintenanceForm)" id="EditInvoice.InvoiceLinesMaintenanceForm" name="EditInvoice.InvoiceLinesMaintenanceForm" role="form" ng-validate="validationOptions">
-                                <div class="grid-row" ng-repeat="invoiceLine in EditInvoice.InvoiceLines track by $index" data-idx="{{$index + 1}}" ng-init="invoiceLine.LineNo = $index + 1 + ''">
-                                    <div class="data-row row sortable-handle editable-row">
-                                        <div class="row-index col" style="width:50px; float:left;">
-                                            {{$index + 1}}
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <select class="form-control item-code" name="ItemCode[]" id="ItemCode_{{$index + 1}}" ng-model="invoiceLine.ItemCode">
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:300px; float:left;">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="Description[]" id="Description_{{$index + 1}}" ng-model="invoiceLine.Description" />
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <select class="form-control item-code" name="UomID[]" id="UomID_{{$index + 1}}" ng-model="invoiceLine.UomID">
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <input class="form-control" name="Quantity[]" id="Quantity_{{$index + 1}}" ng-model="invoiceLine.Quantity" />
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <input class="form-control" name="UnitPrice[]" id="UnitPrice_{{$index + 1}}" ng-model="invoiceLine.UnitPrice" />
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="Amount[]" id="Amount_{{$index + 1}}" ng-model="invoiceLine.Amount" />
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes">
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat"/>
-                                            </div>
-                                        </div>
-                                        <div class="col grid-static-col" style="width:150px; float:left;">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountPayment[]" id="AmountPayment_{{$index + 1}}" ng-model="invoiceLine.AmountPayment"/>
-                                            </div>
-                                        </div>
-                                        <div class="col" style="width:50px; float:left;">
-                                            
+                            <div class="grid-row" ng-repeat="invoiceLine in EditInvoice.InvoiceLines track by $index" data-idx="{{$index + 1}}" ng-init="invoiceLine.LineNo = $index + 1 + ''">
+                                <div class="data-row row sortable-handle editable-row">
+                                    <!-- <div class="row-index col" style="width:50px; float:left;"> -->
+                                    <div class="row-index col grid-static-col" style="width:50px; float:left;">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="No[]" id="No_{{$index + 1}}" value="{{$index + 1}}" readonly/>
                                         </div>
                                     </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <select class="form-control item-code" name="ItemCode[]" id="ItemCode_{{$index + 1}}" ng-model="invoiceLine.ItemCode">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:300px; float:left;">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="Description[]" id="Description_{{$index + 1}}" ng-model="invoiceLine.Description" />
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <select class="form-control item-code" name="UomID[]" id="UomID_{{$index + 1}}" ng-model="invoiceLine.UomID">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <input class="form-control" name="Quantity[]" id="Quantity_{{$index + 1}}" ng-model="invoiceLine.Quantity" awnum="quantity"/>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <input class="form-control" name="UnitPrice[]" id="UnitPrice_{{$index + 1}}" ng-model="invoiceLine.UnitPrice" awnum="price"/>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="Amount[]" id="Amount_{{$index + 1}}" ng-model="invoiceLine.Amount" awnum="amount"/>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount"/>
+                                        </div>
+                                    </div>
+                                    <div class="col grid-static-col" style="width:150px; float:left;">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="AmountPayment[]" id="AmountPayment_{{$index + 1}}" ng-model="invoiceLine.AmountPayment" awnum="amount"/>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="width:50px; float:left;">
+                                        
+                                    </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                         <div class="grid-empty text-center" ng-show="EditInvoice.InvoiceLines.length == 0">No Data</div>
                         <div class="small form-clickable-section grid-footer">
                             <div class="row">
                                 <div class="col-sm-6 grid-buttons">
-                                    <!-- <button type="reset" class="btn btn-xs btn-default grid-add-row" ng-click="addLine()"> Add new row</button> -->
+                                    <button type="reset" class="btn btn-xs btn-default grid-add-row" ng-click="addLine()"> Add new row</button>
                                 </div>
                             </div>
                         </div>

@@ -388,6 +388,16 @@ span .small-font { font-size:9px; }
     padding-top: 8px;
 }
 
+/** select2 css begin **/
+.grid-body .editable-row .select2-selection {
+    border: 0 none;
+    border-radius: 0;
+    height: 38px;
+    padding-bottom: 9px;
+    padding-top: 8px;
+}
+/** select2  css end**********/
+
 .grid-body .editable-row .link-btn {
     top: 8px;
 }

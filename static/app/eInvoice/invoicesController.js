@@ -130,6 +130,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 animation: true,
                 ariaLabelledBy: 'modal-title',
                 ariaDescribedBy: 'modal-body',
+                backdrop: 'static', //disables modal closing by click on the backdrop
                 size:'lg',
                 windowClass: 'my-modal-fullscreen', //set style in .my-modal-fullscreen .modal-lg {} in site.css
                 templateUrl: 'app/eInvoice/invoiceMaintenance.html',

@@ -51,6 +51,7 @@ require.config({
         'reportjs-designer': 'scripts/stimulsoft/stimulsoft.designer',
         'angular-dynamic-number': 'bower_components/angular-dynamic-number/release/dynamic-number.min',
         'angular-ui-select': 'bower_components/angular-ui-select/dist/select.min',
+        'bignumber': 'bower_components/bignumber.js/bignumber.min',
         'ajaxService': 'app/common/services/ajaxServices',
         'alertsService': 'app/common/services/alertsServices',
         'stateConfig': 'app/common/config/stateConfig',
