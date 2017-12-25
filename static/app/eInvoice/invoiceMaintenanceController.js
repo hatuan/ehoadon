@@ -3,10 +3,10 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'eInvoiceService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService'], function(angularAMD, $) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$auth', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
-    var invoiceMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, $stateParams, $confirm, Constants, editInvoice) {
+    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
@@ -34,6 +34,141 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
                 $scope.EditInvoice.InvoiceLines.push(invoiceLine);
             }
         };
+
+        $scope.$watch('$viewContentLoaded', 
+            function() { 
+                setTimeout(function() {
+                    $('#CustomerID').select2({
+                        ajax: {
+                            url: '/api/autocomplete',
+                            tags: true, 
+                            data: function (params) {
+                              var query = {
+                                term: params.term || this.select2('data')[0].text,
+                                page: params.page,
+                                object:'ehd_customer'
+                              }
+                        
+                              // Query parameters will be ?term=[term]&object=public
+                              return query;
+                            },
+                            beforeSend: function (xhr) {   //Include the bearer token in header
+                                xhr.setRequestHeader("Authorization", $auth.getToken());
+                            },
+                            processResults: function (data) {
+                                var mappedItems = null;
+                                mappedItems = $.map(data, function (obj) {
+                                    obj.id = obj.id || obj["ID"];
+                                    obj.text = obj.text || obj["Code"];
+                                    obj.description = obj.description || obj["Description"];
+
+                                    return obj;
+                                });
+
+                                return {
+                                  results: mappedItems
+                                };
+                            }
+                        },
+                        dropdownCssClass : 'big-dropdown-width',
+                        theme: "bootstrap",
+                        templateResult : function (result) { 
+                            if (result.loading) 
+                                return "Searching...";
+                            return result.text + " - " + result.description; 
+                        }
+                    }).on('select2:select', function (e) {
+                        var data = e.params.data;
+                        $scope.updateCustomer(data.id);
+                    });
+
+                    $("[name='ItemCode[]']").select2({
+                        ajax: {
+                            url: '/api/autocomplete',
+                            tags: true, 
+                            data: function (params) {
+                              var query = {
+                                term: params.term || this.select2('data')[0].text,
+                                page: params.page,
+                                object:'ehd_item'
+                              }
+                        
+                              // Query parameters will be ?term=[term]&object=public
+                              return query;
+                            },
+                            beforeSend: function (xhr) {   //Include the bearer token in header
+                                xhr.setRequestHeader("Authorization", $auth.getToken());
+                            },
+                            processResults: function (data) {
+                                var mappedItems = null;
+                                mappedItems = $.map(data, function (obj) {
+                                    obj.id = obj.id || obj["ID"];
+                                    obj.text = obj.text || obj["Code"];
+                                    obj.description = obj.description || obj["Description"];
+
+                                    return obj;
+                                });
+
+                                return {
+                                  results: mappedItems
+                                };
+                            }
+                        },
+                        dropdownCssClass : 'big-dropdown-width',
+                        theme: "bootstrap",
+                        templateResult : function (result) { 
+                            if (result.loading) 
+                                return "Searching...";
+                            return result.text + " - " + result.description; 
+                        }
+                    }).on('select2:select', function (e) {
+                        var data = e.params.data;
+                        $scope.updateItem(data.id, angular.element(e.target).scope().invoiceLine);
+                    });
+
+                    $("[name='UomID[]").select2({
+                        ajax: {
+                            url: '/api/autocomplete',
+                            tags: true, 
+                            data: function (params) {
+                              var query = {
+                                term: params.term || this.select2('data')[0].text,
+                                page: params.page,
+                                object:'ehd_item_uom'
+                              }
+                        
+                              // Query parameters will be ?term=[term]&object=public
+                              return query;
+                            },
+                            beforeSend: function (xhr) {   //Include the bearer token in header
+                                xhr.setRequestHeader("Authorization", $auth.getToken());
+                            },
+                            processResults: function (data) {
+                                var mappedItems = null;
+                                mappedItems = $.map(data, function (obj) {
+                                    obj.id = obj.id || obj["ID"];
+                                    obj.text = obj.text || obj["Code"];
+                                    obj.description = obj.description || obj["Description"];
+
+                                    return obj;
+                                });
+
+                                return {
+                                  results: mappedItems
+                                };
+                            }
+                        },
+                        dropdownCssClass : 'big-dropdown-width',
+                        theme: "bootstrap",
+                        templateResult : function (result) { 
+                            if (result.loading) 
+                                return "Searching...";
+                            return result.text + " - " + result.description; 
+                        }
+                    });
+
+                }, 0);    
+        });
 
         $scope.validationOptions = {
             rules: {
@@ -112,16 +247,47 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
             invoiceLine.LineNo = $scope.EditInvoice.InvoiceLines.length;
             invoiceLine.ID = $scope.EditInvoice.ID;
             invoiceLine.Description = '';
+            invoiceLine.Vat = $scope.Constants.VatTypes[0].Code;
 
             return invoiceLine;
-
         }
 
         $scope.addLine = function() {
             var invoiceLine = $scope.createInvoiceLineObject();
 
             $scope.EditInvoice.InvoiceLines.push(invoiceLine);
-        }
+        };
+
+        $scope.updateCustomer = function(customerID) {
+            eInvoiceCustomerService.getCustomer({ID:customerID}, 
+                function(response, status) { //success
+                    var _customer = response.Data.eInvoiceCustomer;
+                    $scope.EditInvoice.CustomerVatNumber = _customer.VatNumber;
+                    $scope.EditInvoice.CustomerName = _customer.Description;
+                    $scope.EditInvoice.CustomerAddress = _customer.Address;
+                    $scope.EditInvoice.CustomerContactName = _customer.ContactName;
+                    $scope.EditInvoice.CustomerContactName = _customer.ContactName;
+                    $scope.EditInvoice.CustomerBankAccount = _customer.BankAccount;
+                    $scope.EditInvoice.CustomerBankName = _customer.BankName;
+                },
+                function(response) { //error
+
+                })
+        };
+
+        $scope.updateItem = function(_ID, invoiceLine) {
+            eInvoiceItemService.getItem({ID : _ID}, 
+                function(response, status) { //success
+                    var _item = response.Data.eInvoiceItem;
+                    invoiceLine.Description = _item.Description;
+  
+                    var newOption = new Option(_item.UomCode, _item.UomID, false, false);
+                    $('#UomID_' + invoiceLine.LineNo).empty().append(newOption).trigger('change');
+                },
+                function(response) { //error
+
+                })
+        };
     };
 
     invoiceMaintenanceController.$inject = injectParams;

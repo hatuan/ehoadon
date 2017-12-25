@@ -45,6 +45,7 @@ require.config({
         'bootstrap-switch': 'bower_components/bootstrap-switch/dist/js/bootstrap-switch.min',
         'angular-bootstrap-switch': 'bower_components/angular-bootstrap-switch/dist/angular-bootstrap-switch.min',
         'angular-confirm-modal': 'bower_components/angular-confirm-modal/angular-confirm.min',
+        'select2': 'bower_components/select2/dist/js/select2.full.min',
         'reportjs-report': 'scripts/stimulsoft/stimulsoft.reports',
         'reportjs-viewer': 'scripts/stimulsoft/stimulsoft.viewer',
         'reportjs-designer': 'scripts/stimulsoft/stimulsoft.designer',
@@ -103,7 +104,8 @@ require.config({
         'reportjs-viewer': { deps: ['reportjs-report']},
         'reportjs-designer': { deps: ['reportjs-report']},
         'angular-dynamic-number': ["angular", "angularAMD"],
-        'angular-ui-select': ["angular"]
+        'angular-ui-select': ["angular"],
+        'select2': ['jquery', 'bootstrap']
     },
 
     // kick start application

@@ -101,6 +101,11 @@ span .small-font { font-size:9px; }
     margin-top: 15px;
 }
 
+/**Select2 Dropdown width**/
+.big-dropdown-width {
+    width: 300px !important;
+}
+
 .thumbnail .selected {
     border: 2px solid black;
 }

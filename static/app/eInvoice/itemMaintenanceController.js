@@ -79,19 +79,19 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceItemSer
             $uibModalInstance.dismiss('cancel');
         };
 
-        $scope.itemUpdateCompleted = function() {
+        $scope.itemUpdateCompleted = function(response, status) {
             var _result = new Object();
             _result.EditItem = $scope.EditItem;
             $uibModalInstance.close(_result);
         };
 
-        $scope.itemUpdateError = function() {
+        $scope.itemUpdateError = function(response) {
             alertsService.RenderErrorMessage(response.Error);
         };
 
         $scope.searchUoms = function($select) {
             var data = { object:'ehd_item_uom', term: $select.search };
-            ajaxService.AjaxGetWithData(data, "/api/autocomplete", $scope.searchUomsSuccessFunction, $scope.searchUomsErrorFunction);    
+            ajaxService.AjaxGetWithDataNoBlock(data, "/api/autocomplete", $scope.searchUomsSuccessFunction, $scope.searchUomsErrorFunction);    
         };
 
         $scope.searchUomsSuccessFunction = function(response, status) {
@@ -118,7 +118,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceItemSer
             $scope.SearchUoms = mappedItems;
         };
 
-        $scope.searchUomsErrorFunction = function(response, status) {
+        $scope.searchUomsErrorFunction = function(response) {
             alertsService.RenderErrorMessage(response.Error);    
         };
     };

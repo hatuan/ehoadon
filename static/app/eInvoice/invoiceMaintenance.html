@@ -22,22 +22,27 @@
                                 <label class="control-label" for="InvoiceNo">Inv Number</label>
                                 <input type="text" class="form-control" name="InvoiceNo" id="InvoiceNo" ng-model="EditInvoice.InvoiceNo" readonly/>
                             </div>
+                            <!--
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="CurrencyID">Currency</label>
-                                <input type="text" class="form-control" name="CurrencyID" id="CurrencyID" ng-model="EditInvoice.CurrencyID"/>
+                                <select class="form-control" name="CurrencyID" id="CurrencyID" ng-model="EditInvoice.CurrencyID">
+                                </select>
+                                
                             </div>
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="ExchangeRateAmount">Exchange Rate</label>
                                 <input type="text" class="form-control" name="ExchangeRateAmount" id="ExchangeRateAmount" ng-model="EditInvoice.ExchangeRateAmount"/>
                             </div>
+                            -->
                         </div>
                     </div>
                     <hr>
                     <div class="col">
                         <div class="row">
                             <div class="form-group col-xs-3">
-                                <label class="control-label" for="CustomerCode">Customer Code</label>
-                                <input type="text" class="form-control" name="CustomerCode" id="CustomerCode" ng-model="EditInvoice.CustomerCode"/>
+                                <label class="control-label" for="CustomerID">Customer</label>
+                                <select class="form-control" name="CustomerID" id="CustomerID" ng-model="EditInvoice.CustomerID">
+                                </select>
                             </div>
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="CustomerVatNumber">Vat Number</label>
@@ -49,31 +54,31 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="control-label" for="CustomerContactName">Customer Address</label>
-                            <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName"/>
+                            <label class="control-label" for="CustomerAddress">Customer Address</label>
+                            <input type="text" class="form-control" name="CustomerAddress" id="CustomerAddress" ng-model="EditInvoice.CustomerAddress"/>
                         </div>
                     </div>
                 </div>
                 <div class="col-xs-6">
                     <div class="row">
-                        <div class="form-group col-xs-6">
+                        <div class="form-group col-xs-4">
                             <label class="control-label" for="CustomerContactName">Contact Name</label>
                             <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName"/>
                         </div>
-                        <div class="form-group col-xs-3">
-                            <label class="control-label" for="CustomerContactName">Contact Phone</label>
-                            <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName"/>
+                        <div class="form-group col-xs-4">
+                            <label class="control-label" for="CustomerContactPhone">Contact Phone</label>
+                            <input type="text" class="form-control" name="CustomerContactPhone" id="CustomerContactPhone" ng-model="EditInvoice.CustomerContactPhone"/>
                         </div>
-                        <div class="form-group col-xs-3">
-                            <label class="control-label" for="CustomerContactName">Contact Email</label>
-                            <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName"/>
+                        <div class="form-group col-xs-4">
+                            <label class="control-label" for="CustomerContactEmail">Contact Email</label>
+                            <input type="text" class="form-control" name="CustomerContactEmail" id="CustomerContactEmail" ng-model="EditInvoice.CustomerContactEmail"/>
                         </div>
                     </div>
                     <hr>
                     <div class="row">
                         <div class="form-group col-xs-3">
-                            <label class="control-label" for="CustomerContactName">Pay Type</label>
-                            <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName"/>
+                            <label class="control-label" for="PayType">Pay Type</label>
+                            <input type="text" class="form-control" name="PayType" id="PayType" ng-model="EditInvoice.PayType"/>
                         </div>
                         <div class="form-group col-xs-3">
                             <label class="control-label" for="CustomerBankAccount">Bank Account</label>
@@ -116,7 +121,8 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="ItemCode[]" id="ItemCode_{{$index + 1}}" ng-model="invoiceLine.ItemCode" />
+                                                <select class="form-control item-code" name="ItemCode[]" id="ItemCode_{{$index + 1}}" ng-model="invoiceLine.ItemCode">
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:300px; float:left;">
@@ -126,7 +132,8 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input class="form-control" name="UomCode[]" id="UomCode_{{$index + 1}}" ng-model="invoiceLine.UomCode" />
+                                                <select class="form-control item-code" name="UomID[]" id="UomID_{{$index + 1}}" ng-model="invoiceLine.UomID">
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
@@ -146,7 +153,8 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat"/>
+                                                <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes">
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">

@@ -178,6 +178,9 @@ type AutoCompleteDTO struct {
 }
 
 func AutoComplete(object, term string, orgID int64) ([]AutoCompleteDTO, error) {
+	if term == "" || object == "" {
+		return []AutoCompleteDTO{}, nil
+	}
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Fatal(err)
@@ -201,7 +204,7 @@ func AutoComplete(object, term string, orgID int64) ([]AutoCompleteDTO, error) {
 	for _, org := range orgs {
 		orgIDs = append(orgIDs, *org.ID)
 	}
-	strSQL := fmt.Sprintf("SELECT id, code, description FROM %s WHERE id IN (SELECT id FROM textsearch WHERE textsearch_object=? AND organization_id IN (?)  AND client_id = ? AND textsearch_value @@ to_tsquery('simple', ?))", object)
+	strSQL := fmt.Sprintf("SELECT id, code, description FROM %s WHERE id IN (SELECT id FROM textsearch WHERE textsearch_object=? AND organization_id IN (?)  AND client_id = ? AND textsearch_value @@ to_tsquery('simple', ?)) ORDER BY code", object)
 
 	query, args, err := sqlx.In(strSQL, object, orgIDs, orgs[0].ClientID, term)
 
