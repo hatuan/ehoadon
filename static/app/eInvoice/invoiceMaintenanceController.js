@@ -24,18 +24,9 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                 $scope.EditInvoice.RecModified = new Date();
 
                 $scope.EditInvoice.InvoiceLines = [];
+            } else {
+                //load from api
             }
-
-            /*
-            if ($scope.EditInvoice.InvoiceLines.length == null) 
-                $scope.EditInvoice.InvoiceLines.length == 0;
-
-            for(var i = $scope.EditInvoice.InvoiceLines.length + 1; i <= 10; i ++)
-            {
-                var invoiceLine = $scope.createInvoiceLineObject();
-                $scope.EditInvoice.InvoiceLines.push(invoiceLine);
-            }
-            */
         };
 
         $scope.$watch('$viewContentLoaded', 
@@ -383,13 +374,13 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                     if(invoiceLine.Quantity != 0 && invoiceLine.UnitPrice) {
                         var qty = new BigNumber(invoiceLine.Quantity);
                         var price = new BigNumber(invoiceLine.UnitPrice);
-                        var amount =  price.times(qty);
+                        var amount =  price.times(qty).round();
                         invoiceLine.Amount = amount;
 
                         if(invoiceLine.Vat > 0) {
-                            var vatAmount = amount.dividedBy(100).times(invoiceLine.Vat).round();
-                            invoiceLine.AmountVat = vatAmount;
-                            var amountPayment = amount.plus(vatAmount);
+                            var amountVat = amount.dividedBy(100).times(invoiceLine.Vat).round();
+                            invoiceLine.AmountVat = amountVat;
+                            var amountPayment = amount.plus(amountVat);
                             invoiceLine.AmountPayment = amountPayment;
                         }
                     }
@@ -477,7 +468,45 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
             $scope.EditInvoice.TotalVat10 = totalVat10;
 
             $scope.EditInvoice.TotalPayment = totalPayment;
-        }
+        }; //$scope.updateTotal
+
+        $scope.validLine = function(_colName, _invoiceLine) {
+            var qty = new BigNumber(_invoiceLine.Quantity);
+            var price = new BigNumber(_invoiceLine.UnitPrice);
+            var amount = new BigNumber(_invoiceLine.Amount);
+            var vatType = _invoiceLine.Vat;
+            var amountVat = new BigNumber(_invoiceLine.AmountVat);
+            var amountPayment = new BigNumber(_invoiceLine.AmountPayment);
+
+            switch(_colName) {
+                case 'ItemCode':
+                    break;
+                case 'Quantity':
+                    amount = price.times(qty).round();
+                    amountVat = amount.dividedBy(100).times(vatType).round();
+                    amountPayment = amount.plus(amountVat);
+                    break;
+                case 'UnitPrice':
+                    amount = price.times(qty).round();
+                    amountVat = amount.dividedBy(100).times(vatType).round();
+                    amountPayment = amount.plus(amountVat);
+                    break;
+                case 'VatType':
+                    amountVat = amount.dividedBy(100).times(vatType).round();
+                    amountPayment = amount.plus(amountVat);
+                    break;
+                case 'AmountVat':
+                    amountPayment = amount.plus(amountVat);
+                    break;
+                case 'AmountPayment':
+                    break;
+            }
+
+            _invoiceLine.Amount = amount;
+            _invoiceLine.AmountVat = amountVat;
+            _invoiceLine.AmountPayment = amountPayment;
+            $scope.updateTotal();
+        };//$scope.validLine
 
     };
 

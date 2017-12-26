@@ -154,33 +154,33 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input class="form-control" name="Quantity[]" id="Quantity_{{$index + 1}}" ng-model="invoiceLine.Quantity" awnum="quantity"/>
+                                                <input class="form-control" name="Quantity[]" id="Quantity_{{$index + 1}}" ng-model="invoiceLine.Quantity" awnum="quantity" ng-change="validLine('Quantity', invoiceLine)"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input class="form-control" name="UnitPrice[]" id="UnitPrice_{{$index + 1}}" ng-model="invoiceLine.UnitPrice" awnum="price"/>
+                                                <input class="form-control" name="UnitPrice[]" id="UnitPrice_{{$index + 1}}" ng-model="invoiceLine.UnitPrice" awnum="price" ng-change="validLine('UnitPrice', invoiceLine)"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="Amount[]" id="Amount_{{$index + 1}}" ng-model="invoiceLine.Amount" awnum="amount"/>
+                                                <input type="text" class="form-control" name="Amount[]" id="Amount_{{$index + 1}}" ng-model="invoiceLine.Amount" awnum="amount" readonly/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes">
+                                                <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes" ng-change="validLine('VatType', invoiceLine)">
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount"/>
+                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount" ng-change="validLine('AmountVat', invoiceLine)"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountPayment[]" id="AmountPayment_{{$index + 1}}" ng-model="invoiceLine.AmountPayment" awnum="amount"/>
+                                                <input type="text" class="form-control" name="AmountPayment[]" id="AmountPayment_{{$index + 1}}" ng-model="invoiceLine.AmountPayment" awnum="amount" ng-change="validLine('AmountPayment', invoiceLine)"/>
                                             </div>
                                         </div>
                                         <div class="col" style="width:50px; float:left;">
