@@ -106,7 +106,7 @@ func GetEInvoiceFormReleases(orgID int64, searchCondition string, infiniteScroll
 		" ehd_form_type.symbol as form_type_symbol, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.name as organization " +
+		" organization.description as organization " +
 		" FROM ehd_form_release " +
 		" INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_form_release.rec_modified_by = user_modified.id " +
@@ -256,7 +256,7 @@ func GetEInvoiceFormReleaseByID(id int64) (EInvoiceFormRelease, TransactionalInf
 		" ehd_form_type.symbol as form_type_symbol, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization "+
+		" organization.description as organization "+
 		"	FROM ehd_form_release "+
 		"		INNER JOIN user_profile as user_created ON ehd_form_release.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_form_release.rec_modified_by = user_modified.id "+

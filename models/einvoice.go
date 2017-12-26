@@ -17,18 +17,19 @@ type EInvoice struct {
 	ID                       *int64          `db:"id" json:",string"`
 	FormReleaseID            int64           `db:"form_release_id" json:",string"`
 	OriginalInvoiceID        *int64          `db:"original_invoice_id" json:",string"`
-	CreatedDate              *Timestamp      `db:"created_date"`
 	InvoiceDate              *Timestamp      `db:"invoice_date"`
 	InvoiceNo                string          `db:"invoice_no"`
 	PayType                  string          `db:"pay_type"`
-	CurrencyID               int64           `db:"currency_id" json:",string"`
+	CurrencyID               *int64          `db:"currency_id" json:",string"`
 	ExchangeRateAmount       decimal.Decimal `db:"exchange_rate_amount"`
 	RelationalExchRateAmount decimal.Decimal `db:"relational_exch_rate_amount"`
-	CustomerID               *int64          `db:"customer_id"`
+	CustomerID               *int64          `db:"customer_id" json:",string"`
 	CustomerVatNumber        string          `db:"customer_vat_number"`
 	CustomerName             string          `db:"customer_name"`
 	CustomerAddress          string          `db:"customer_address"`
 	CustomerContactName      string          `db:"customer_contact_name"`
+	CustomerContactMobile    string          `db:"customer_contact_mobile"`
+	CustomerContactEmail     string          `db:"customer_contact_email"`
 	CustomerBankAccount      string          `db:"customer_bank_account"`
 	CustomerBankName         string          `db:"customer_bank_name"`
 	ProcessInvoiceStatus     int8            `db:"process_invoice_status"`
@@ -106,7 +107,7 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 	sqlString := "SELECT ehd_invoice.*, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.name as organization " +
+		" organization.description as organization " +
 		" FROM ehd_invoice " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id " +
@@ -164,10 +165,9 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 	defer db.Close()
 	tx := db.MustBegin()
 
-	stmt, _ := tx.PrepareNamed("INSERT INTO ehd_invoice as invoice(id " +
+	stmt, _ := tx.PrepareNamed("INSERT INTO ehd_invoice as invoice(id, " +
 		" form_release_id, " +
 		" original_invoice_id, " +
-		" created_date, " +
 		" invoice_date, " +
 		" invoice_no, " +
 		" pay_type, " +
@@ -178,6 +178,8 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		" customer_name, " +
 		" customer_address, " +
 		" customer_contact_name, " +
+		" customer_contact_mobile, " +
+		" customer_contact_email, " +
 		" customer_bank_account, " +
 		" customer_bank_name, " +
 		" process_invoice_status, " +
@@ -195,7 +197,6 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		" total_other, " +
 		" total_payment, " +
 		" total_payment_words, " +
-		" total_payment_words, " +
 		" rec_created_by, " +
 		" rec_created_at, " +
 		" rec_modified_by, " +
@@ -207,7 +208,6 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		" VALUES ( COALESCE(:id, id_generator()), " +
 		" :form_release_id, " +
 		" :original_invoice_id, " +
-		" :created_date, " +
 		" :invoice_date, " +
 		" :invoice_no, " +
 		" :pay_type, " +
@@ -218,6 +218,8 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		" :customer_name, " +
 		" :customer_address, " +
 		" :customer_contact_name, " +
+		" :customer_contact_mobile, " +
+		" :customer_contact_email, " +
 		" :customer_bank_account, " +
 		" :customer_bank_name, " +
 		" :process_invoice_status, " +
@@ -240,13 +242,12 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		" :rec_modified_by, " +
 		" :rec_modified_at, " +
 		" :status, " +
-		" COALESCE(:version, 1), " +
+		" :version, " +
 		" :client_id, " +
 		" :organization_id) " +
 		" ON CONFLICT ON CONSTRAINT pk_ehd_invoice DO UPDATE SET " +
 		" form_release_id		= EXCLUDED.form_release_id," +
 		" original_invoice_id	= EXCLUDED.original_invoice_id, " +
-		" created_date			= EXCLUDED.created_date, " +
 		" invoice_date			= EXCLUDED.invoice_date, " +
 		" invoice_no			= EXCLUDED.invoice_no, " +
 		" pay_type				= EXCLUDED.pay_type, " +
@@ -257,6 +258,8 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 		" customer_name			= EXCLUDED.customer_name, " +
 		" customer_address		= EXCLUDED.customer_address, " +
 		" customer_contact_name	= EXCLUDED.customer_contact_name, " +
+		" customer_contact_mobile	= EXCLUDED.customer_contact_mobile, " +
+		" customer_contact_email	= EXCLUDED.customer_contact_email, " +
 		" customer_bank_account	= EXCLUDED.customer_bank_account, " +
 		" customer_bank_name	= EXCLUDED.customer_bank_name, " +
 		" process_invoice_status	= EXCLUDED.process_invoice_status, " +
@@ -410,7 +413,7 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 	err = db.Get(&getData, "SELECT ehd_invoice.*, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization "+
+		" organization.description as organization "+
 		"	FROM ehd_invoice "+
 		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+

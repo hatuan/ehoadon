@@ -90,7 +90,7 @@ func GetEInvoiceItemUoms(orgID int64, searchCondition string, infiniteScrollingI
 	defer db.Close()
 
 	sqlString := "SELECT ehd_item_uom.*, user_created.name as rec_created_by_user, " +
-		" user_modified.name as rec_modified_by_user, organization.name as organization" +
+		" user_modified.name as rec_modified_by_user, organization.description as organization" +
 		" FROM ehd_item_uom " +
 		" INNER JOIN user_profile as user_created ON ehd_item_uom.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_item_uom.rec_modified_by = user_modified.id " +
@@ -216,7 +216,7 @@ func GetEInvoiceItemUomByID(id int64) (EInvoiceItemUom, TransactionalInformation
 	err = db.Get(&getData, "SELECT ehd_item_uom.*,"+
 		"user_created.name as rec_created_by_user,"+
 		"user_modified.name as rec_modified_by_user,"+
-		"organization.name as organization"+
+		"organization.description as organization"+
 		"	FROM ehd_item_uom "+
 		"		INNER JOIN user_profile as user_created ON ehd_item_uom.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_item_uom.rec_modified_by = user_modified.id "+
@@ -247,7 +247,7 @@ func GetEInvoiceItemUomByCode(code string, orgID int64) (EInvoiceItemUom, Transa
 	err = db.Get(&getData, "SELECT ehd_item_uom.*,"+
 		"user_created.name as rec_created_by_user,"+
 		"user_modified.name as rec_modified_by_user,"+
-		"organization.name as organization"+
+		"organization.description as organization"+
 		"	FROM ehd_item_uom "+
 		"		INNER JOIN user_profile as user_created ON ehd_item_uom.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_item_uom.rec_modified_by = user_modified.id "+

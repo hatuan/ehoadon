@@ -18,7 +18,7 @@ type EInvoiceCustomer struct {
 	Description            string     `db:"description"`
 	Address                string     `db:"address"`
 	AddressTransition      string     `db:"address_transition"`
-	VatNumber                string     `db:"vat_number"`
+	VatNumber              string     `db:"vat_number"`
 	Mobile                 string     `db:"mobile"`
 	Fax                    string     `db:"fax"`
 	Telephone              string     `db:"telephone"`
@@ -103,7 +103,7 @@ func GetEInvoiceCustomers(orgID int64, searchCondition string, infiniteScrolling
 	defer db.Close()
 
 	sqlString := "SELECT ehd_customer.*, user_created.name as rec_created_by_user, " +
-		" user_modified.name as rec_modified_by_user, organization.name as organization" +
+		" user_modified.name as rec_modified_by_user, organization.description as organization" +
 		" FROM ehd_customer " +
 		" INNER JOIN user_profile as user_created ON ehd_customer.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_customer.rec_modified_by = user_modified.id " +
@@ -268,7 +268,7 @@ func GetEInvoiceCustomerByID(id int64) (EInvoiceCustomer, TransactionalInformati
 	err = db.Get(&getData, "SELECT ehd_customer.*,"+
 		"user_created.name as rec_created_by_user,"+
 		"user_modified.name as rec_modified_by_user,"+
-		"organization.name as organization"+
+		"organization.description as organization"+
 		"	FROM ehd_customer "+
 		"		INNER JOIN user_profile as user_created ON ehd_customer.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_customer.rec_modified_by = user_modified.id "+
@@ -299,7 +299,7 @@ func GetEInvoiceCustomerByCode(code string, orgID int64) (EInvoiceCustomer, Tran
 	err = db.Get(&getData, "SELECT ehd_customer.*,"+
 		"user_created.name as rec_created_by_user,"+
 		"user_modified.name as rec_modified_by_user,"+
-		"organization.name as organization"+
+		"organization.description as organization"+
 		"	FROM ehd_customer "+
 		"		INNER JOIN user_profile as user_created ON ehd_customer.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_customer.rec_modified_by = user_modified.id "+

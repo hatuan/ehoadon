@@ -101,7 +101,7 @@ func GetEInvoiceItems(orgID int64, searchCondition string, infiniteScrollingInfo
 	sqlString := "SELECT ehd_item.*, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.name as organization, " +
+		" organization.description as organization, " +
 		" COALESCE(ehd_item_uom.code, '') as item_uom_code, " +
 		" COALESCE(ehd_item_group.code, '') as item_group_code " +
 		" FROM ehd_item " +
@@ -251,7 +251,7 @@ func GetEInvoiceItemByID(id int64) (EInvoiceItem, TransactionalInformation) {
 	err = db.Get(&getData, "SELECT ehd_item.*, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization, "+
+		" organization.description as organization, "+
 		" COALESCE(ehd_item_uom.code, '') as item_uom_code, "+
 		" COALESCE(ehd_item_group.code, '') as item_group_code "+
 		"	FROM ehd_item "+
@@ -286,7 +286,7 @@ func GetEInvoiceItemByCode(code string, orgID int64) (EInvoiceItem, Transactiona
 	err = db.Get(&getData, "SELECT ehd_item.*, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization, "+
+		" organization.description as organization, "+
 		" COALESCE(ehd_item_uom.code, '') as item_uom_code, "+
 		" COALESCE(ehd_item_group.code, '') as item_group_code "+
 		"	FROM ehd_item "+

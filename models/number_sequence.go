@@ -179,7 +179,7 @@ func GetNumberSequences(orgID int64, searchCondition string, infiniteScrollingIn
 	defer db.Close()
 
 	sqlString := "SELECT number_sequence.*, user_created.name as rec_created_by_user, " +
-		" user_modified.name as rec_modified_by_user, organization.name as organization" +
+		" user_modified.name as rec_modified_by_user, organization.description as organization" +
 		" FROM number_sequence " +
 		" INNER JOIN user_profile as user_created ON number_sequence.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON number_sequence.rec_modified_by = user_modified.id " +
@@ -288,7 +288,7 @@ func GetNumberSequenceByID(id int64) (NumberSequence, TransactionalInformation) 
 	err = db.Get(&numberSequence, "SELECT number_sequence.*,"+
 		"user_created.name as rec_created_by_user,"+
 		"user_modified.name as rec_modified_by_user,"+
-		"organization.name as organization"+
+		"organization.description as organization"+
 		"	FROM number_sequence "+
 		"		INNER JOIN user_profile as user_created ON number_sequence.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON number_sequence.rec_modified_by = user_modified.id "+
@@ -319,7 +319,7 @@ func GetNumberSequenceByCode(code string, orgID int64) (NumberSequence, Transact
 	err = db.Get(&numberSequence, "SELECT number_sequence.*,"+
 		"user_created.name as rec_created_by_user,"+
 		"user_modified.name as rec_modified_by_user,"+
-		"organization.name as organization"+
+		"organization.description as organization"+
 		"	FROM number_sequence "+
 		"		INNER JOIN user_profile as user_created ON number_sequence.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON number_sequence.rec_modified_by = user_modified.id "+

@@ -81,7 +81,7 @@ func GetEInvoiceLines(orgID int64, searchCondition string, infiniteScrollingInfo
 	sqlString := "SELECT ehd_invoice_line.*, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.name as organization, " +
+		" organization.description as organization, " +
 		" FROM ehd_invoice_line " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice_line.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice_line.rec_modified_by = user_modified.id " +
@@ -255,7 +255,7 @@ func GetEInvoiceLinesByHeaderID(headerID int64) ([]EInvoiceLine, TransactionalIn
 	sqlString := "SELECT ehd_invoice_line.*, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.name as organization, " +
+		" organization.description as organization, " +
 		" FROM ehd_invoice_line " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice_line.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice_line.rec_modified_by = user_modified.id " +
@@ -289,7 +289,7 @@ func GetEInvoiceLineByID(id int64) (EInvoiceLine, TransactionalInformation) {
 	err = db.Get(&getData, "SELECT ehd_invoice_line.*, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
-		" organization.name as organization, "+
+		" organization.description as organization, "+
 		"	FROM ehd_invoice_line "+
 		"		INNER JOIN user_profile as user_created ON ehd_invoice_line.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_invoice_line.rec_modified_by = user_modified.id "+

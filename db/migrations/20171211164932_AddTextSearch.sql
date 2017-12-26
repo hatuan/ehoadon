@@ -30,7 +30,7 @@ $BODY$
 DECLARE
 BEGIN
     CASE TG_TABLE_NAME
-        WHEN 'xxxx' THEN
+        WHEN 'xxx' THEN
             RETURN NEW;
         ELSE
             IF (TG_OP = 'DELETE') THEN
@@ -50,6 +50,22 @@ END
 $BODY$
   LANGUAGE plpgsql;
 -- +goose StatementEnd
+
+CREATE TRIGGER textsearch_udate
+  AFTER INSERT OR UPDATE OR DELETE
+  ON currency
+  FOR EACH ROW
+  EXECUTE PROCEDURE textsearch_udate_trigger();
+
+UPDATE currency SET description = description;
+
+CREATE TRIGGER textsearch_udate
+  AFTER INSERT OR UPDATE OR DELETE
+  ON number_sequence
+  FOR EACH ROW
+  EXECUTE PROCEDURE textsearch_udate_trigger();
+
+UPDATE number_sequence SET description = description;
 
 CREATE TRIGGER textsearch_udate
   AFTER INSERT OR UPDATE OR DELETE
@@ -84,6 +100,10 @@ CREATE TRIGGER textsearch_udate
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 DROP TABLE textsearch;
+DROP TRIGGER IF EXISTS textsearch_udate ON client;
+DROP TRIGGER IF EXISTS textsearch_udate ON organization;
+DROP TRIGGER IF EXISTS textsearch_udate ON currency;
+DROP TRIGGER IF EXISTS textsearch_udate ON number_sequence;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_customer;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_tax_authorities;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_uom;
