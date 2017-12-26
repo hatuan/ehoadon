@@ -101,17 +101,16 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_organization_code ON organization USING bt
 
 CREATE TABLE IF NOT EXISTS role
 (
-  client_id bigint NOT NULL,
-  description character varying NOT NULL,
   id bigint NOT NULL DEFAULT id_generator(), 
-  name character varying NOT NULL,
-  organization_id bigint NOT NULL,
+  description character varying NOT NULL,
   rec_created_by bigint NOT NULL,
   rec_modified_by bigint NOT NULL,
   status smallint NOT NULL,
   version bigint NOT NULL,
   rec_created_at timestamp with time zone NOT NULL,
   rec_modified_at timestamp with time zone NOT NULL,
+  client_id bigint NOT NULL,
+  organization_id bigint NOT NULL,
   CONSTRAINT pk_role PRIMARY KEY (id)
 );
 
