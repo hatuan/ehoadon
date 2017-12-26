@@ -10,13 +10,8 @@
                     <input type="text" class="form-control" name="Code" id="Code" ng-model="EditItem.Code" capitalize required/>
                 </div>
                 <div class="form-group col-md-6">
-                    <label class="control-label" for="Uom">UOM</label>
-                    <ui-select name="Uom" id="Uom" ng-model="EditItem.UomID">
-                        <ui-select-match>{{$select.selected.value.Code}}</ui-select-match>
-                        <ui-select-choices refresh="searchUoms($select)" refresh-delay="300" repeat="uom.value.ID as (key, uom) in SearchUoms">
-                            <div>{{uom.value.Code}}</div>
-                        </ui-select-choices>
-                    </ui-select>
+                    <label class="control-label" for="UomID">UOM</label>
+                    <select class="form-control" name="UomID" id="UomID" ng-model="EditItem.UomID"></select>
                 </div>
             </div>    
             <div class="form-group">

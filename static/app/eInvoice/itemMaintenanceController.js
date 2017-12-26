@@ -3,13 +3,12 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceItemService'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceItemService', '$stateParams', '$confirm', 'Constants', 'editItem'];
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'eInvoiceItemService'], function(angularAMD, $) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$auth', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceItemService', '$stateParams', '$confirm', 'Constants', 'editItem'];
 
-    var itemMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceItemService, $stateParams, $confirm, Constants, editItem) {
+    var itemMaintenanceController = function($scope, $rootScope, $state, $auth, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceItemService, $stateParams, $confirm, Constants, editItem) {
         $scope.Constants = Constants;
         $scope.EditItem = editItem;
-        $scope.SearchUoms = [];
 
         if($scope.EditItem.ID == null) {
             $scope.EditItem.Code = "";
@@ -22,9 +21,56 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceItemSer
             $scope.EditItem.RecModifiedByID = $rootScope.currentUser.ID;
             $scope.EditItem.RecModifiedByUser = $rootScope.currentUser.Name;
             $scope.EditItem.RecModified = new Date();
-        } else {
-            $scope.SearchUoms = [{ID: $scope.EditItem.UomID, Code:$scope.EditItem.UomCode}];
-        }
+        };
+
+        $scope.$watch('$viewContentLoaded', 
+            function() { 
+                setTimeout(function() {
+                    $('#UomID').select2({
+                        ajax: {
+                            url: '/api/autocomplete',
+                            tags: true, 
+                            data: function (params) {
+                              var query = {
+                                term: params.term || this.select2('data')[0].text,
+                                page: params.page,
+                                object:'ehd_item_uom'
+                              }
+                        
+                              // Query parameters will be ?term=[term]&object=public
+                              return query;
+                            },
+                            beforeSend: function (xhr) {   //Include the bearer token in header
+                                xhr.setRequestHeader("Authorization", $auth.getToken());
+                            },
+                            processResults: function (data) {
+                                var mappedItems = null;
+                                mappedItems = $.map(data, function (obj) {
+                                    obj.id = obj.id || obj["ID"];
+                                    obj.text = obj.text || obj["Code"];
+                                    obj.description = obj.description || obj["Description"];
+
+                                    return obj;
+                                });
+
+                                return {
+                                  results: mappedItems
+                                };
+                            }
+                        },
+                        dropdownCssClass : 'big-dropdown-width',
+                        theme: "bootstrap",
+                        templateResult : function (result) { 
+                            if (result.loading) 
+                                return "Searching...";
+                            return result.text + " - " + result.description; 
+                        }
+                    });
+
+                    var newOption = new Option($scope.EditItem.UomCode, $scope.EditItem.UomID, false, false);
+                    $('#UomID').empty().append(newOption);
+                }, 0);    
+        });
 
         $scope.validationOptions = {
             rules: {
