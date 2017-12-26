@@ -11,7 +11,9 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         $scope.initializeController = function() {
             $scope.Constants = Constants;
             $scope.EditInvoice = editInvoice;
+            $scope.EditInvoice.InvoiceLines = [];
 
+            
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                 $scope.EditInvoice.Status = $scope.Constants.Status[1].Code;
                 $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
@@ -24,12 +26,6 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                 $scope.EditInvoice.InvoiceLines = [];
             }
 
-            /*
-            if ($scope.EditInvoice.InvoiceLines.length == null || $scope.EditInvoice.InvoiceLines.length == 0) {
-                var invoiceLine = $scope.createInvoiceLineObject();
-                $scope.EditInvoice.InvoiceLines.push(invoiceLine);
-            }
-            */
             /*
             if ($scope.EditInvoice.InvoiceLines.length == null) 
                 $scope.EditInvoice.InvoiceLines.length == 0;
@@ -88,7 +84,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                         var data = e.params.data;
                         $scope.updateCustomer(data.id);
                     });
-/*
+
                     $("[name='ItemCode[]']").select2({
                         ajax: {
                             url: '/api/autocomplete',
@@ -173,61 +169,43 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                             return result.text + " - " + result.description; 
                         }
                     });
-*/
-                }, 0);    
 
+                }, 0);    
         });
 
         $scope.validationOptions = {
             rules: {
-                "InvoiceType": {
-                    required: true
-                },
-                "NumberForm2": {
-                    required: true
-                },
-                "NumberForm3": {
-                    required: true
-                },
-                "SymbolPart1": {
-                    required: true
-                },
-                "SymbolPart2": {
-                    required: true
-                },
-                "InvoiceForm": {
-                    required: true
-                },
+                
             }
         };
 
-        $scope.ok = function(form) {
-            if (form.validate()) {
-                var _postInvoice = new Object();
-                $scope.EditInvoice.NumberForm3 = ("000" + $scope.EditInvoice.NumberForm3).substring($scope.EditInvoice.NumberForm3.length);
-                $scope.EditInvoice.NumberForm = $scope.EditInvoice.InvoiceType + $scope.EditInvoice.NumberForm2 + "/" + $scope.EditInvoice.NumberForm3;
-                $scope.EditInvoice.Symbol = $scope.EditInvoice.SymbolPart1 + "/" + $scope.EditInvoice.SymbolPart2 + $scope.EditInvoice.InvoiceForm;
-
-                if($scope.EditInvoice.ID == "") {
-                    $scope.EditInvoice.ID = null;
-                    $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
-                    $scope.EditInvoice.RecCreated = new Date();
-                    $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
-                    $scope.EditInvoice.RecModified = new Date();
-
-                    _postInvoice = $scope.EditInvoice;
-                    _postInvoice.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
-                    _postInvoice.RecModified = new moment($scope.EditInvoice.RecModified).unix();
-                } else {
-                    $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
-                    $scope.EditInvoice.RecModified = new Date();
-
-                    _postInvoice = $scope.EditInvoice;
-                    _postInvoice.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
-                    _postInvoice.RecModifiedByID = $rootScope.currentUser.ID;
-                    _postInvoice.RecModified = new moment($scope.EditInvoice.RecModified).unix();
+        $scope.validationLinesOptions = {
+            rules: {
+                "Description[]": {
+                    required: true
+                }, 
+                "Quantity[]": {
+                    number: true
+                }, 
+                "UnitPrice[]": {
+                    number: true
+                }, 
+                "Amount[]": {
+                    number: true
+                }, 
+                "AmountVat[]": {
+                    number: true
+                }, 
+                "AmountPayment[]": {
+                    number: true
                 }
-                
+            }
+        };
+
+        $scope.ok = function(form, formDetail) {
+            if (form.validate() && formDetail.validate()) {
+                var _postInvoice = new Object();
+                                
                 eInvoiceService.updateInvoice(_postInvoice, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
             }
         };
@@ -249,16 +227,23 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         };
 
         $scope.createInvoiceLineObject = function() {
-            
             var _invoiceLine = new Object();
             _invoiceLine.InvoiceID = $scope.EditInvoice.ID;
-            //_invoiceLine.LineNo = angular.isUndefinedOrNull($scope.EditInvoice.InvoiceLines.length) ? 1 : $scope.EditInvoice.InvoiceLines.length + 1;
+            _invoiceLine.Description = "";
             _invoiceLine.Quantity = new BigNumber(0);
             _invoiceLine.UnitPrice = new BigNumber(0);
             _invoiceLine.Amount = new BigNumber(0);
             _invoiceLine.Vat = $scope.Constants.VatTypes[0].Code;
             _invoiceLine.AmountVat = new BigNumber(0);
             _invoiceLine.AmountPayment = new BigNumber(0);
+
+            _invoiceLine.Status = $scope.Constants.Status[1].Code;
+            _invoiceLine.RecCreatedByID = $rootScope.currentUser.ID;
+            _invoiceLine.RecCreatedByUser = $rootScope.currentUser.Name;
+            _invoiceLine.RecCreated = new Date();
+            _invoiceLine.RecModifiedByID = $rootScope.currentUser.ID;
+            _invoiceLine.RecModifiedByUser = $rootScope.currentUser.Name;
+            _invoiceLine.RecModified = new Date();
 
             return _invoiceLine;
         }
@@ -268,16 +253,14 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
 
             $scope.EditInvoice.InvoiceLines.push(_invoiceLine);
 
-            /*
             setTimeout(function() {
                 $scope.SetItemSelect2ToObject("#ItemCode_" + _invoiceLine.LineNo);
                 $scope.SetItemUomSelect2ToObject("#UomID_" + _invoiceLine.LineNo);
 
                 $("#ItemCode_" + _invoiceLine.LineNo).select2('open');
             }, 0);
-            */
         };
-
+        
         $scope.SetItemSelect2ToObject = function(objectString) {
             $(objectString).select2({
                 ajax: {
@@ -385,6 +368,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         };
 
         $scope.updateItem = function(_ID, invoiceLine) {
+            
             eInvoiceItemService.getItem(
                 {ID : _ID}, 
                 function(response, status) { //success
@@ -494,6 +478,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
 
             $scope.EditInvoice.TotalPayment = totalPayment;
         }
+
     };
 
     invoiceMaintenanceController.$inject = injectParams;
