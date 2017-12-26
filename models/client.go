@@ -16,7 +16,7 @@ import (
 // Client represents the client model
 type Client struct {
 	ClientID                    *int64          `db:"id" json:",string"`
-	Name                        string          `db:"name"`
+	Description                 string          `db:"description"`
 	Version                     int16           `db:"version"`
 	IsActivated                 bool            `db:"is_activated"`
 	RecCreatedBy                int64           `db:"rec_created_by" json:",string"`

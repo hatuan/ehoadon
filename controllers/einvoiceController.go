@@ -57,6 +57,7 @@ func API_eInvoices(w http.ResponseWriter, r *http.Request, next http.HandlerFunc
 			einvoice.RecModifiedByID = *user.ID
 			einvoice.RecCreated = &models.Timestamp{time.Now()}
 			einvoice.RecModified = &models.Timestamp{time.Now()}
+			einvoice.Version = 1
 			einvoice.ClientID = user.ClientID
 			einvoice.OrganizationID = user.OrganizationID
 		} else {

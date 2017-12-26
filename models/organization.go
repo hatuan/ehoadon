@@ -13,7 +13,7 @@ import (
 type Organization struct {
 	ID                *int64     `db:"id" json:",string"`
 	Code              string     `db:"code"`
-	Name              string     `db:"name"`
+	Description       string     `db:"description"`
 	RecCreatedByID    int64      `db:"rec_created_by" json:",string"`
 	RecCreatedByUser  string     `db:"-"`
 	RecCreatedAt      *Timestamp `db:"rec_created_at"`

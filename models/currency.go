@@ -3,7 +3,7 @@ package models
 type Currency struct {
 	ID                *int64     `db:"id" json:",string"`
 	Code              string     `db:"code"`
-	Name              string     `db:"name"`
+	Description       string     `db:"description"`
 	RecCreatedByID    int64      `db:"rec_created_by_id" json:",string"`
 	RecCreatedByUser  string     `db:"rec_created_by_user"`
 	RecCreated        *Timestamp `db:"rec_created"`

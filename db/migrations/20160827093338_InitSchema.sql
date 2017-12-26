@@ -61,17 +61,17 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_user_profile_name ON user_profile USING bt
 
 CREATE TABLE IF NOT EXISTS client
 (
-  version bigint NOT NULL,
-  rec_created_by bigint NOT NULL,
-  name character varying NOT NULL,
-  is_activated boolean NOT NULL,
   id bigint NOT NULL DEFAULT id_generator(),
+  description character varying NOT NULL,
+  is_activated boolean NOT NULL,
   culture_id character varying NOT NULL,
   amount_decimal_places smallint NOT NULL,
   amount_rounding_precision numeric NOT NULL,
   "unit-amount_decimal_places" smallint NOT NULL,
   "unit-amount_rounding_precision" numeric NOT NULL,
   currency_lcy_id bigint,
+  version bigint NOT NULL,
+  rec_created_by bigint NOT NULL,
   rec_modified_by bigint NOT NULL,
   rec_created_at timestamp with time zone NOT NULL,
   rec_modified_at timestamp with time zone NOT NULL,
@@ -82,16 +82,16 @@ CREATE INDEX IF NOT EXISTS idx_client_currency_lcy ON client USING btree (curren
 
 CREATE TABLE IF NOT EXISTS organization
 (
+  id bigint NOT NULL DEFAULT id_generator(),
+  code character varying NOT NULL,
+  description character varying NOT NULL,
   version bigint NOT NULL,
   status smallint NOT NULL,
   rec_modified_by bigint NOT NULL,
   rec_created_by bigint NOT NULL,
-  name character varying NOT NULL,
-  id bigint NOT NULL DEFAULT id_generator(),
-  code character varying NOT NULL,
-  client_id bigint NOT NULL,
   rec_created_at timestamp with time zone NOT NULL,
   rec_modified_at timestamp with time zone NOT NULL,
+  client_id bigint NOT NULL,
   CONSTRAINT pk_organization PRIMARY KEY (id)
 );
 
@@ -129,24 +129,24 @@ CREATE INDEX IF NOT EXISTS "idx_userinrole_userid"  ON user_in_role USING btree 
 
 CREATE TABLE IF NOT EXISTS number_sequence
 (
-  client_id bigint NOT NULL,
+  id bigint NOT NULL DEFAULT id_generator(),
   code character varying NOT NULL,
+  description character varying NOT NULL,
   current_no integer NOT NULL,
+  starting_no integer NOT NULL,
   ending_no integer NOT NULL,
   format_no character varying NOT NULL,
-  id bigint NOT NULL DEFAULT id_generator(),
   is_default boolean NOT NULL,
   manual boolean NOT NULL,
-  name character varying NOT NULL,
   no_seq_name character varying NOT NULL,
-  organization_id bigint NOT NULL,
   rec_created_by bigint NOT NULL,
   rec_modified_by bigint NOT NULL,
-  starting_no integer NOT NULL,
   status smallint NOT NULL,
   version bigint NOT NULL,
   rec_created_at timestamp with time zone NOT NULL,
   rec_modified_at timestamp with time zone NOT NULL,
+  client_id bigint NOT NULL,
+  organization_id bigint NOT NULL,
   CONSTRAINT pk_number_sequence PRIMARY KEY (id)
 );
 
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS currency
 (
   id bigint NOT NULL DEFAULT id_generator(),
   code character varying NOT NULL,
-  name character varying NOT NULL,
+  description character varying NOT NULL,
   organization_id bigint NOT NULL,
   client_id bigint NOT NULL,
   version bigint NOT NULL,
