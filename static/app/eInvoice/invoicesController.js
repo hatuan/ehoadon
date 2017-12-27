@@ -3,7 +3,7 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceService', 'app/eInvoice/invoiceMaintenanceController'], function (angularAMD, $) {
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myApp.Search', 'eInvoiceService', 'app/eInvoice/invoiceMaintenanceController', 'app/eInvoice/invoiceViewReportController'], function (angularAMD, $) {
     var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceService'];
 
     var eInvoicesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceService) {
@@ -43,7 +43,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             */
             $scope.eInvoices = [];
             $scope.FilteredInvoices = [];
-            $scope.selectReports = false;
+            $scope.selectViewReport = false;
             $scope.getInvoices();
         };
 
@@ -132,6 +132,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 ariaDescribedBy: 'modal-body',
                 backdrop: 'static', //disables modal closing by click on the backdrop
                 size:'lg',
+                keyboard: false,
                 windowClass: 'my-modal-fullscreen', //set style in .my-modal-fullscreen .modal-lg {} in site.css
                 templateUrl: 'app/eInvoice/invoiceMaintenance.html',
                 controller: 'eInvoiceMaintenanceController',
@@ -149,12 +150,50 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
+                var _invoice = _result.EditInvoice;
+                $scope.selectViewReport = _result.selectViewReport;
 
+                if($scope.selectViewReport) {
+                    $scope.viewReport(_invoice);
+                }
             }, function(_result) {
                 //dismissed 
             })['finally'](function() {
                 modalInstance = undefined;
             });    
+        };
+
+        $scope.viewReport = function(_invoice) {
+            var modalViewReportInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                backdrop: 'static', //disables modal closing by click on the backdrop
+                size:'lg',
+                keyboard: false,
+                templateUrl: 'app/eInvoice/invoiceViewReport.html',
+                controller: 'eInvoiceViewReportController',
+                resolve: {
+                    editInvoice: function() {
+                        var __invoice = $.extend({}, _invoice);
+                        return __invoice;
+                    }
+                }
+            });
+            modalViewReportInstance.rendered.then(function(result) {
+                $('.modal .modal-body').css('overflow-y', 'auto');
+                $('.modal .modal-body').css('max-height', $(window).height() * 0.7);
+                $('.modal .modal-body').css('height', $(window).height() * 0.7);
+                $('.modal .modal-body').css('margin-right', 0);
+            });
+            modalViewReportInstance.result.then(function(_result) { //close
+                $scope.edit(_result.EditInvoice);
+            }, function(_result) { //dismiss
+                $scope.edit(_result.EditInvoice);
+            })['finally'](function() {
+                modalViewReportInstance = undefined;
+                $scope.selectViewReport = false;
+            });
         };
     };
 

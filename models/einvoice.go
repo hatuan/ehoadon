@@ -23,6 +23,7 @@ type EInvoice struct {
 	FormReleaseDate                 *Timestamp      `db:"form_release_date"`
 	FormReleaseStartDate            *Timestamp      `db:"form_release_start_date"`
 	FormReleaseTaxAuthoritiesStatus int8            `db:"form_release_tax_authorities_status" json:",string"`
+	FormTypeID                      int64           `db:"form_type_id" json:",string"`
 	FormTypeNumberForm              string          `db:"form_type_number_form"` //01GTKT0/000
 	FormTypeSymbol                  string          `db:"form_type_symbol"`      //EY/17E
 	OriginalInvoiceID               *int64          `db:"original_invoice_id" json:",string"`
@@ -56,7 +57,7 @@ type EInvoice struct {
 	TotalVat                        decimal.Decimal `db:"total_vat"`
 	TotalOther                      decimal.Decimal `db:"total_other"`
 	TotalPayment                    decimal.Decimal `db:"total_payment"`
-	TotalPaymentWords               decimal.Decimal `db:"total_payment_words"`
+	TotalPaymentWords               string          `db:"total_payment_words"`
 	InvoiceLines                    []EInvoiceLine  `db:"-"`
 	RecCreatedByID                  int64           `db:"rec_created_by" json:",string"`
 	RecCreatedByUser                string          `db:"rec_created_by_user"`
@@ -122,6 +123,7 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 		" ehd_form_release.release_date as form_release_date, " +
 		" ehd_form_release.start_date as form_release_start_date, " +
 		" ehd_form_release.tax_authorities_status as form_release_tax_authorities_status, " +
+		" ehd_form_release.form_type_id  as form_type_id, " +
 		" ehd_form_type.number_form as form_type_number_form, " +
 		" ehd_form_type.symbol as form_type_symbol, " +
 		" ehd_customer.code as customer_code, " +
@@ -439,6 +441,7 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 		" ehd_form_release.release_date as form_release_date, "+
 		" ehd_form_release.start_date as form_release_start_date, "+
 		" ehd_form_release.tax_authorities_status as form_release_tax_authorities_status, "+
+		" ehd_form_release.form_type_id  as form_type_id, "+
 		" ehd_form_type.number_form as form_type_number_form, "+
 		" ehd_form_type.symbol as form_type_symbol, "+
 		" ehd_customer.code as customer_code, "+

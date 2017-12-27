@@ -3,7 +3,7 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'select2', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService'], function(angularAMD, $, BigNumber) {
+define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService'], function(angularAMD, $, BigNumber) {
     var injectParams = ['$scope', '$rootScope', '$state', '$auth', '$filter' , 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
     var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, $filter, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, $stateParams, $confirm, Constants, editInvoice) {
@@ -13,6 +13,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
             $scope.eInvoiceFormTypes = [];
             $scope.EditInvoice = editInvoice;
             $scope.EditInvoice.InvoiceLines = [];
+            $scope.selectViewReport = false;
 
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                 $scope.EditInvoice.Status = $scope.Constants.Status[1].Code;
@@ -25,7 +26,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
 
                 $scope.EditInvoice.InvoiceLines = [];
             } else {
-                $scope.getInvoice($scope.EditInvoice.ID);
+                
             }
 
             $scope.getFormReleases();
@@ -120,7 +121,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
             }
         };
 
-        $scope.ok = function(form, formDetail) {
+        $scope.ok = function(form, formDetail, _selectViewReport) {
             if (form.validate() && formDetail.validate()) {
                 
                 var _post = new Object();
@@ -160,7 +161,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                         _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
                     }
                 }
-
+                $scope.selectViewReport = _selectViewReport;
                 eInvoiceService.updateInvoice(_post, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
             }
         };
@@ -172,6 +173,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         $scope.invoiceUpdateCompleted = function(response, status) {
             var _result = new Object();
             _result.EditInvoice = $scope.EditInvoice;
+            _result.selectViewReport = $scope.selectViewReport;
 
             $uibModalInstance.close(_result);
         };
@@ -179,12 +181,6 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         $scope.invoiceUpdateError = function(response, status) {
             alertsService.RenderErrorMessage(response.Error);
         };
-
-        $scope.ok = function(form, formDetail) {
-            if (form.validate() && formDetail.validate()) {
-                
-            }
-        }
 
         $scope.getInvoice = function(_ID) {
             var invoiceInquiry = new Object();
@@ -230,6 +226,9 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                         $scope.eInvoiceFormTypes[i].Description = $filter('filter')($scope.Constants.InvoiceTypes, {Code:$scope.eInvoiceFormTypes[i].FormTypeInvoiceType})[0].Name + " - " + $scope.eInvoiceFormTypes[i].FormTypeNumberForm + " - " + $scope.eInvoiceFormTypes[i].FormTypeSymbol;
                         $scope.eInvoiceFormTypes[i].Description += " (From : " + $scope.eInvoiceFormTypes[i].ReleaseFrom + " - To : " + $scope.eInvoiceFormTypes[i].ReleaseTo + ")";
                     }
+
+                    if (!angular.isUndefinedOrNull($scope.EditInvoice.ID))
+                        $scope.getInvoice($scope.EditInvoice.ID);
                 },
                 function(response){
                     alertsService.RenderErrorMessage(response.Error);
