@@ -14,52 +14,61 @@ import (
 )
 
 type EInvoice struct {
-	ID                       *int64          `db:"id" json:",string"`
-	FormReleaseID            int64           `db:"form_release_id" json:",string"`
-	OriginalInvoiceID        *int64          `db:"original_invoice_id" json:",string"`
-	InvoiceDate              *Timestamp      `db:"invoice_date"`
-	InvoiceNo                string          `db:"invoice_no"`
-	PayType                  string          `db:"pay_type"`
-	CurrencyID               *int64          `db:"currency_id" json:",string"`
-	ExchangeRateAmount       decimal.Decimal `db:"exchange_rate_amount"`
-	RelationalExchRateAmount decimal.Decimal `db:"relational_exch_rate_amount"`
-	CustomerID               *int64          `db:"customer_id" json:",string"`
-	CustomerCode             string          `db:"customer_code"`
-	CustomerVatNumber        string          `db:"customer_vat_number"`
-	CustomerName             string          `db:"customer_name"`
-	CustomerAddress          string          `db:"customer_address"`
-	CustomerContactName      string          `db:"customer_contact_name"`
-	CustomerContactMobile    string          `db:"customer_contact_mobile"`
-	CustomerContactEmail     string          `db:"customer_contact_email"`
-	CustomerBankAccount      string          `db:"customer_bank_account"`
-	CustomerBankName         string          `db:"customer_bank_name"`
-	ProcessInvoiceStatus     int8            `db:"process_invoice_status"`
-	ProcessAdjustedForm      int8            `db:"process_adjusted_form"`
-	ProcessAdjustedType      int8            `db:"process_adjusted_type"`
-	TotalAmount              decimal.Decimal `db:"total_amount"`
-	TotalAmountNoVat         decimal.Decimal `db:"total_amount_no_vat"`
-	TotalAmountVat0          decimal.Decimal `db:"total_amount_vat0"`
-	TotalAmountVat5          decimal.Decimal `db:"total_amount_vat5"`
-	TotalAmountVat10         decimal.Decimal `db:"total_amount_vat10"`
-	TotalDiscount            decimal.Decimal `db:"total_discount"`
-	TotalVat5                decimal.Decimal `db:"total_vat5"`
-	TotalVat10               decimal.Decimal `db:"total_vat10"`
-	TotalVat                 decimal.Decimal `db:"total_vat"`
-	TotalOther               decimal.Decimal `db:"total_other"`
-	TotalPayment             decimal.Decimal `db:"total_payment"`
-	TotalPaymentWords        decimal.Decimal `db:"total_payment_words"`
-	InvoiceLines             []EInvoiceLine  `db:"-"`
-	RecCreatedByID           int64           `db:"rec_created_by" json:",string"`
-	RecCreatedByUser         string          `db:"rec_created_by_user"`
-	RecCreated               *Timestamp      `db:"rec_created_at"`
-	RecModifiedByID          int64           `db:"rec_modified_by" json:",string"`
-	RecModifiedByUser        string          `db:"rec_modified_by_user"`
-	RecModified              *Timestamp      `db:"rec_modified_at"`
-	Status                   int8            `db:"status"`
-	Version                  int16           `db:"version"`
-	ClientID                 int64           `db:"client_id" json:",string"`
-	OrganizationID           int64           `db:"organization_id" json:",string"`
-	Organization             string          `db:"organization"`
+	ID                              *int64          `db:"id" json:",string"`
+	FormReleaseID                   int64           `db:"form_release_id" json:",string"`
+	FormReleaseTotal                int32           `db:"form_release_total"`
+	FormReleaseFrom                 int32           `db:"form_release_from"`
+	FormReleaseTo                   int32           `db:"form_release_to"`
+	FormReleaseUsed                 int32           `db:"form_release_used"`
+	FormReleaseDate                 *Timestamp      `db:"form_release_date"`
+	FormReleaseStartDate            *Timestamp      `db:"form_release_start_date"`
+	FormReleaseTaxAuthoritiesStatus int8            `db:"form_release_tax_authorities_status" json:",string"`
+	FormTypeNumberForm              string          `db:"form_type_number_form"` //01GTKT0/000
+	FormTypeSymbol                  string          `db:"form_type_symbol"`      //EY/17E
+	OriginalInvoiceID               *int64          `db:"original_invoice_id" json:",string"`
+	InvoiceDate                     *Timestamp      `db:"invoice_date"`
+	InvoiceNo                       string          `db:"invoice_no"`
+	PayType                         string          `db:"pay_type"`
+	CurrencyID                      *int64          `db:"currency_id" json:",string"`
+	ExchangeRateAmount              decimal.Decimal `db:"exchange_rate_amount"`
+	RelationalExchRateAmount        decimal.Decimal `db:"relational_exch_rate_amount"`
+	CustomerID                      *int64          `db:"customer_id" json:",string"`
+	CustomerCode                    string          `db:"customer_code"`
+	CustomerVatNumber               string          `db:"customer_vat_number"`
+	CustomerName                    string          `db:"customer_name"`
+	CustomerAddress                 string          `db:"customer_address"`
+	CustomerContactName             string          `db:"customer_contact_name"`
+	CustomerContactMobile           string          `db:"customer_contact_mobile"`
+	CustomerContactEmail            string          `db:"customer_contact_email"`
+	CustomerBankAccount             string          `db:"customer_bank_account"`
+	CustomerBankName                string          `db:"customer_bank_name"`
+	ProcessInvoiceStatus            int8            `db:"process_invoice_status"`
+	ProcessAdjustedForm             int8            `db:"process_adjusted_form"`
+	ProcessAdjustedType             int8            `db:"process_adjusted_type"`
+	TotalAmount                     decimal.Decimal `db:"total_amount"`
+	TotalAmountNoVat                decimal.Decimal `db:"total_amount_no_vat"`
+	TotalAmountVat0                 decimal.Decimal `db:"total_amount_vat0"`
+	TotalAmountVat5                 decimal.Decimal `db:"total_amount_vat5"`
+	TotalAmountVat10                decimal.Decimal `db:"total_amount_vat10"`
+	TotalDiscount                   decimal.Decimal `db:"total_discount"`
+	TotalVat5                       decimal.Decimal `db:"total_vat5"`
+	TotalVat10                      decimal.Decimal `db:"total_vat10"`
+	TotalVat                        decimal.Decimal `db:"total_vat"`
+	TotalOther                      decimal.Decimal `db:"total_other"`
+	TotalPayment                    decimal.Decimal `db:"total_payment"`
+	TotalPaymentWords               decimal.Decimal `db:"total_payment_words"`
+	InvoiceLines                    []EInvoiceLine  `db:"-"`
+	RecCreatedByID                  int64           `db:"rec_created_by" json:",string"`
+	RecCreatedByUser                string          `db:"rec_created_by_user"`
+	RecCreated                      *Timestamp      `db:"rec_created_at"`
+	RecModifiedByID                 int64           `db:"rec_modified_by" json:",string"`
+	RecModifiedByUser               string          `db:"rec_modified_by_user"`
+	RecModified                     *Timestamp      `db:"rec_modified_at"`
+	Status                          int8            `db:"status"`
+	Version                         int16           `db:"version"`
+	ClientID                        int64           `db:"client_id" json:",string"`
+	OrganizationID                  int64           `db:"organization_id" json:",string"`
+	Organization                    string          `db:"organization"`
 }
 
 // ErrEInvoiceNotFound indicates there was no EInvoice
@@ -106,6 +115,15 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 	defer db.Close()
 
 	sqlString := "SELECT ehd_invoice.*, " +
+		" ehd_form_release.release_total as form_release_total, " +
+		" ehd_form_release.release_from as form_release_from, " +
+		" ehd_form_release.release_to as form_release_to, " +
+		" ehd_form_release.release_used as form_release_used, " +
+		" ehd_form_release.release_date as form_release_date, " +
+		" ehd_form_release.start_date as form_release_start_date, " +
+		" ehd_form_release.tax_authorities_status as form_release_tax_authorities_status, " +
+		" ehd_form_type.number_form as form_type_number_form, " +
+		" ehd_form_type.symbol as form_type_symbol, " +
 		" ehd_customer.code as customer_code, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
@@ -114,7 +132,9 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 		" INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id " +
 		" INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id " +
-		" INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "
+		" INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id " +
+		" INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id " +
+		" INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "
 
 	sqlWhere := " WHERE ehd_invoice.organization_id = $1"
 	if len(searchCondition) > 0 {
@@ -412,6 +432,15 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 
 	getData := EInvoice{}
 	err = db.Get(&getData, "SELECT ehd_invoice.*, "+
+		" ehd_form_release.release_total as form_release_total, "+
+		" ehd_form_release.release_from as form_release_from, "+
+		" ehd_form_release.release_to as form_release_to, "+
+		" ehd_form_release.release_used as form_release_used, "+
+		" ehd_form_release.release_date as form_release_date, "+
+		" ehd_form_release.start_date as form_release_start_date, "+
+		" ehd_form_release.tax_authorities_status as form_release_tax_authorities_status, "+
+		" ehd_form_type.number_form as form_type_number_form, "+
+		" ehd_form_type.symbol as form_type_symbol, "+
 		" ehd_customer.code as customer_code, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
@@ -421,6 +450,8 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+
 		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "+
 		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
+		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id "+
+		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
 		"	WHERE ehd_invoice.id=$1", id)
 
 	if err != nil && err == sql.ErrNoRows {

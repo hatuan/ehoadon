@@ -180,6 +180,12 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
             alertsService.RenderErrorMessage(response.Error);
         };
 
+        $scope.ok = function(form, formDetail) {
+            if (form.validate() && formDetail.validate()) {
+                
+            }
+        }
+
         $scope.getInvoice = function(_ID) {
             var invoiceInquiry = new Object();
             invoiceInquiry.ID = _ID
