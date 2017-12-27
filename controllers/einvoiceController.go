@@ -65,6 +65,21 @@ func API_eInvoices(w http.ResponseWriter, r *http.Request, next http.HandlerFunc
 			einvoice.RecModified = &models.Timestamp{time.Now()}
 		}
 
+		for lineIndex := range einvoice.InvoiceLines {
+			if einvoice.InvoiceLines[lineIndex].ID == nil {
+				einvoice.InvoiceLines[lineIndex].Version = 1
+				einvoice.InvoiceLines[lineIndex].RecCreatedByID = *user.ID
+				einvoice.InvoiceLines[lineIndex].RecModifiedByID = *user.ID
+				einvoice.InvoiceLines[lineIndex].RecCreated = &models.Timestamp{time.Now()}
+				einvoice.InvoiceLines[lineIndex].RecModified = &models.Timestamp{time.Now()}
+				einvoice.InvoiceLines[lineIndex].ClientID = user.ClientID
+				einvoice.InvoiceLines[lineIndex].OrganizationID = user.OrganizationID
+			} else {
+				einvoice.InvoiceLines[lineIndex].RecModifiedByID = *user.ID
+				einvoice.InvoiceLines[lineIndex].RecModified = &models.Timestamp{time.Now()}
+			}
+		}
+
 		einvoice, tranInfor := models.PostEInvoice(einvoice)
 		if tranInfor.ReturnStatus == false && len(tranInfor.ValidationErrors) > 0 {
 			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, ValidationErrors: tranInfor.ValidationErrors, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": einvoice}}, http.StatusBadRequest)

@@ -4,16 +4,16 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'select2', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService'], function(angularAMD, $, BigNumber) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$auth', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceFormReleaseService', 'eInvoiceService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$auth', '$filter' , 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
-    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, $stateParams, $confirm, Constants, editInvoice) {
+    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, $filter, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
+            $scope.eInvoiceFormTypes = [];
             $scope.EditInvoice = editInvoice;
             $scope.EditInvoice.InvoiceLines = [];
 
-            
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                 $scope.EditInvoice.Status = $scope.Constants.Status[1].Code;
                 $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
@@ -25,8 +25,10 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
 
                 $scope.EditInvoice.InvoiceLines = [];
             } else {
-                //load from api
+                $scope.getInvoice($scope.EditInvoice.ID);
             }
+
+            $scope.getFormReleases();
         };
 
         $scope.$watch('$viewContentLoaded', 
@@ -76,97 +78,22 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                         $scope.updateCustomer(data.id);
                     });
 
-                    $("[name='ItemCode[]']").select2({
-                        ajax: {
-                            url: '/api/autocomplete',
-                            tags: true, 
-                            data: function (params) {
-                              var query = {
-                                term: params.term || this.select2('data')[0].text,
-                                page: params.page,
-                                object:'ehd_item'
-                              }
-                        
-                              // Query parameters will be ?term=[term]&object=public
-                              return query;
-                            },
-                            beforeSend: function (xhr) {   //Include the bearer token in header
-                                xhr.setRequestHeader("Authorization", $auth.getToken());
-                            },
-                            processResults: function (data) {
-                                var mappedItems = null;
-                                mappedItems = $.map(data, function (obj) {
-                                    obj.id = obj.id || obj["ID"];
-                                    obj.text = obj.text || obj["Code"];
-                                    obj.description = obj.description || obj["Description"];
-
-                                    return obj;
-                                });
-
-                                return {
-                                  results: mappedItems
-                                };
-                            }
-                        },
-                        dropdownCssClass : 'big-dropdown-width',
-                        theme: "bootstrap",
-                        templateResult : function (result) { 
-                            if (result.loading) 
-                                return "Searching...";
-                            return result.text + " - " + result.description; 
-                        }
-                    }).on('select2:select', function (e) {
-                        var data = e.params.data;
-                        $scope.updateItem(data.id, angular.element(e.target).scope().invoiceLine);
-                    });
-
-                    $("[name='UomID[]").select2({
-                        ajax: {
-                            url: '/api/autocomplete',
-                            tags: true, 
-                            data: function (params) {
-                              var query = {
-                                term: params.term || this.select2('data')[0].text,
-                                page: params.page,
-                                object:'ehd_item_uom'
-                              }
-                        
-                              // Query parameters will be ?term=[term]&object=public
-                              return query;
-                            },
-                            beforeSend: function (xhr) {   //Include the bearer token in header
-                                xhr.setRequestHeader("Authorization", $auth.getToken());
-                            },
-                            processResults: function (data) {
-                                var mappedItems = null;
-                                mappedItems = $.map(data, function (obj) {
-                                    obj.id = obj.id || obj["ID"];
-                                    obj.text = obj.text || obj["Code"];
-                                    obj.description = obj.description || obj["Description"];
-
-                                    return obj;
-                                });
-
-                                return {
-                                  results: mappedItems
-                                };
-                            }
-                        },
-                        dropdownCssClass : 'big-dropdown-width',
-                        theme: "bootstrap",
-                        templateResult : function (result) { 
-                            if (result.loading) 
-                                return "Searching...";
-                            return result.text + " - " + result.description; 
-                        }
-                    });
-
+                    var newOption = new Option($scope.EditInvoice.CustomerCode, $scope.EditInvoice.CustomerID, false, false);
+                    $('#CustomerID').empty().append(newOption);
                 }, 0);    
-        });
+        }); //$scope.watch
 
         $scope.validationOptions = {
             rules: {
-                
+                "CustomerVatNumber": {
+                    required: true
+                },
+                "CustomerName": {
+                    required: true
+                },
+                "CustomerAddress": {
+                    required: true
+                }
             }
         };
 
@@ -195,9 +122,46 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
 
         $scope.ok = function(form, formDetail) {
             if (form.validate() && formDetail.validate()) {
-                var _postInvoice = new Object();
-                                
-                eInvoiceService.updateInvoice(_postInvoice, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
+                
+                var _post = new Object();
+                if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
+                    $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
+                    $scope.EditInvoice.RecCreated = new Date();
+                    $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
+                    $scope.EditInvoice.RecModified = new Date();
+
+                    _post = $scope.EditInvoice;
+                    _post.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
+                    _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
+                } else {
+                    $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
+                    $scope.EditInvoice.RecModified = new Date();
+
+                    _post = $scope.EditInvoice;
+                    _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
+                }
+                
+                for (var i = 0, len = $scope.EditInvoice.InvoiceLines.length; i < len; i++) {
+                    var invoiceLine = $scope.EditInvoice.InvoiceLines[i];
+                    var _postInvoiceLine = _post.InvoiceLines[i];
+
+                    if (angular.isUndefinedOrNull(invoiceLine.ID)) {
+                        invoiceLine.RecCreatedByID = $rootScope.currentUser.ID;
+                        invoiceLine.RecCreated = new Date();
+                        invoiceLine.RecModifiedByID = $rootScope.currentUser.ID;
+                        invoiceLine.RecModified = new Date();
+
+                        _postInvoiceLine.RecCreated = new moment(invoiceLine.RecCreated).unix();
+                        _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
+                    } else {
+                        invoiceLine.RecModifiedByID = $rootScope.currentUser.ID;
+                        invoiceLine.RecModified = new Date();
+
+                        _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
+                    }
+                }
+
+                eInvoiceService.updateInvoice(_post, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
             }
         };
         
@@ -207,7 +171,6 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
 
         $scope.invoiceUpdateCompleted = function(response, status) {
             var _result = new Object();
-            _result.SelectReports = false;
             _result.EditInvoice = $scope.EditInvoice;
 
             $uibModalInstance.close(_result);
@@ -216,6 +179,57 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         $scope.invoiceUpdateError = function(response, status) {
             alertsService.RenderErrorMessage(response.Error);
         };
+
+        $scope.getInvoice = function(_ID) {
+            var invoiceInquiry = new Object();
+            invoiceInquiry.ID = _ID
+            eInvoiceService.getInvoice(
+                invoiceInquiry, 
+                function(response, status) { //success
+                    $scope.EditInvoice = response.Data.eInvoice;
+                    setTimeout(function() {
+                        for(var i = 0, len = $scope.EditInvoice.InvoiceLines.length; i < len; i ++) {
+                            var _invoiceLine = $scope.EditInvoice.InvoiceLines[i];
+                            $scope.SetItemSelect2ToObject("#ItemID_" + _invoiceLine.LineNo);
+                            $scope.SetItemUomSelect2ToObject("#UomID_" + _invoiceLine.LineNo);
+
+                            var newOptionItem = new Option(_invoiceLine.ItemCode, _invoiceLine.ItemID, true, true);
+                            $("#ItemID_" + _invoiceLine.LineNo).empty().append(newOptionItem);
+
+                            var newOptionUom = new Option(_invoiceLine.UomCode, _invoiceLine.UomID, true, true);
+                            $("#UomID_" + _invoiceLine.LineNo).empty().append(newOptionUom);
+                        }
+                    }, 100);
+                },
+                function(response) { //error
+                    alertsService.RenderErrorMessage(response.Error);
+                }
+            )
+        };
+
+        $scope.getFormReleases = function() {
+            var formReleaseInquiry = new Object();
+            formReleaseInquiry.Search = "tax_authorities_status=1";
+            formReleaseInquiry.SortExpression = 'release_date';
+            formReleaseInquiry.SortDirection = 'ASC';
+
+            eInvoiceFormReleaseService.getFormReleases(
+                formReleaseInquiry, 
+                function(response, status){
+                    $scope.eInvoiceFormTypes = response.Data.eInvoiceFormReleases;
+                    for (var i = 0, len = $scope.eInvoiceFormTypes.length; i < len; i++) {
+                        $scope.eInvoiceFormTypes[i].ReleaseDate = new moment.unix($scope.eInvoiceFormTypes[i].ReleaseDate).toDate();
+                        $scope.eInvoiceFormTypes[i].StartDate = new moment.unix($scope.eInvoiceFormTypes[i].StartDate).toDate();
+        
+                        $scope.eInvoiceFormTypes[i].Description = $filter('filter')($scope.Constants.InvoiceTypes, {Code:$scope.eInvoiceFormTypes[i].FormTypeInvoiceType})[0].Name + " - " + $scope.eInvoiceFormTypes[i].FormTypeNumberForm + " - " + $scope.eInvoiceFormTypes[i].FormTypeSymbol;
+                        $scope.eInvoiceFormTypes[i].Description += " (From : " + $scope.eInvoiceFormTypes[i].ReleaseFrom + " - To : " + $scope.eInvoiceFormTypes[i].ReleaseTo + ")";
+                    }
+                },
+                function(response){
+                    alertsService.RenderErrorMessage(response.Error);
+                }
+            );
+        }; //$scope.getFormReleases
 
         $scope.createInvoiceLineObject = function() {
             var _invoiceLine = new Object();
@@ -245,10 +259,10 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
             $scope.EditInvoice.InvoiceLines.push(_invoiceLine);
 
             setTimeout(function() {
-                $scope.SetItemSelect2ToObject("#ItemCode_" + _invoiceLine.LineNo);
+                $scope.SetItemSelect2ToObject("#ItemID_" + _invoiceLine.LineNo);
                 $scope.SetItemUomSelect2ToObject("#UomID_" + _invoiceLine.LineNo);
 
-                $("#ItemCode_" + _invoiceLine.LineNo).select2('open');
+                $("#ItemID_" + _invoiceLine.LineNo).select2('open');
             }, 0);
         };
         
@@ -359,7 +373,6 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
         };
 
         $scope.updateItem = function(_ID, invoiceLine) {
-            
             eInvoiceItemService.getItem(
                 {ID : _ID}, 
                 function(response, status) { //success
@@ -385,9 +398,12 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                         }
                     }
                     $scope.updateTotal();
+                    invoiceLine.UomID = _item.UomID;
 
-                    var newOption = new Option(_item.UomCode, _item.UomID, false, false);
-                    $('#UomID_' + invoiceLine.LineNo).empty().append(newOption);
+                    setTimeout(function() {
+                        var newOption = new Option(_item.UomCode, _item.UomID, true, true);
+                        $('#UomID_' + invoiceLine.LineNo).empty().append(newOption);
+                    }, 0);
                 },
                 function(response) { //error
                 })
@@ -492,7 +508,11 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'se
                     amountPayment = amount.plus(amountVat);
                     break;
                 case 'VatType':
-                    amountVat = amount.dividedBy(100).times(vatType).round();
+                    if(vatType > 0) {
+                        amountVat = amount.dividedBy(100).times(vatType).round();
+                    } else {
+                        amountVat = new BigNumber(0);
+                    }
                     amountPayment = amount.plus(amountVat);
                     break;
                 case 'AmountVat':

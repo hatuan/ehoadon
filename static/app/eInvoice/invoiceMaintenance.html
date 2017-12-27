@@ -9,7 +9,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label class="control-label" for="FormNumber">Form Number</label>
-                            <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditInvoice.FormTypeID" ng-options="s.ID as s.Name for s in eInvoiceFormTypes" ng-change="updateFormType()" required>
+                            <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditInvoice.FormReleaseID" ng-options="s.ID as s.Description for s in eInvoiceFormTypes" required>
                                 <option value="">--Select --</option>
                             </select>
                         </div>
@@ -46,7 +46,7 @@
                             </div>
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="CustomerVatNumber">Vat Number</label>
-                                <input type="text" class="form-control" name="CustomerVatNumber" id="CustomerVatNumber" ng-model="EditInvoice.CustomerVatNumber"/>
+                                <input type="text" class="form-control" name="CustomerVatNumber" id="CustomerVatNumber" ng-model="EditInvoice.CustomerVatNumber" required capitalize/>
                             </div>
                             <div class="form-group col-xs-6">
                                 <label class="control-label" for="CustomerName">Customer Name</label>
@@ -55,7 +55,7 @@
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="CustomerAddress">Customer Address</label>
-                            <input type="text" class="form-control" name="CustomerAddress" id="CustomerAddress" ng-model="EditInvoice.CustomerAddress"/>
+                            <input type="text" class="form-control" name="CustomerAddress" id="CustomerAddress" ng-model="EditInvoice.CustomerAddress" required/>
                         </div>
                     </div>
                 </div>
@@ -137,7 +137,7 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <select class="form-control item-code" name="ItemCode[]" id="ItemCode_{{$index + 1}}" ng-model="invoiceLine.ItemCode">
+                                                <select class="form-control item-code" name="ItemID[]" id="ItemID_{{$index + 1}}" ng-model="invoiceLine.ItemID">
                                                 </select>
                                             </div>
                                         </div>
@@ -175,7 +175,7 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount" ng-change="validLine('AmountVat', invoiceLine)"/>
+                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount" ng-change="validLine('AmountVat', invoiceLine)" ng-readonly="invoiceLine.Vat==Constants.VatTypes[0].Code || invoiceLine.Vat==Constants.VatTypes[1].Code"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">

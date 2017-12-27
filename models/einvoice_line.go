@@ -16,6 +16,7 @@ import (
 type EInvoiceLine struct {
 	ID                *int64          `db:"id" json:",string"`
 	InvoiceID         *int64          `db:"invoice_id" json:",string"`
+	LineNo            int64           `db:"line_no" json:",string"`
 	ItemID            *int64          `db:"item_id" json:",string"`
 	ItemCode          string          `db:"item_code"`
 	UomID             *int64          `db:"uom_id" json:",string"`
@@ -79,13 +80,17 @@ func GetEInvoiceLines(orgID int64, searchCondition string, infiniteScrollingInfo
 	defer db.Close()
 
 	sqlString := "SELECT ehd_invoice_line.*, " +
+		" ehd_item.code as item_code, " +
+		" ehd_item_uom.code as uom_code, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
 		" organization.description as organization, " +
 		" FROM ehd_invoice_line " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice_line.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice_line.rec_modified_by = user_modified.id " +
-		" INNER JOIN organization as organization ON ehd_invoice_line.organization_id = organization.id "
+		" INNER JOIN organization as organization ON ehd_invoice_line.organization_id = organization.id " +
+		" INNER JOIN ehd_item as ehd_item ON ehd_invoice_line.item_id = ehd_item.id " +
+		" INNER JOIN ehd_item_uom as ehd_item_uom ON ehd_invoice_line.uom_id = ehd_item_uom.id "
 
 	sqlWhere := " WHERE ehd_invoice_line.organization_id = $1"
 	if len(searchCondition) > 0 {
@@ -149,69 +154,66 @@ func PostEInvoiceLines(headerID int64, postDatas []EInvoiceLine) ([]EInvoiceLine
 
 	for _, postData := range postDatas {
 		stmt, _ := tx.PrepareNamed("INSERT INTO ehd_invoice_line AS invoice_line(invoice_id," +
-			"item_id, " +
-			"item_code, " +
-			"uom_id, " +
-			"uom_code," +
-			"description," +
-			"quantity, " +
-			"unit_price, " +
-			"amount, " +
-			"vat, " +
-			"amount_vat, " +
-			"discount, " +
-			"amount_discount, " +
-			"amount_payment, " +
-			"rec_created_by," +
-			"rec_created_at," +
-			"rec_modified_by," +
-			"rec_modified_at," +
-			"status," +
-			"version," +
-			"client_id," +
-			"organization_id)" +
+			" line_no, " +
+			" item_id, " +
+			" uom_id, " +
+			" description," +
+			" quantity, " +
+			" unit_price, " +
+			" amount, " +
+			" vat, " +
+			" amount_vat, " +
+			" discount, " +
+			" amount_discount, " +
+			" amount_payment, " +
+			" rec_created_by," +
+			" rec_created_at," +
+			" rec_modified_by," +
+			" rec_modified_at," +
+			" status," +
+			" version," +
+			" client_id," +
+			" organization_id)" +
 			" VALUES (:invoice_id," +
-			":item_id, " +
-			":item_code, " +
-			":uom_id, " +
-			":uom_code," +
-			":description," +
-			":quantity, " +
-			":unit_price, " +
-			":amount, " +
-			":vat, " +
-			":amount_vat, " +
-			":discount, " +
-			":amount_discount, " +
-			":amount_payment, " +
-			":rec_created_by," +
-			":rec_created_at," +
-			":rec_modified_by," +
-			":rec_modified_at," +
-			":status," +
-			":version," +
-			":client_id," +
-			":organization_id) " +
+			" :line_no, " +
+			" :item_id, " +
+			" :uom_id, " +
+			" :description," +
+			" :quantity, " +
+			" :unit_price, " +
+			" :amount, " +
+			" :vat, " +
+			" :amount_vat, " +
+			" :discount, " +
+			" :amount_discount, " +
+			" :amount_payment, " +
+			" :rec_created_by," +
+			" :rec_created_at," +
+			" :rec_modified_by," +
+			" :rec_modified_at," +
+			" :status," +
+			" :version," +
+			" :client_id," +
+			" :organization_id) " +
 			"ON CONFLICT ON CONSTRAINT pk_ehd_invoice_line DO UPDATE SET " +
-			"invoice_id	=	EXCLUDED.invoice_id, " +
-			"item_id	=	EXCLUDED.item_id, " +
-			"item_code	=	EXCLUDED.item_code, " +
-			"uom_id	=	EXCLUDED.uom_id, " +
-			"uom_code	=	EXCLUDED.uom_code," +
-			"description	=	EXCLUDED.description," +
-			"quantity	=	EXCLUDED.quantity, " +
-			"unit_price	=	EXCLUDED.unit_price, " +
-			"amount	=	EXCLUDED.amount, " +
-			"vat	=	EXCLUDED.vat, " +
-			"amount_vat	=	EXCLUDED.amount_vat, " +
-			"discount	=	EXCLUDED.discount, " +
-			"amount_discount	=	EXCLUDED.amount_discount, " +
-			"amount_payment	=	EXCLUDED.amount_payment, " +
-			"rec_modified_by	=	EXCLUDED.rec_modified_by," +
-			"rec_modified_at	=	EXCLUDED.rec_modified_at," +
-			"status	=	EXCLUDED.status," +
-			"version	=	:version + 1" +
-			"WHERE invoice_line.version = :version RETURNING id")
+			" invoice_id	=	EXCLUDED.invoice_id, " +
+			" line_no	=	EXCLUDED.line_no, " +
+			" item_id	=	EXCLUDED.item_id, " +
+			" uom_id	=	EXCLUDED.uom_id, " +
+			" description	=	EXCLUDED.description," +
+			" quantity	=	EXCLUDED.quantity, " +
+			" unit_price	=	EXCLUDED.unit_price, " +
+			" amount	=	EXCLUDED.amount, " +
+			" vat	=	EXCLUDED.vat, " +
+			" amount_vat	=	EXCLUDED.amount_vat, " +
+			" discount	=	EXCLUDED.discount, " +
+			" amount_discount	=	EXCLUDED.amount_discount, " +
+			" amount_payment	=	EXCLUDED.amount_payment, " +
+			" rec_modified_by	=	EXCLUDED.rec_modified_by," +
+			" rec_modified_at	=	EXCLUDED.rec_modified_at," +
+			" status	=	EXCLUDED.status," +
+			" version	=	:version + 1" +
+			" WHERE invoice_line.version = :version RETURNING id")
 
 		var id int64
 		err := stmt.Get(&id, postData)
@@ -253,15 +255,19 @@ func GetEInvoiceLinesByHeaderID(headerID int64) ([]EInvoiceLine, TransactionalIn
 	defer db.Close()
 
 	sqlString := "SELECT ehd_invoice_line.*, " +
+		" ehd_item.code as item_code, " +
+		" ehd_item_uom.code as uom_code, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
-		" organization.description as organization, " +
+		" organization.description as organization " +
 		" FROM ehd_invoice_line " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice_line.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice_line.rec_modified_by = user_modified.id " +
 		" INNER JOIN organization as organization ON ehd_invoice_line.organization_id = organization.id " +
+		" INNER JOIN ehd_item as ehd_item ON ehd_invoice_line.item_id = ehd_item.id " +
+		" INNER JOIN ehd_item_uom as ehd_item_uom ON ehd_invoice_line.uom_id = ehd_item_uom.id " +
 		" INNER JOIN ehd_invoice as ehd_invoice ON ehd_invoice_line.invoice_id = ehd_invoice.id " +
-		" WHERE ehd_invoice.invoice_id = $1 " +
+		" WHERE ehd_invoice.id = $1 " +
 		" ORDER BY ehd_invoice_line.line_no"
 
 	getDatas := []EInvoiceLine{}
@@ -287,6 +293,8 @@ func GetEInvoiceLineByID(id int64) (EInvoiceLine, TransactionalInformation) {
 
 	getData := EInvoiceLine{}
 	err = db.Get(&getData, "SELECT ehd_invoice_line.*, "+
+		" ehd_item.code as item_code, "+
+		" ehd_item_uom.code as uom_code, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" organization.description as organization, "+
@@ -294,6 +302,8 @@ func GetEInvoiceLineByID(id int64) (EInvoiceLine, TransactionalInformation) {
 		"		INNER JOIN user_profile as user_created ON ehd_invoice_line.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_invoice_line.rec_modified_by = user_modified.id "+
 		"		INNER JOIN organization as organization ON ehd_invoice_line.organization_id = organization.id "+
+		"		INNER JOIN ehd_item as ehd_item ON ehd_invoice_line.item_id = ehd_item.id "+
+		"		INNER JOIN ehd_item_uom as ehd_item_uom ON ehd_invoice_line.uom_id = ehd_item_uom.id "+
 		"	WHERE ehd_invoice_line.id=$1", id)
 	if err != nil && err == sql.ErrNoRows {
 		return EInvoiceLine{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceLineNotFound.Error()}}

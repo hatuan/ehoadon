@@ -40,14 +40,13 @@
                             <td style="text-align: center;" ng-click="toggleSelection(eInvoice.ID)">
                                 <input type="checkbox" id="{{eInvoice.ID}}" value="{{eInvoice.ID}}" ng-checked="Selection.indexOf(eInvoice.ID) > -1"/>
                             </td>
-                            <td><a ng-click="edit(eInvoice)">eInvoice.InvoiceNo</a></td>
-                            <td>eInvoice.InvoiceNo</td>
-                            <td>eInvoice.InvoiceNo</td>
-                            <td>eInvoice.InvoiceNo</td>
-                            <td>eInvoice.InvoiceDate</td>
-                            <td>eInvoice.CustomerVatNumber</td>
-                            <td>eInvoice.CustomerName</td>
-                            <td>eInvoice.TotalPayment</td>
+                            <td><a ng-click="edit(eInvoice)">{{eInvoice.InvoiceNo != '' ? eInvoice.InvoiceNo : 'Edit'}}</a></td>
+                            <td>{{eInvoice.InvoiceNo}}</td>
+                            <td>{{eInvoice.InvoiceNo}}</td>
+                            <td>{{eInvoice.InvoiceDate}}</td>
+                            <td>{{eInvoice.CustomerVatNumber}}</td>
+                            <td>{{eInvoice.CustomerName}}</td>
+                            <td>{{eInvoice.TotalPayment|awnum:'amount'}}</td>
                         </tr>
                     </tbody>
                 </table>

@@ -24,6 +24,7 @@ type EInvoice struct {
 	ExchangeRateAmount       decimal.Decimal `db:"exchange_rate_amount"`
 	RelationalExchRateAmount decimal.Decimal `db:"relational_exch_rate_amount"`
 	CustomerID               *int64          `db:"customer_id" json:",string"`
+	CustomerCode             string          `db:"customer_code"`
 	CustomerVatNumber        string          `db:"customer_vat_number"`
 	CustomerName             string          `db:"customer_name"`
 	CustomerAddress          string          `db:"customer_address"`
@@ -105,13 +106,15 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 	defer db.Close()
 
 	sqlString := "SELECT ehd_invoice.*, " +
+		" ehd_customer.code as customer_code, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
 		" organization.description as organization " +
 		" FROM ehd_invoice " +
 		" INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
 		" INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id " +
-		" INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "
+		" INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id " +
+		" INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "
 
 	sqlWhere := " WHERE ehd_invoice.organization_id = $1"
 	if len(searchCondition) > 0 {
@@ -296,12 +299,12 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 	_line_ids := []int64{}
 	if postData.InvoiceLines != nil && len(postData.InvoiceLines) > 0 {
 		for _, invoiceLine := range postData.InvoiceLines {
+			invoiceLine.InvoiceID = postData.ID
 			stmt, _ := tx.PrepareNamed("INSERT INTO ehd_invoice_line AS invoice_line(id, " +
 				" invoice_id, " +
+				" line_no, " +
 				" item_id, " +
-				" item_code, " +
 				" uom_id, " +
-				" uom_code, " +
 				" description, " +
 				" quantity, " +
 				" unit_price, " +
@@ -321,10 +324,9 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 				" organization_id) " +
 				" VALUES (COALESCE(:id, id_generator()), " +
 				" :invoice_id, " +
+				" :line_no, " +
 				" :item_id, " +
-				" :item_code, " +
 				" :uom_id, " +
-				" :uom_code," +
 				" :description, " +
 				" :quantity, " +
 				" :unit_price, " +
@@ -339,15 +341,14 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 				" :rec_modified_by, " +
 				" :rec_modified_at, " +
 				" :status, " +
-				" COALESCE(:version, 1), " +
+				" :version, " +
 				" :client_id, " +
 				" :organization_id) " +
 				" ON CONFLICT ON CONSTRAINT pk_ehd_invoice_line DO UPDATE SET " +
 				" invoice_id	=	EXCLUDED.invoice_id, " +
+				" line_no	=	EXCLUDED.line_no, " +
 				" item_id	=	EXCLUDED.item_id, " +
-				" item_code	=	EXCLUDED.item_code, " +
 				" uom_id	=	EXCLUDED.uom_id, " +
-				" uom_code	=	EXCLUDED.uom_code," +
 				" description	=	EXCLUDED.description," +
 				" quantity	=	EXCLUDED.quantity, " +
 				" unit_price	=	EXCLUDED.unit_price, " +
@@ -411,6 +412,7 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 
 	getData := EInvoice{}
 	err = db.Get(&getData, "SELECT ehd_invoice.*, "+
+		" ehd_customer.code as customer_code, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" organization.description as organization "+
@@ -418,6 +420,7 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id "+
 		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+
 		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "+
+		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
 		"	WHERE ehd_invoice.id=$1", id)
 
 	if err != nil && err == sql.ErrNoRows {

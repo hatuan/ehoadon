@@ -175,23 +175,24 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
     id bigint NOT NULL DEFAULT id_generator(),
     form_release_id bigint NOT NULL,
     original_invoice_id bigint,
-    created_date date NOT NULL,
-    invoice_date date NOT NULL,
+    invoice_date date,
     invoice_no character varying NOT NULL,
     pay_type character varying NOT NULL, 
     currency_id bigint,
-    exchange_rate_amount numeric(38, 20) NOT NULL,
-    relational_exch_rate_amount numeric(38, 20) NOT NULL,
+    exchange_rate_amount numeric(38, 20) NOT NULL DEFAULT 1,
+    relational_exch_rate_amount numeric(38, 20) NOT NULL DEFAULT 1,
     customer_id bigint,
     customer_vat_number character varying NOT NULL,
     customer_name character varying NOT NULL,
     customer_address character varying NOT NULL,
     customer_contact_name character varying NOT NULL,
+    customer_contact_mobile character varying NOT NULL,
+    customer_contact_email character varying NOT NULL,
     customer_bank_account character varying NOT NULL,
     customer_bank_name character varying NOT NULL,
-    process_invoice_status smallint NOT NULL, /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh  */
-    process_adjusted_form smallint, /* Hinh thuc dieu chinh null: khong dieu chinh, 1: Dieu chinh tang, 2: Dieu chinh giam, 3: Dieu chinh khong thay doi tien, 4: Dieu chinh khac */
-    process_adjusted_type smallint, /* Loai dieu chinh Neu process_adjusted_form = 1,2 => 1: Hang hoa dich vu; process_adjusted_form = 3 => 2: Ma so thue, 3: Tien chu, 4: Ten khach, Dia chi; Neu process_adjusted_form = 4 => 5: Khac*/
+    process_invoice_status smallint NOT NULL DEFAULT 0, /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh  */
+    process_adjusted_form smallint NOT NULL DEFAULT 0, /* Hinh thuc dieu chinh 0: khong dieu chinh, 1: Dieu chinh tang, 2: Dieu chinh giam, 3: Dieu chinh khong thay doi tien, 4: Dieu chinh khac */
+    process_adjusted_type smallint NOT NULL DEFAULT 0, /* Loai dieu chinh 0: khong dieu chinh; Neu process_adjusted_form = 1,2 => 1: Hang hoa dich vu; process_adjusted_form = 3 => 2: Ma so thue, 3: Tien chu, 4: Ten khach, Dia chi; Neu process_adjusted_form = 4 => 5: Khac*/
     total_amount numeric(38, 20) NOT NULL,
     total_amount_no_vat numeric(38, 20) NOT NULL,
     total_amount_vat0 numeric(38, 20) NOT NULL,
@@ -222,9 +223,7 @@ CREATE TABLE IF NOT EXISTS ehd_invoice_line
     id bigint NOT NULL DEFAULT id_generator(),
     invoice_id bigint NOT NULL,
     item_id bigint,
-    item_code character varying NOT NULL,
     uom_id bigint,
-    uom_code character varying NOT NULL,
     description character varying NOT NULL,
     quantity numeric(38, 20) NOT NULL,
     unit_price numeric(38, 20) NOT NULL,
