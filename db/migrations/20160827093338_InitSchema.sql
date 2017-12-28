@@ -67,8 +67,8 @@ CREATE TABLE IF NOT EXISTS client
   culture_id character varying NOT NULL,
   amount_decimal_places smallint NOT NULL,
   amount_rounding_precision numeric NOT NULL,
-  "unit-amount_decimal_places" smallint NOT NULL,
-  "unit-amount_rounding_precision" numeric NOT NULL,
+  unit_amount_decimal_places smallint NOT NULL,
+  unit_amount_rounding_precision numeric NOT NULL,
   currency_lcy_id bigint,
   vat_number character varying NOT NULL, --ma so thue
   group_unit_code character varying NOT NULL, -- khoi doanh nghiep : doanh nghiep, truong hoc, y te, khac
