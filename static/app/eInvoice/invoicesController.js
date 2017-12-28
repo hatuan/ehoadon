@@ -132,7 +132,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 ariaDescribedBy: 'modal-body',
                 backdrop: 'static', //disables modal closing by click on the backdrop
                 size:'lg',
-                keyboard: false,
                 windowClass: 'my-modal-fullscreen', //set style in .my-modal-fullscreen .modal-lg {} in site.css
                 templateUrl: 'app/eInvoice/invoiceMaintenance.html',
                 controller: 'eInvoiceMaintenanceController',
@@ -170,7 +169,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 ariaDescribedBy: 'modal-body',
                 backdrop: 'static', //disables modal closing by click on the backdrop
                 size:'lg',
-                keyboard: false,
                 templateUrl: 'app/eInvoice/invoiceViewReport.html',
                 controller: 'eInvoiceViewReportController',
                 resolve: {
@@ -188,8 +186,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             });
             modalViewReportInstance.result.then(function(_result) { //close
                 $scope.edit(_result.EditInvoice);
-            }, function(_result) { //dismiss
-                $scope.edit(_result.EditInvoice);
+            }, function() { //dismiss
+                $scope.edit(modalViewReportInstance.result.EditInvoice);
             })['finally'](function() {
                 modalViewReportInstance = undefined;
                 $scope.selectViewReport = false;

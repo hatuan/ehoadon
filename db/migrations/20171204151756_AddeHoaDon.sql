@@ -260,6 +260,41 @@ CREATE INDEX IF NOT EXISTS idx_ehd_process_log_invoice_id ON ehd_process_log USI
 CREATE INDEX IF NOT EXISTS idx_ehd_process_log_modified_at ON ehd_process_log USING btree (modified_at);
 CREATE INDEX IF NOT EXISTS idx_ehd_process_log_modified_user ON ehd_process_log USING btree (modified_user);
 
+/*** Bo xung them cac thong tin client lien quan den hoa don dien tu **/
+CREATE TABLE IF NOT EXISTS ehd_client
+(
+    id bigint NOT NULL DEFAULT id_generator(),
+    client_id bigint NOT NULL,
+    token_serial_number character varying NOT NULL,
+    token_issuer_name character varying NOT NULL,
+    token_cert_valid_from date NOT NULL,
+    token_cert_valid_to date NOT NULL,
+    token_cert_content character varying NOT NULL,
+    CONSTRAINT pk_ehd_client PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ehd_client_id ON ehd_client USING btree (client_id);
+
+/*** EINV-20 - Thông tin đơn vị **/
+ALTER TABLE client 
+    ADD COLUMN IF NOT EXISTS vat_number character varying NOT NULL DEFAULT '', --ma so thue
+    ADD COLUMN IF NOT EXISTS group_unit_code character varying NOT NULL DEFAULT '', -- khoi doanh nghiep : doanh nghiep, truong hoc, y te, khac
+    ADD COLUMN IF NOT EXISTS vat_method_code character varying NOT NULL DEFAULT '', -- Hình thức khai thuế : Trực Tiếp, Khấu trừ, Đơn vị trong khu chế xuất, khu phi thuế quan
+    ADD COLUMN IF NOT EXISTS province_code character varying NOT NULL DEFAULT '', -- Tỉnh / Thành phố
+    ADD COLUMN IF NOT EXISTS districts_code character varying NOT NULL DEFAULT '', -- Quan / Huyen
+    ADD COLUMN IF NOT EXISTS address character varying NOT NULL DEFAULT '', -- Dia chi
+    ADD COLUMN IF NOT EXISTS trassition_adress character varying NOT NULL DEFAULT '', -- Dia chi giao dich
+    ADD COLUMN IF NOT EXISTS telephone character varying NOT NULL DEFAULT '', -- Dien thoai
+    ADD COLUMN IF NOT EXISTS email character varying NOT NULL DEFAULT '', -- Email
+    ADD COLUMN IF NOT EXISTS fax character varying NOT NULL DEFAULT '', -- FAX
+    ADD COLUMN IF NOT EXISTS website character varying NOT NULL DEFAULT '', -- website
+    ADD COLUMN IF NOT EXISTS representative_name character varying NOT NULL DEFAULT '', -- nguoi dai dien
+    ADD COLUMN IF NOT EXISTS representative_position character varying NOT NULL DEFAULT '', -- chuc vu nguoi dai dien
+    ADD COLUMN IF NOT EXISTS contact_name character varying NOT NULL DEFAULT '', -- nguoi lien he
+    ADD COLUMN IF NOT EXISTS mobile character varying NOT NULL DEFAULT '', -- mobile
+    ADD COLUMN IF NOT EXISTS bank_account character varying NOT NULL DEFAULT '', -- tai khoan ngan hang
+    ADD COLUMN IF NOT EXISTS bank_name character varying NOT NULL DEFAULT '', -- ten ngan hang
+    ADD COLUMN IF NOT EXISTS tax_authorities_id bigint NOT NULL DEFAULT 0; -- Chi cuc thue ehd_tax_authorities
+
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 DROP TABLE ehd_customer;
@@ -273,3 +308,4 @@ DROP TABLE ehd_invoice;
 DROP TABLE ehd_invoice_line;
 DROP TABLE ehd_tax_authorities;
 DROP TABLE ehd_process_log;
+DROP TABLE ehd_client;

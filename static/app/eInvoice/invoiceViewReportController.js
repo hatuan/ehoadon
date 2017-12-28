@@ -22,20 +22,12 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
         };
         
         $scope.cancel = function() {
-            var _result = new Object();
-            _result.EditInvoice = $scope.EditInvoice;
-            $uibModalInstance.dismiss(_result);
+            $uibModalInstance.dismiss('cancel');
         };
-
-        /*
+        
         $scope.$on('modal.closing', function(event, reason, closed){
-            event.preventDefault();
-
-            var _result = new Object();
-            _result.EditInvoice = $scope.EditInvoice;
-            $uibModalInstance.dismiss(_result);            
+            $uibModalInstance.result.EditInvoice = $scope.EditInvoice;
         });
-        */
 
         $scope.getFormType = function(_ID) {
             var formTypeInquiry = new Object();
@@ -92,25 +84,32 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
             var ds = {};
             ds.Invoice = $scope.EditInvoice;
             ds.InvoiceLines = $scope.EditInvoice.InvoiceLines;
+
             for(var _i = ds.InvoiceLines.length; _i < 10; _i++ ) {
                 ds.InvoiceLines.push({LineNo: _i + 1});
             }
             dataSet.readJson(ds);
 
             var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
-            var report = new $window.Stimulsoft.Report.StiReport();
-            report.load($scope.FormType.FormFile);
-            $scope.FormType.FormFile = report.saveToJsonString();
-            report.load($scope.FormType.FormFile);
-            report.regData(dataSet.dataSetName, "", dataSet);
 
             viewer.options.toolbar.visible = false;
             viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
             viewer.options.appearance.scrollbarsMode = true;
             viewer.options.width = "100%";
             viewer.options.height = $("#modal-body").height() + "px";
-            viewer.report = report;
             viewer.renderHtml('reportviewer');
+
+            setTimeout(function () {
+				var report = new $window.Stimulsoft.Report.StiReport();
+                report.load($scope.FormType.FormFile);
+                // Remove all connections in report template (they are used in the first place)
+                report.dictionary.databases.clear();
+                // Registered JSON data specified in the report with same name
+                report.regData(dataSet.dataSetName, "", dataSet);
+				// Assign the report to the viewer
+				viewer.report = report;
+			}, 50);
+
         };
     };
 

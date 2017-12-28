@@ -70,6 +70,24 @@ CREATE TABLE IF NOT EXISTS client
   "unit-amount_decimal_places" smallint NOT NULL,
   "unit-amount_rounding_precision" numeric NOT NULL,
   currency_lcy_id bigint,
+  vat_number character varying NOT NULL, --ma so thue
+  group_unit_code character varying NOT NULL, -- khoi doanh nghiep : doanh nghiep, truong hoc, y te, khac
+  vat_method_code character varying NOT NULL, -- Hình thức khai thuế : Trực Tiếp, Khấu trừ, Đơn vị trong khu chế xuất, khu phi thuế quan
+  province_code character varying NOT NULL, -- Tỉnh / Thành phố
+  districts_code character varying NOT NULL, -- Quan / Huyen
+  address character varying NOT NULL, -- Dia chi
+  trassition_adress character varying NOT NULL, -- Dia chi giao dich
+  telephone character varying NOT NULL, -- Dien thoai
+  email character varying NOT NULL, -- Email
+  fax character varying NOT NULL, -- FAX
+  website character varying NOT NULL, -- website
+  representative_name character varying NOT NULL, -- nguoi dai dien
+  representative_position character varying NOT NULL, -- chuc vu nguoi dai dien
+  contact_name character varying NOT NULL, -- nguoi lien he
+  mobile character varying NOT NULL, -- mobile
+  bank_account character varying NOT NULL, -- tai khoan ngan hang
+  bank_name character varying NOT NULL, -- ten ngan hang
+  tax_authorities_id bigint NOT NULL, -- Chi cuc thue ehd_tax_authorities
   version bigint NOT NULL,
   rec_created_by bigint NOT NULL,
   rec_modified_by bigint NOT NULL,
