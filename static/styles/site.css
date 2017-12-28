@@ -111,6 +111,21 @@ select.custom::-ms-expand {
 }
 /********************************/
 
+/** input remove clean button **/
+/* IE10+ */
+input[type=text]::-ms-clear {
+    display: none;
+}
+
+/* Chrome */
+input[type=text]::-webkit-search-decoration,
+input[type=text]::-webkit-search-cancel-button,
+input[type=text]::-webkit-search-results-button,
+input[type=text]::-webkit-search-results-decoration { 
+  display: none; 
+}
+/*******************************/
+
 span .small-font { font-size:9px; }
 
 /* Modal Full Screen*/
