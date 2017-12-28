@@ -69,13 +69,13 @@ UPDATE number_sequence SET description = description;
 
 CREATE TRIGGER textsearch_udate
   AFTER INSERT OR UPDATE OR DELETE
-  ON ehd_customer
+  ON tax_authorities
   FOR EACH ROW
   EXECUTE PROCEDURE textsearch_udate_trigger();
 
 CREATE TRIGGER textsearch_udate
   AFTER INSERT OR UPDATE OR DELETE
-  ON ehd_tax_authorities
+  ON ehd_customer
   FOR EACH ROW
   EXECUTE PROCEDURE textsearch_udate_trigger();
 
@@ -104,8 +104,8 @@ DROP TRIGGER IF EXISTS textsearch_udate ON client;
 DROP TRIGGER IF EXISTS textsearch_udate ON organization;
 DROP TRIGGER IF EXISTS textsearch_udate ON currency;
 DROP TRIGGER IF EXISTS textsearch_udate ON number_sequence;
+DROP TRIGGER IF EXISTS textsearch_udate ON tax_authorities;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_customer;
-DROP TRIGGER IF EXISTS textsearch_udate ON ehd_tax_authorities;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_uom;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_group;

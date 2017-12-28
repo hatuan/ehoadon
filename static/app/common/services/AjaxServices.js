@@ -51,6 +51,18 @@ define(['angularAMD'], function (angularAMD) {
 
         }
 
+        this.AjaxGetNoBlock = function (route, successFunction, errorFunction) {
+            setTimeout(function () {
+                $http({ method: 'GET', url: route }).success(function (response, status, headers, config) {
+                    successFunction(response, status);
+                }).error(function (response) {
+                    if (response.IsAuthenicated == false) { $state.go('login'); }
+                    errorFunction(response);
+                });
+            }, 1000);
+
+        }
+
         this.AjaxGetWithData = function (data, route, successFunction, errorFunction) {
             blockUI.start();
             setTimeout(function () {

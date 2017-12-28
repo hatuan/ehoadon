@@ -60,6 +60,7 @@ require.config({
         'myApp.Search': 'app/common/directives/searchForm',
         'myApp.navBar': 'app/main/navBarController',
         'reportService': 'app/common/services/reportService',
+        'clientService': 'app/client/clientService',
         'organizationsService': 'app/organization/organizationsService',
         'usersService': 'app/user/usersService',
         'myApp.autoComplete': 'app/common/directives/autoComplete',

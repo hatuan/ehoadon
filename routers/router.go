@@ -17,11 +17,13 @@ func InitRoutes() *mux.Router {
 	//API router
 	api := router.PathPrefix("/api").Subrouter()
 	api = api.StrictSlash(true)
+
 	//token auth login
 	api.Handle("/token-auth",
 		negroni.New(
 			negroni.HandlerFunc(controllers.TokenAuth),
 		)).Methods("POST")
+
 	api.Handle("/token-auth",
 		negroni.New(
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
@@ -43,10 +45,18 @@ func InitRoutes() *mux.Router {
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.API_Users_Id),
 		))
+
 	api.Handle("/user/preference",
 		negroni.New(
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.API_User_Preference),
+		))
+
+	//client api
+	api.Handle("/client",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_Client),
 		))
 
 	//organization api

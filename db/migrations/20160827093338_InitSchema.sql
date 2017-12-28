@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS client
   province_code character varying NOT NULL, -- Tỉnh / Thành phố
   districts_code character varying NOT NULL, -- Quan / Huyen
   address character varying NOT NULL, -- Dia chi
-  trassition_adress character varying NOT NULL, -- Dia chi giao dich
+  address_transition character varying NOT NULL, -- Dia chi giao dich
   telephone character varying NOT NULL, -- Dien thoai
   email character varying NOT NULL, -- Email
   fax character varying NOT NULL, -- FAX
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS client
   mobile character varying NOT NULL, -- mobile
   bank_account character varying NOT NULL, -- tai khoan ngan hang
   bank_name character varying NOT NULL, -- ten ngan hang
-  tax_authorities_id bigint NOT NULL, -- Chi cuc thue ehd_tax_authorities
+  tax_authorities_id bigint, -- Chi cuc thue tax_authorities
   version bigint NOT NULL,
   rec_created_by bigint NOT NULL,
   rec_modified_by bigint NOT NULL,
@@ -221,6 +221,25 @@ CREATE TABLE IF NOT EXISTS session
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_session_user ON session USING btree (user_id);
 
+CREATE TABLE IF NOT EXISTS tax_authorities
+(
+    id bigint NOT NULL DEFAULT id_generator(),
+    code character varying NOT NULL,
+    description character varying NOT NULL,
+    province_code character varying NOT NULL,
+    managing_code character varying NOT NULL,
+    organization_id bigint NOT NULL,
+    client_id bigint NOT NULL,
+    version bigint NOT NULL,
+    status smallint NOT NULL,
+    rec_modified_by bigint NOT NULL,
+    rec_created_by bigint NOT NULL,
+    rec_created_at timestamp with time zone NOT NULL,
+    rec_modified_at timestamp with time zone NOT NULL,
+    CONSTRAINT pk_tax_authorities PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tax_authorities_code ON tax_authorities USING btree (client_id, code);
+
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 DROP TABLE user_profile;
@@ -232,6 +251,7 @@ DROP TABLE number_sequence;
 DROP TABLE currency;
 DROP TABLE currency_convert_rate;
 DROP TABLE session;
+DROP TABLE tax_authorities;
 DROP SEQUENCE user_id_sequence;
 DROP SEQUENCE client_id_sequence;
 DROP SEQUENCE global_id_sequence;

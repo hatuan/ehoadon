@@ -106,25 +106,6 @@ CREATE TABLE IF NOT EXISTS ehd_item
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_ehd_item_code ON ehd_item USING btree (client_id, code);
 
-CREATE TABLE IF NOT EXISTS ehd_tax_authorities
-(
-    id bigint NOT NULL DEFAULT id_generator(),
-    code character varying NOT NULL,
-    description character varying NOT NULL,
-    province_code character varying NOT NULL,
-    managing_code character varying NOT NULL,
-    organization_id bigint NOT NULL,
-    client_id bigint NOT NULL,
-    version bigint NOT NULL,
-    status smallint NOT NULL,
-    rec_modified_by bigint NOT NULL,
-    rec_created_by bigint NOT NULL,
-    rec_created_at timestamp with time zone NOT NULL,
-    rec_modified_at timestamp with time zone NOT NULL,
-    CONSTRAINT pk_ehd_tax_authorities PRIMARY KEY (id)
-);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_ehd_tax_authorities_code ON ehd_tax_authorities USING btree (client_id, code);
-
 /***** Dinh nghia cac mau hoa don *****/
 CREATE TABLE IF NOT EXISTS ehd_form_type
 (
@@ -282,7 +263,7 @@ ALTER TABLE client
     ADD COLUMN IF NOT EXISTS province_code character varying NOT NULL DEFAULT '', -- Tỉnh / Thành phố
     ADD COLUMN IF NOT EXISTS districts_code character varying NOT NULL DEFAULT '', -- Quan / Huyen
     ADD COLUMN IF NOT EXISTS address character varying NOT NULL DEFAULT '', -- Dia chi
-    ADD COLUMN IF NOT EXISTS trassition_adress character varying NOT NULL DEFAULT '', -- Dia chi giao dich
+    ADD COLUMN IF NOT EXISTS address_transition character varying NOT NULL DEFAULT '', -- Dia chi giao dich
     ADD COLUMN IF NOT EXISTS telephone character varying NOT NULL DEFAULT '', -- Dien thoai
     ADD COLUMN IF NOT EXISTS email character varying NOT NULL DEFAULT '', -- Email
     ADD COLUMN IF NOT EXISTS fax character varying NOT NULL DEFAULT '', -- FAX
@@ -293,7 +274,7 @@ ALTER TABLE client
     ADD COLUMN IF NOT EXISTS mobile character varying NOT NULL DEFAULT '', -- mobile
     ADD COLUMN IF NOT EXISTS bank_account character varying NOT NULL DEFAULT '', -- tai khoan ngan hang
     ADD COLUMN IF NOT EXISTS bank_name character varying NOT NULL DEFAULT '', -- ten ngan hang
-    ADD COLUMN IF NOT EXISTS tax_authorities_id bigint NOT NULL DEFAULT 0; -- Chi cuc thue ehd_tax_authorities
+    ADD COLUMN IF NOT EXISTS tax_authorities_id bigint NOT NULL DEFAULT 0; -- Chi cuc thue tai bang tax_authorities
 
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
@@ -306,6 +287,5 @@ DROP TABLE ehd_form_type;
 DROP TABLE ehd_form_release;
 DROP TABLE ehd_invoice;
 DROP TABLE ehd_invoice_line;
-DROP TABLE ehd_tax_authorities;
 DROP TABLE ehd_process_log;
 DROP TABLE ehd_client;
