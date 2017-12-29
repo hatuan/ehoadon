@@ -59,7 +59,7 @@
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="Email">Email</label>
-                                        <input type="text" class="form-control" name="Email" id="Email" ng-model="Client.Email"/>
+                                        <input type="text" class="form-control" name="Email" id="Email" ng-model="Client.Email" required/>
                                     </div>
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="Website">Website</label>
@@ -81,27 +81,29 @@
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="RepresentativeName">Representative Name</label>
-                                        <input type="text" class="form-control" name="RepresentativeName" id="RepresentativeName" ng-model="Client.RepresentativeName"/>
+                                        <input type="text" class="form-control" name="RepresentativeName" id="RepresentativeName" ng-model="Client.RepresentativeName" required />
                                     </div>
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="RepresentativePosition">Representative Position</label>
-                                        <input type="text" class="form-control" name="RepresentativePosition" id="RepresentativePosition" ng-model="Client.RepresentativePosition"/>
+                                        <input type="text" class="form-control" name="RepresentativePosition" id="RepresentativePosition" ng-model="Client.RepresentativePosition" required/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="ContactName">Contact Name</label>
-                                        <input type="text" class="form-control" name="ContactName" id="ContactName" ng-model="Client.ContactName"/>
+                                        <input type="text" class="form-control" name="ContactName" id="ContactName" ng-model="Client.ContactName" required/>
                                     </div>
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="Mobile">Mobile</label>
-                                        <input type="text" class="form-control" name="Mobile" id="Mobile" ng-model="Client.Mobile"/>
+                                        <input type="text" class="form-control" name="Mobile" id="Mobile" ng-model="Client.Mobile" required/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="ProvinceCode">Province</label>
-                                        <input type="text" class="form-control" name="ProvinceCode" id="ProvinceCode" ng-model="Client.ProvinceCode"/>
+                                        <select class="form-control" id="ProvinceCode" name="ProvinceCode" ng-model="Client.ProvinceCode" ng-options="s.Code as s.Name for s in Provinces">
+                                            <option value="">-- Select --</option>
+                                        </select>
                                     </div>
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="TaxAuthoritiesID">Tax Authorities</label>
@@ -111,11 +113,15 @@
                                 <div class="row">
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="VatMethodCode">Vat Method</label>
-                                        <input type="text" class="form-control" name="VatMethodCode" id="VatMethodCode" ng-model="Client.VatMethodCode"/>
+                                        <select class="form-control" id="VatMethodCode" name="VatMethodCode" ng-model="Client.VatMethodCode" ng-options="s.Code as s.Name for s in Constants.VatMethods">
+                                            <option value="">-- Select --</option>
+                                        </select>
                                     </div>
                                     <div class="form-group col-xs-6">
                                         <label class="control-label" for="GroupUnitCode">Group Unit</label>
-                                        <input type="text" class="form-control" name="GroupUnitCode" id="GroupUnitCode" ng-model="Client.GroupUnitCode"/>
+                                        <select class="form-control" id="GroupUnitCode" name="GroupUnitCode" ng-model="Client.GroupUnitCode" ng-options="s.Code as s.Name for s in Constants.CompanyGroupUnits">
+                                            <option value="">-- Select --</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

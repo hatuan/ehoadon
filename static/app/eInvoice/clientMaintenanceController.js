@@ -3,19 +3,34 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', 'alertsService', 'clientService', '$stateParams', '$confirm', 'Constants'];
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'provinceService'], function(angularAMD, $) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', 'alertsService', 'clientService', 'provinceService', '$stateParams', '$confirm', 'Constants'];
 
-    var clientMaintenanceController = function($scope, $rootScope, $state, $window, moment, alertsService, clientService, $stateParams, $confirm, Constants) {
+    var clientMaintenanceController = function($scope, $rootScope, $state, $window, moment, alertsService, clientService, provinceService, $stateParams, $confirm, Constants) {
         
         $scope.initializeController = function() {
             $scope.Constants = Constants;
             $scope.Client = {};
             $scope.Token = {};
-            
-            $scope.getClient();
+            $scope.Provinces = [];
+
+            $scope.getProvinces(function () { //success
+                $scope.getClient();
+            });
         };
 
+        $scope.getProvinces = function(successFunction) {
+            provinceService.getProvinces(
+                function(response, status) { //success
+                    $scope.Provinces = response;
+
+                    successFunction();
+                },
+                function(response) { //error
+                    alertsService.RenderErrorMessage(response.Error);
+                }
+            )
+        }
         $scope.getClient = function() {
             clientService.getClient($scope.clientInquiryCompleted, $scope.clientInquiryError);
         };
@@ -34,6 +49,22 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService']
                     required: true
                 },
                 "Address": {
+                    required: true
+                },
+                "Email": {
+                    required: true,
+                    email: true
+                },
+                "RepresentativeName": {
+                    required: true
+                },
+                "RepresentativePosition": {
+                    required: true
+                },
+                "ContactName": {
+                    required: true
+                },
+                "Mobile": {
                     required: true
                 }
             }

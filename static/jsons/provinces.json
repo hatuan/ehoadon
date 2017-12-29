@@ -1,0 +1,317 @@
+[
+    {
+        "Code": "101",
+        "Name": "Hà Nội",
+        "M_Code": "HAN"
+    },
+    {
+        "Code": "103",
+        "Name": "Hải Phòng",
+        "M_Code": "HPH"
+    },
+    {
+        "Code": "107",
+        "Name": "Hải Dương",
+        "M_Code": "HDU"
+    },
+    {
+        "Code": "109",
+        "Name": "Hưng Yên",
+        "M_Code": "HYE"
+    },
+    {
+        "Code": "111",
+        "Name": "Hà Nam",
+        "M_Code": "HNA"
+    },
+    {
+        "Code": "113",
+        "Name": "Nam Định",
+        "M_Code": "NDI"
+    },
+    {
+        "Code": "115",
+        "Name": "Thái Bình",
+        "M_Code": "TBI"
+    },
+    {
+        "Code": "117",
+        "Name": "Ninh Bình",
+        "M_Code": "NBI"
+    },
+    {
+        "Code": "201",
+        "Name": "Hà Giang",
+        "M_Code": "HGI"
+    },
+    {
+        "Code": "203",
+        "Name": "Cao Bằng",
+        "M_Code": "CBA"
+    },
+    {
+        "Code": "205",
+        "Name": "Lào Cai",
+        "M_Code": "LCA"
+    },
+    {
+        "Code": "207",
+        "Name": "Bắc Cạn",
+        "M_Code": "BCA"
+    },
+    {
+        "Code": "209",
+        "Name": "Lạng Sơn",
+        "M_Code": "LSO"
+    },
+    {
+        "Code": "211",
+        "Name": "Tuyên Quang",
+        "M_Code": "TQU"
+    },
+    {
+        "Code": "213",
+        "Name": "Yên Bái",
+        "M_Code": "YBA"
+    },
+    {
+        "Code": "215",
+        "Name": "Thái Nguyên",
+        "M_Code": "TNG"
+    },
+    {
+        "Code": "217",
+        "Name": "Phú Thọ",
+        "M_Code": "PTH"
+    },
+    {
+        "Code": "219",
+        "Name": "Vĩnh Phúc",
+        "M_Code": "VPH"
+    },
+    {
+        "Code": "221",
+        "Name": "Bắc Giang",
+        "M_Code": "BGI"
+    },
+    {
+        "Code": "223",
+        "Name": "Bắc Ninh",
+        "M_Code": "BNI"
+    },
+    {
+        "Code": "225",
+        "Name": "Quảng Ninh",
+        "M_Code": "QNI"
+    },
+    {
+        "Code": "301",
+        "Name": "Điện Biên",
+        "M_Code": "DBI"
+    },
+    {
+        "Code": "302",
+        "Name": "Lai Châu",
+        "M_Code": "LCH"
+    },
+    {
+        "Code": "303",
+        "Name": "Sơn La",
+        "M_Code": "SLA"
+    },
+    {
+        "Code": "305",
+        "Name": "Hoà Bình",
+        "M_Code": "HBI"
+    },
+    {
+        "Code": "401",
+        "Name": "Thanh Hoá",
+        "M_Code": "THO"
+    },
+    {
+        "Code": "403",
+        "Name": "Nghệ An",
+        "M_Code": "NAN"
+    },
+    {
+        "Code": "405",
+        "Name": "Hà Tĩnh",
+        "M_Code": "HTI"
+    },
+    {
+        "Code": "407",
+        "Name": "Quảng Bình",
+        "M_Code": "QBI"
+    },
+    {
+        "Code": "409",
+        "Name": "Quảng Trị",
+        "M_Code": "QTR"
+    },
+    {
+        "Code": "411",
+        "Name": "TT-Huế",
+        "M_Code": "TTH"
+    },
+    {
+        "Code": "501",
+        "Name": "Đà Nẵng",
+        "M_Code": "DAN"
+    },
+    {
+        "Code": "503",
+        "Name": "Quảng Nam",
+        "M_Code": "QNA"
+    },
+    {
+        "Code": "505",
+        "Name": "Quảng Ngãi",
+        "M_Code": "QNG"
+    },
+    {
+        "Code": "507",
+        "Name": "Bình Định",
+        "M_Code": "BDI"
+    },
+    {
+        "Code": "509",
+        "Name": "Phú Yên",
+        "M_Code": "PHY"
+    },
+    {
+        "Code": "511",
+        "Name": "Khánh Hoà",
+        "M_Code": "KHH"
+    },
+    {
+        "Code": "601",
+        "Name": "Kon Tum",
+        "M_Code": "KTU"
+    },
+    {
+        "Code": "603",
+        "Name": "Gia Lai",
+        "M_Code": "GLA"
+    },
+    {
+        "Code": "605",
+        "Name": "Đắk Lắk",
+        "M_Code": "DLA"
+    },
+    {
+        "Code": "606",
+        "Name": "Đắk Nông",
+        "M_Code": "DNO"
+    },
+    {
+        "Code": "701",
+        "Name": "Hồ Chí Minh",
+        "M_Code": "HCM"
+    },
+    {
+        "Code": "703",
+        "Name": "Lâm Đồng",
+        "M_Code": "LDO"
+    },
+    {
+        "Code": "705",
+        "Name": "Ninh Thuận",
+        "M_Code": "NTH"
+    },
+    {
+        "Code": "707",
+        "Name": "Bình Phước",
+        "M_Code": "BPH"
+    },
+    {
+        "Code": "709",
+        "Name": "Tây Ninh",
+        "M_Code": "TNI"
+    },
+    {
+        "Code": "711",
+        "Name": "Bình Dương",
+        "M_Code": "BDU"
+    },
+    {
+        "Code": "713",
+        "Name": "Đồng Nai",
+        "M_Code": "DON"
+    },
+    {
+        "Code": "715",
+        "Name": "Bình Thuận",
+        "M_Code": "BTH"
+    },
+    {
+        "Code": "717",
+        "Name": "Bà Rịa - Vũng Tàu",
+        "M_Code": "BRV"
+    },
+    {
+        "Code": "801",
+        "Name": "Long An",
+        "M_Code": "LAN"
+    },
+    {
+        "Code": "803",
+        "Name": "Đồng Tháp",
+        "M_Code": "DTH"
+    },
+    {
+        "Code": "805",
+        "Name": "An Giang",
+        "M_Code": "AGI"
+    },
+    {
+        "Code": "807",
+        "Name": "Tiền Giang",
+        "M_Code": "TGI"
+    },
+    {
+        "Code": "809",
+        "Name": "Vĩnh Long",
+        "M_Code": "VLO"
+    },
+    {
+        "Code": "811",
+        "Name": "Bến Tre",
+        "M_Code": "BTR"
+    },
+    {
+        "Code": "813",
+        "Name": "Kiên Giang",
+        "M_Code": "KGI"
+    },
+    {
+        "Code": "815",
+        "Name": "Cần Thơ",
+        "M_Code": "CTH"
+    },
+    {
+        "Code": "816",
+        "Name": "Hậu Giang",
+        "M_Code": "HAG"
+    },
+    {
+        "Code": "817",
+        "Name": "Trà Vinh",
+        "M_Code": "TVI"
+    },
+    {
+        "Code": "819",
+        "Name": "Sóc Trăng",
+        "M_Code": "STR"
+    },
+    {
+        "Code": "821",
+        "Name": "Bạc Liêu",
+        "M_Code": "BLI"
+    },
+    {
+        "Code": "823",
+        "Name": "Cà Mau",
+        "M_Code": "CMA"
+    }
+]

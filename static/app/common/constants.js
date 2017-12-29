@@ -14,6 +14,17 @@ define(['angular'], function (angular) {
             {Code : 0, Name : ''},
             {Code : 1, Name : 'Yes'},
         ],
+        CompanyGroupUnits: [
+            {Code: 'DN', Name: 'Business'},
+            {Code: 'HS', Name: 'School'},
+            {Code: 'YT', Name: 'Medical'},
+            {Code: 'OT', Name: 'Other'},
+        ],
+        VatMethods: [
+            {Code: 'TRUC_TIEP', Name: 'Direct method'},
+            {Code: 'KHAU_TRU', Name: 'Deduction method'},
+            {Code: 'CHE_XUAT', Name: 'Export proccessing zone'},
+        ],
         VatTypes: [
             {Code : -1, Name : 'No Vat'},
             {Code : 0, Name : '0%' },
