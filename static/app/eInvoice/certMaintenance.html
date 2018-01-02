@@ -1,0 +1,33 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title" >Certificates Maintenance</h3>
+</div>
+<div class="modal-body row" id="modal-body" ng-init="initializeController()">
+    <div class="col-xs-12">
+        <form id="CertMaintenanceForm" name="CertMaintenanceForm" role="form" ng-validate="validationOptions">
+            <div class="row">
+                <div class="form-group col-xs-12" id="certificates-body" style="display: block;">
+                    <table class="table table-responsive table-bordered" id="certificateTable">
+                        <thead>
+                            <tr style="vertical-align: middle;">
+                                <th style="width: 30px;"></th>
+                                <th style="width: 100px; vertical-align: middle;">Mã số thuế</th>
+                                <th style="vertical-align: middle;">Tên chủ thể</th>
+                                <th style="vertical-align: middle;">Số seri</th>
+                                <th style="width: 80px; vertical-align: middle;">Ngày hiệu lực</th>
+                                <th style="width: 80px; vertical-align: middle;">Ngày hết hạn</th>
+                                <th style="width: 150px; vertical-align: middle;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-align-center" id="certificates-tbody">
+                            <!-- append go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>    
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok(CertMaintenanceForm)">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

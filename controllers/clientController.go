@@ -22,12 +22,21 @@ func API_Client(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, Data: map[string]interface{}{"Client": models.Client{}}, IsAuthenticated: true}, http.StatusInternalServerError)
 
 		}
-		JSONResponse(w, models.Response{ReturnStatus: true, Data: map[string]interface{}{"Client": client}, IsAuthenticated: true}, http.StatusOK)
+
+		einvoiceClient, tranInfor := models.GetEInvoiceClientByClientID(requestUser.ClientID)
+		if tranInfor.ReturnStatus == false {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"Client": models.Client{}, "eInvoiceClient": models.EInvoiceClient{}}}, http.StatusBadRequest)
+			return
+		}
+		JSONResponse(w, models.Response{ReturnStatus: true, Data: map[string]interface{}{"Client": client, "eInvoiceClient": einvoiceClient}, IsAuthenticated: true}, http.StatusOK)
 
 	case r.Method == "POST": //update client
-		client := models.Client{}
-
-		err := json.NewDecoder(r.Body).Decode(&client)
+		type PostData struct {
+			Client         models.Client         `json:"Client"`
+			EInvoiceClient models.EInvoiceClient `json:"eInvoiceClient"`
+		}
+		postData := PostData{}
+		err := json.NewDecoder(r.Body).Decode(&postData)
 		if err != nil {
 			log.Error(err.Error())
 			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true, Data: map[string]interface{}{"Client": models.Client{}}}, http.StatusBadRequest)
@@ -41,6 +50,7 @@ func API_Client(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 			return
 		}
 
+		client := postData.Client
 		if client.ClientID == nil {
 			client.RecCreatedByID = *user.ID
 			client.RecModifiedByID = *user.ID
@@ -61,6 +71,18 @@ func API_Client(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 			return
 		}
 
-		JSONResponse(w, models.Response{ReturnStatus: true, IsAuthenticated: true, Data: map[string]interface{}{"Client": client}}, http.StatusOK)
+		if postData.EInvoiceClient.ID == nil {
+			postData.EInvoiceClient.ClientID = requestUser.ClientID
+		}
+		einvoiceClient, tranInfor := models.PostEInvoiceClient(postData.EInvoiceClient)
+		if tranInfor.ReturnStatus == false && len(tranInfor.ValidationErrors) > 0 {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, ValidationErrors: tranInfor.ValidationErrors, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceClient": einvoiceClient}}, http.StatusBadRequest)
+			return
+		} else if tranInfor.ReturnStatus == false {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceClient": einvoiceClient}}, http.StatusBadRequest)
+			return
+		}
+
+		JSONResponse(w, models.Response{ReturnStatus: true, IsAuthenticated: true, Data: map[string]interface{}{"Client": client, "eInvoiceClient": einvoiceClient}}, http.StatusOK)
 	}
 }

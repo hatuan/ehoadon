@@ -52,6 +52,7 @@ require.config({
         'angular-dynamic-number': 'bower_components/angular-dynamic-number/release/dynamic-number.min',
         'angular-ui-select': 'bower_components/angular-ui-select/dist/select.min',
         'bignumber': 'bower_components/bignumber.js/bignumber.min',
+        'digitalsignature': 'scripts/digitalsignature',
         'ajaxService': 'app/common/services/ajaxServices',
         'alertsService': 'app/common/services/alertsServices',
         'stateConfig': 'app/common/config/stateConfig',
@@ -108,7 +109,8 @@ require.config({
         'reportjs-designer': { deps: ['reportjs-report']},
         'angular-dynamic-number': ["angular", "angularAMD"],
         'angular-ui-select': ["angular"],
-        'select2': ['jquery', 'bootstrap']
+        'select2': ['jquery', 'bootstrap'],
+        'digitalsignature': ['jquery']
     },
 
     // kick start application

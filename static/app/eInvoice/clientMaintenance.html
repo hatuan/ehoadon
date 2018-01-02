@@ -134,7 +134,7 @@
                     <div class="panel-heading">
                         <h3 class="panel-title">Token Infomation
                             <span class="btn-group btn-group-xs pull-right">
-                                <a class="btn btn-default" id="read-token-button" ng-click="readToken()"> Read Token</a>
+                                <a class="btn btn-default" id="btnLoadCerts" ng-click="selectCert()"> Read Token</a>
                             </span>
                         </h3>
                     </div>
@@ -143,21 +143,21 @@
                             <div class="row">
                                 <div class="form-group col-xs-6">
                                     <label class="control-label" for="SerialNumber">Serial Number</label>
-                                    <input type="text" class="form-control" name="SerialNumber" id="SerialNumber" ng-model="TokenSerialNumber" readonly/>
+                                    <input type="text" class="form-control" name="SerialNumber" id="SerialNumber" ng-model="Token.TokenSerialNumber" readonly/>
                                 </div>
                                 <div class="form-group col-xs-6">
                                     <label class="control-label" for="IssuerName">Issuer Name</label>
-                                    <input type="text" class="form-control" name="IssuerName" id="IssuerName" ng-model="TokenIssuerName" readonly/>
+                                    <input type="text" class="form-control" name="IssuerName" id="IssuerName" ng-model="Token.TokenIssuerName" readonly/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-xs-3">
                                     <label class="control-label" for="CertValidFrom">Valid From</label>
-                                    <input type="text" class="form-control" name="CertValidFrom" id="CertValidFrom" ng-model="TokenCertValidFrom" readonly/>
+                                    <input type="text" class="form-control" name="CertValidFrom" id="CertValidFrom" ng-model="Token.TokenCertValidFrom" uib-datepicker-popup="dd/MM/yyyy" readonly/>
                                 </div>
                                 <div class="form-group col-xs-3">
                                     <label class="control-label" for="CertValidTo">Valid To</label>
-                                    <input type="text" class="form-control" name="CertValidTo" id="CertValidTo" ng-model="TokenCertValidTo" readonly/>
+                                    <input type="text" class="form-control" name="CertValidTo" id="CertValidTo" ng-model="Token.TokenCertValidTo" uib-datepicker-popup="dd/MM/yyyy" readonly/>
                                 </div>
                             </div>
                         </div>

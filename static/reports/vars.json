@@ -1,0 +1,13 @@
+{
+    "Vars": {
+        "NumberForm": "",
+        "Symbol": "",
+        "CompanyName": "",
+        "CompanyVatNumber": "",
+        "CompanyAddress": "",
+        "CompanyPhone": "",
+        "CompanyEmail": "",
+        "CompanyURL": "",
+        "ImageHeader": ""
+	}
+}
