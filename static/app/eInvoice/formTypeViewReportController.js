@@ -11,8 +11,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
         $scope.initializeController = function() {
             $scope.Constants = Constants;
             $scope.EditFormType = editFormType;
-          
-            $scope.displayReport($scope.EditFormType.FormFileName, $scope.EditFormType.FormFile);
+            $scope.FormVars = {};
+            try {
+                $scope.FormVars = JSON.parse($scope.EditFormType.FormVars);
+            } catch(e) {
+                $scope.FormVars = {};
+                delete $scope.EditFormType.FormVars;
+            }
+            $scope.displayReport();
         }
 
         $scope.ok = function(form) {
@@ -24,10 +30,10 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
         };
 
         $scope.displayReport = function(formFileName, formFile){
-            if(!angular.isUndefinedOrNull(formFile)) {
+            if(!angular.isUndefinedOrNull($scope.EditFormType.FormFile)) {
                 ajaxService.AjaxGet("/reports/invoice.json", $scope.getReportDataSuccessFunction, $scope.getReportDataErrorFunction);     
-            } else if(!angular.isUndefinedOrNull(formFileName)) {
-                ajaxService.AjaxGet("/reports/" + formFileName + ".mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction);
+            } else if(!angular.isUndefinedOrNull($scope.EditFormType.FormFileName)) {
+                ajaxService.AjaxGet("/reports/" + $scope.EditFormType.FormFileName + ".mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction);
             }
         }
 
@@ -42,22 +48,29 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
 
         $scope.getReportDataSuccessFunction = function(response, status) {
             var dataSet = new Stimulsoft.System.Data.DataSet("Invoice");
+            response.Vars = $scope.FormVars;
             dataSet.readJson(response);
 
             var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
-            var report = new $window.Stimulsoft.Report.StiReport();
-            report.load($scope.EditFormType.FormFile);
-            $scope.EditFormType.FormFile = report.saveToJsonString();
-            report.load($scope.EditFormType.FormFile);
-            report.regData(dataSet.dataSetName, "", dataSet);
-
             viewer.options.toolbar.visible = false;
             viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
             viewer.options.appearance.scrollbarsMode = true;
             viewer.options.width = "100%";
             viewer.options.height = $("#modal-body").height() + "px";
-            viewer.report = report;
             viewer.renderHtml('reportviewer');
+
+            setTimeout(function () {
+				var report = new $window.Stimulsoft.Report.StiReport();
+                report.load($scope.EditFormType.FormFile);
+
+                // Remove all connections in report template (they are used in the first place)
+                report.dictionary.databases.clear();
+                // Registered JSON data specified in the report with same name
+                report.regData(dataSet.dataSetName, "", dataSet);
+
+				// Assign the report to the viewer
+				viewer.report = report;
+			}, 100);
         };
 
         $scope.getReportDataErrorFunction = function(response, status) {

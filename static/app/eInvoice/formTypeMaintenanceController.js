@@ -3,15 +3,17 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTypeService', 'reportjs-report', 'reportjs-viewer'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editFormType'];
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceFormTypeService', 'reportjs-report', 'reportjs-viewer'], function(angularAMD, $) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editFormType'];
 
-    var formTypeMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editFormType) {
+    var formTypeMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, clientService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editFormType) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
             $scope.EditFormType = editFormType;
-          
+            $scope.Client = {};
+            $scope.FormVars = {};
+
             if($scope.EditFormType.ID == null) {
                 $scope.EditFormType.ID = "";
                 $scope.EditFormType.InvoiceType = '';
@@ -39,9 +41,17 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
                 indexOfslash = $scope.EditFormType.Symbol.indexOf("/");
                 $scope.EditFormType.SymbolPart1 = $scope.EditFormType.Symbol.substring(0, indexOfslash);
                 $scope.EditFormType.SymbolPart2 = $scope.EditFormType.Symbol.substring(indexOfslash + 1, $scope.EditFormType.Symbol.length - 1);
+
+                try {
+                    $scope.FormVars = JSON.parse($scope.EditFormType.FormVars);
+                } catch(e) {
+                    $scope.FormVars = {};
+                    delete $scope.EditFormType.FormVars;
+                }
+                
             }
 
-            $scope.displayReport($scope.EditFormType.FormFileName, $scope.EditFormType.FormFile);
+            $scope.getClient();
         };
 
         $scope.$watch(function(scope) {
@@ -87,7 +97,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
                 $scope.EditFormType.NumberForm3 = ("000" + $scope.EditFormType.NumberForm3).substring($scope.EditFormType.NumberForm3.length);
                 $scope.EditFormType.NumberForm = $scope.EditFormType.InvoiceType + $scope.EditFormType.NumberForm2 + "/" + $scope.EditFormType.NumberForm3;
                 $scope.EditFormType.Symbol = $scope.EditFormType.SymbolPart1 + "/" + $scope.EditFormType.SymbolPart2 + $scope.EditFormType.InvoiceForm;
-
+                $scope.EditFormType.FormVars = JSON.stringify($scope.FormVars);
+                
                 if($scope.EditFormType.ID == "") {
                     $scope.EditFormType.ID = null;
                     $scope.EditFormType.RecCreatedByID = $rootScope.currentUser.ID;
@@ -128,11 +139,44 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
             alertsService.RenderErrorMessage(response.Error);
         };
 
-        $scope.displayReport = function(formFileName, formFile){
-            if(!angular.isUndefinedOrNull(formFile)) {
+        $scope.getClient = function() {
+            clientService.getClient($scope.clientInquiryCompleted, $scope.clientInquiryError);
+        };
+
+        $scope.clientInquiryCompleted = function(response, status) {
+            $scope.Client = response.Data.Client;
+            $scope.displayReport();
+        };
+
+        $scope.clientInquiryError = function(response) {
+            alertsService.RenderErrorMessage(response.Error);
+        }
+
+        $scope.setFormVars = function() {
+            if(angular.isUndefinedOrNull($scope.EditFormType.FormVars)) {
+                $scope.FormVars.NumberForm = $scope.EditFormType.NumberForm;
+                $scope.FormVars.Symbol = $scope.EditFormType.Symbol;
+                $scope.FormVars.CompanyName = $scope.Client.Description;
+                $scope.FormVars.CompanyVatNumber = $scope.Client.VatNumber;
+                $scope.FormVars.CompanyAddress = $scope.Client.Address;
+                $scope.FormVars.CompanyPhone = $scope.Client.Telephone;
+                $scope.FormVars.CompanyEmail = $scope.Client.Email;
+                $scope.FormVars.CompanyURL = $scope.Client.Website;
+            }
+        }
+        
+        $scope.refreshReport = function() {
+            delete $scope.EditFormType.FormVars;
+            $scope.displayReport();
+        };
+
+        $scope.displayReport = function(){
+            $scope.setFormVars();
+
+            if(!angular.isUndefinedOrNull($scope.EditFormType.FormFile)) {
                 ajaxService.AjaxGet("/reports/invoice.json", $scope.getReportDataSuccessFunction, $scope.getReportDataErrorFunction);     
-            } else if(!angular.isUndefinedOrNull(formFileName)) {
-                ajaxService.AjaxGet("/reports/" + formFileName + ".mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction);
+            } else if(!angular.isUndefinedOrNull($scope.EditFormType.FormFileName)) {
+                ajaxService.AjaxGet("/reports/" + $scope.EditFormType.FormFileName + ".mrt", $scope.getReportDesignSuccessFunction, $scope.getReportDesignErrorFunction);
             }
         }
 
@@ -147,23 +191,31 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
 
         $scope.getReportDataSuccessFunction = function(response, status) {
             var dataSet = new Stimulsoft.System.Data.DataSet("Invoice");
+            response.Vars = $scope.FormVars;
             dataSet.readJson(response);
 
             var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
-            var report = new $window.Stimulsoft.Report.StiReport();
-            report.load($scope.EditFormType.FormFile);
-            $scope.EditFormType.FormFile = report.saveToJsonString();
-            report.load($scope.EditFormType.FormFile);
-            report.regData(dataSet.dataSetName, "", dataSet);
-
             viewer.options.toolbar.visible = false;
             viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
-            viewer.options.toolbar.zoom = 50;
+            viewer.options.toolbar.zoom = 75;
             viewer.options.appearance.scrollbarsMode = true;
             viewer.options.width = "100%";
             viewer.options.height = $("#modal-body").height() + "px";
-            viewer.report = report;
             viewer.renderHtml('reportviewer');
+
+            setTimeout(function () {
+				var report = new $window.Stimulsoft.Report.StiReport();
+                report.load($scope.EditFormType.FormFile);
+                $scope.EditFormType.FormFile = report.saveToJsonString();
+
+                // Remove all connections in report template (they are used in the first place)
+                report.dictionary.databases.clear();
+                // Registered JSON data specified in the report with same name
+                report.regData(dataSet.dataSetName, "", dataSet);
+
+				// Assign the report to the viewer
+				viewer.report = report;
+			}, 100);
         };
 
         $scope.getReportDataErrorFunction = function(response, status) {

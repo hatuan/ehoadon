@@ -10,8 +10,9 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'reportService']
         
         $scope.initializeController = function() {
             $scope.Constants = Constants;
-            $scope.Reports = [];
-            $scope.ReportFile = '';
+            //$scope.Reports = [];
+            $scope.ReportFile = 'Blank';
+            //$scope.Reports.push($scope.ReportFile);
             $scope.EditFormType = editFormType;
             
             if (angular.isUndefinedOrNull(editFormType.InvoiceType))
@@ -53,8 +54,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'reportService']
             var _result = new Object();
             _result.EditFormType = $scope.EditFormType;
             _result.EditFormType.FormFileName = $scope.ReportFile;
-            _result.EditFormType.FormFile = null; //Reset value, formTypeMaintenance will load new report from FormFileName
-
+            delete _result.EditFormType.FormFile; //Reset value, formTypeMaintenance will load new report from FormFileName
+            delete _result.EditFormType.FormVars;
             $uibModalInstance.close(_result);
         };
         

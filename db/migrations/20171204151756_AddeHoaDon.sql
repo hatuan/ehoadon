@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS ehd_form_type
     symbol character varying NOT NULL, /* Ky hieu : EY/17E (E : invoice_form) */
     form_file_name character varying NOT NULL,
     form_file character varying NOT NULL,
+    form_vars character varying NOT NULL, /*Luu json cac bien vars cua report: Form, Symbol, Company Name ... khi da dang ky dung mau bao cao nay thi khong thay doi nua */
     client_id bigint NOT NULL,
     organization_id bigint NOT NULL,
     version bigint NOT NULL,

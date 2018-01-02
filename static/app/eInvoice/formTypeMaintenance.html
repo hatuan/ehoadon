@@ -42,7 +42,14 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary" ng-click="selectReports()" ng-disabled="EditFormType.InvoiceType==undefined || EditFormType.InvoiceType==''" >Select Report</button>
+                <div class="row">
+                    <div class="form-group col-xs-6">
+                            <button type="button" class="btn btn-primary" ng-click="selectReports()" ng-disabled="EditFormType.InvoiceType==undefined || EditFormType.InvoiceType==''" >Select Report</button>
+                    </div>
+                    <div class="form-group col-xs-6">
+                            <button type="button" class="btn pull-right" ng-click="refreshReport()" ng-disabled="EditFormType.InvoiceType==undefined || EditFormType.InvoiceType==''" >Refresh</button>
+                    </div>
+                </div>
             </div>    
         </form>
     </div>

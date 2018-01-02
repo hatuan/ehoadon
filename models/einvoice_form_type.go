@@ -20,6 +20,7 @@ type EInvoiceFormType struct {
 	Symbol            string     `db:"symbol"`       //EY/17E
 	FormFileName      string     `db:"form_file_name"`
 	FormFile          string     `db:"form_file"`
+	FormVars          string     `db:"form_vars"`
 	RecCreatedByID    int64      `db:"rec_created_by" json:",string"`
 	RecCreatedByUser  string     `db:"rec_created_by_user"`
 	RecCreated        *Timestamp `db:"rec_created_at"`
@@ -174,6 +175,7 @@ func PostEInvoiceFormType(postData EInvoiceFormType) (EInvoiceFormType, Transact
 			"symbol, " +
 			"form_file_name, " +
 			"form_file, " +
+			"form_vars, " +
 			"rec_created_by," +
 			"rec_created_at," +
 			"rec_modified_by," +
@@ -188,6 +190,7 @@ func PostEInvoiceFormType(postData EInvoiceFormType) (EInvoiceFormType, Transact
 			":symbol, " +
 			":form_file_name, " +
 			":form_file, " +
+			":form_vars, " +
 			":rec_created_by," +
 			":rec_created_at," +
 			":rec_modified_by," +
@@ -211,6 +214,7 @@ func PostEInvoiceFormType(postData EInvoiceFormType) (EInvoiceFormType, Transact
 			" symbol		= :symbol, " +
 			" form_file_name	= :form_file_name, " +
 			" form_file		= :form_file, " +
+			" form_vars		= :form_vars, " +
 			" status		= :status," +
 			" version		= :version + 1," +
 			" rec_modified_by	= :rec_modified_by, " +
