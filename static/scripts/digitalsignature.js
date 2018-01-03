@@ -33,6 +33,7 @@ function dateFormat(date) {
     return yyyy +(mm[1]?mm:"0" + mm[0]) + (dd[1]?dd:"0"+dd[0]);
 };
 
+// validTo co dinh dang "DD-MM-YYYY"
 function dateFormatValidTo(validTo) {
 	var str = validTo.split("-");
 	return str[2] + str[1] + str[0];
@@ -41,7 +42,7 @@ function dateFormatValidTo(validTo) {
 function isExpired(toDate) {
 	var result = false;
 	toDate = dateFormatValidTo(toDate);
-
+    /*
 	$.ajax({
 		type : 'GET',
 		url : 'https://laphoadon.gdt.gov.vn/van-portal/registerTaxpayer/getDate',
@@ -53,7 +54,8 @@ function isExpired(toDate) {
 				result = true;
 			}
 		}
-	});
+    });
+    */
 	return result;
 };
 
@@ -78,9 +80,9 @@ function LoadCerts() {
 
     for (idx = 0; idx < document.applet.getCertArr().length; idx++) {
         var serialNumber = document.applet.getCertArr()[idx].getSerialNumber();
-        var isExistedCertificate = false;
-        var isValidIssuer = false;
-        var isRevoked = false;
+        var isExistedCertificate = false; //token da dang ky hay chua
+        var isValidIssuer = true; //token co valid hay khong
+        var isRevoked = false; //token co bi thu hoi khong
 
         var issuer = document.applet.getCertArr()[idx].getIssuer();
         var validFrom = document.applet.getCertArr()[idx].getValidFrom();
@@ -94,7 +96,8 @@ function LoadCerts() {
         var certificateContent = document.applet.getCertArr()[idx].getCertificateContent();
         var certificateVersion = document.applet.getCertArr()[idx].getCertificateVersion();
         
-        /* Check usb token da dang ky voi ivan hay chua
+        /* 
+        //Check usb token da dang ky voi ivan hay chua
         $.ajax({
             type : 'GET',
             url : 'https://laphoadon.gdt.gov.vn/van-portal/registerTaxpayer/isExistedCertificate?serialNumber=' + serialNumber,
@@ -107,8 +110,7 @@ function LoadCerts() {
                 }
             }
         });
-        */
-        /* Check usb token co valid hay khong */
+        //Check usb token co valid hay khong
         $.ajax({
             type : 'POST',
             url : 'https://laphoadon.gdt.gov.vn/van-portal/registerTaxpayer/isValidIssuer?certificateContent=' + certificateContent,
@@ -121,7 +123,7 @@ function LoadCerts() {
                 }
             }
         });
-        /* Check usb token da bi thu hoi hay chua */
+        // Check usb token da bi thu hoi hay chua
         $.ajax({
             type : 'GET',
             url : 'https://laphoadon.gdt.gov.vn/van-portal/registerTaxpayer/isCertificateRevoked?serialNumber=' + serialNumber,
@@ -134,7 +136,7 @@ function LoadCerts() {
                 }
             }
         });
-        
+        */
         html += "<tr>"
         if ((taxCode != null) && (taxCode.length > 0)) {
             if (isExpired(validTo)) {
