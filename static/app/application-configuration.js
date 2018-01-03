@@ -204,7 +204,7 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
 
     }]);
 
-    app.run(['$state', '$rootScope', '$auth', 'globalizeWrapper', 'amMoment', '$window', function($state, $rootScope, $auth, globalizeWrapper, amMoment, $window) {
+    app.run(['$state', '$rootScope', '$location', '$auth', 'globalizeWrapper', 'amMoment', '$window', function($state, $rootScope, $location, $auth, globalizeWrapper, amMoment, $window) {
 
         //kendo.culture("vi-VN");
 
@@ -213,6 +213,13 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
         //   format: "dd/MM/yyyy",
         //   parseFormats: ["yyyy-MM-dd", "dd/MM/yyyy", "yyyy/MM/dd"],
         //};
+
+        //Google Analytics 
+        //http://jasonwatmore.com/post/2015/11/07/angularjs-google-analytics-with-the-ui-router
+        $window.ga('create', 'UA-111883091-1', 'auto');
+        $rootScope.$on('$stateChangeSuccess', function (event) {
+            $window.ga('send', 'pageview', $location.path());
+        });
 
         $rootScope.isAuthenticated = function() {
             var _isAuthenticated = $auth.isAuthenticated();
