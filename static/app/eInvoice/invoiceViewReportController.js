@@ -3,22 +3,75 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormTypeService', 'reportjs-report', 'reportjs-viewer'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function(angularAMD, $) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$sce', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
-    var invoiceViewReportController = function($scope, $rootScope, $state, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editInvoice) {
+    var invoiceViewReportController = function($scope, $rootScope, $state, $sce, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, clientService, eInvoiceService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
             $scope.EditInvoice = editInvoice;
             $scope.FormType = {};
+            $scope.FormVars = {};
+            $scope.Client = {};
+            $scope.Token = {};
+
+            $scope.report = null;
 
             if(!angular.isUndefinedOrNull($scope.EditInvoice.FormTypeID))
-                $scope.getFormType($scope.EditInvoice.FormTypeID);
+                clientService.getClient(
+                    function(response, status) { //success
+                        $scope.Client = response.Data.Client;
+            
+                        $scope.Token = response.Data.eInvoiceClient;
+                        $scope.Token.TokenCertValidFrom = new moment.unix(response.Data.eInvoiceClient.TokenCertValidFrom).toDate();
+                        $scope.Token.TokenCertValidTo = new moment.unix(response.Data.eInvoiceClient.TokenCertValidTo).toDate();
+
+                        $scope.getFormType($scope.EditInvoice.FormTypeID);
+                    }, 
+                    function(response) { //error
+                        alertsService.RenderErrorMessage(response.Error);
+                    }
+                );
+            else
+                alert("Report has error : Unknow FormTypeID");
         }
 
         $scope.signDocument = function() {
+            if(!angular.isUndefinedOrNull($scope.report)) {
+                $("#pdfBase64").attr('value', '');
+                $("#selectedCert").attr('value', '');
+                var settings = new Stimulsoft.Report.Export.StiPdfExportSettings();
+                // Create an PDF service instance.
+                var service = new Stimulsoft.Report.Export.StiPdfExportService();
             
+                // Create a MemoryStream object.
+                var stream = new Stimulsoft.System.IO.MemoryStream();
+                // Export PDF using MemoryStream.
+                service.exportTo($scope.report, stream, settings);
+            
+                // Get PDF data from MemoryStream object
+                var data = stream.toArray(); //or var data = $scope.report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf);
+                var dataBase64 = arrayBufferToBase64(data);
+                //$("#pdfBase64").attr('value', arrayBufferToBase64(data)); //set value of input
+                //$("#selectedCert").attr('value', $scope.Token.TokenSerialNumber);
+                                
+                $scope.appletHtml = null;
+                
+                var appletString = 
+                    '<applet width="0" height="0" id="appletPdfSign' + (new Date()).getTime() + '" code="com.myerp.digitalsignature.applet.PDFSignatureApplet.class" archive="/scripts/SignApplet40-1.0-SNAPSHOT.jar, /scripts/itextpdf-5.5.9.jar, /scripts/bcprov-jdk15on-1.56.jar, /scripts/bcpkix-jdk15on-1.56.jar, /scripts/bcprov-ext-jdk15on-1.56.jar, /scripts/commons-codec-1.9.jar">' +
+                    '  <param name="pdfBase64Field" value="'+ dataBase64 +'">' +
+                    '  <param name="selectedCertField" value="' + $scope.Token.TokenSerialNumber + '">' +
+                    '</applet>'
+
+                $scope.appletHtml = $sce.trustAsHtml(appletString);
+
+                settings = null;
+                stream = null;
+                service = null;
+                data = null;
+                dataBase64 = null;
+            }
         };
         
         $scope.cancel = function() {
@@ -26,6 +79,9 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
         };
         
         $scope.$on('modal.closing', function(event, reason, closed){
+            //$("#pdfBase64").val(''); //set val of input
+            //$("#pdfBase64").attr('value', '') //set value of input
+            $scope.appletHtml = null;
             $uibModalInstance.result.EditInvoice = $scope.EditInvoice;
         });
 
@@ -38,6 +94,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
                 function(response, status) { //success
                     $scope.FormType = response.Data.eInvoiceFormType;
                     
+                    try {
+                        $scope.FormVars = JSON.parse($scope.FormType.FormVars);
+                    } catch(e) {
+                        $scope.FormVars = {};
+                        delete $scope.EditFormType.FormVars;
+
+                        alert("Has error in report process  : FormVars not found"); 
+                    }
+
                     $scope.getInvoice($scope.EditInvoice.ID);
                 },
                 function(response) { //error
@@ -84,6 +149,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
             var ds = {};
             ds.Invoice = $scope.EditInvoice;
             ds.InvoiceLines = $scope.EditInvoice.InvoiceLines;
+            ds.Vars = $scope.FormVars;
 
             for(var _i = ds.InvoiceLines.length; _i < 10; _i++ ) {
                 ds.InvoiceLines.push({LineNo: _i + 1});
@@ -107,7 +173,9 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceService
                 // Registered JSON data specified in the report with same name
                 report.regData(dataSet.dataSetName, "", dataSet);
 				// Assign the report to the viewer
-				viewer.report = report;
+                viewer.report = report;
+                
+                $scope.report = report;
 			}, 50);
 
         };

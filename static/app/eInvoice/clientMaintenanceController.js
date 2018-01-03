@@ -4,15 +4,22 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'provinceService', 'digitalsignature', 'app/eInvoice/certMaintenanceController'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'clientService', 'provinceService', '$stateParams', '$confirm', 'Constants'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$sce', '$window', 'moment', '$uibModal', 'alertsService', 'clientService', 'provinceService', '$stateParams', '$confirm', 'Constants'];
 
-    var clientMaintenanceController = function($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, clientService, provinceService, $stateParams, $confirm, Constants) {
+    var clientMaintenanceController = function($scope, $rootScope, $state, $sce, $window, moment, $uibModal, alertsService, clientService, provinceService, $stateParams, $confirm, Constants) {
         
         $scope.initializeController = function() {
             $scope.Constants = Constants;
             $scope.Client = {};
             $scope.Token = {};
             $scope.Provinces = [];
+
+            $scope.appletHtml = null;
+
+            var appletString = 
+                '<applet width="0" height="0" id="applet" code="com.myerp.digitalsignature.applet.CertificateApplet.class" archive="/scripts/SignApplet40-1.0-SNAPSHOT.jar">' +
+                '</applet>'
+            $scope.appletHtml = $sce.trustAsHtml(appletString);
 
             $scope.getProvinces(function () { //success
                 $scope.getClient();

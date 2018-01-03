@@ -191,3 +191,18 @@ function LoadCerts() {
         return;
     } 
 };
+
+function appletDoException(_info) {
+    alert(_info); 
+}
+
+function appletDebug(_info) {
+    console.log(_info); 
+}
+
+function sendSignedToServer(_pdfSignedBase64) {
+    console.log(_pdfSignedBase64); 
+    var pdfData = base64ToArrayBuffer(_pdfSignedBase64);
+    
+    Object.saveAs(pdfData, "signed.pdf", "application/pdf");
+}
