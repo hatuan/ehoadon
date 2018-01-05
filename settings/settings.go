@@ -31,6 +31,7 @@ type settings struct {
 	CertKeyPath        string       `json:"certkey_path"`
 	JWTExpirationDelta int          `json:"jwt_expiration_delta"`
 	Database           DatabaseInfo `json:"database"`
+	InvoiceFilePath    string       `json:"invoice_file_path"`
 }
 
 func (s *settings) GetDbConn() string {

@@ -1,3 +1,7 @@
+# https://bitbucket.org/liamstask/goose
+# goose defaults to using an environment called development
+# use other environment use -env xxxx (goose -env production up)
+# can use environment variable expansion in your dbconf.yml. Ex "open: $DATABASE_URL"
 production:
     driver: postgres
     open: user=postgres dbname=ehoadon port=5432 sslmode=disable

@@ -4,9 +4,9 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function(angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$sce', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$sce', '$auth', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
-    var invoiceViewReportController = function($scope, $rootScope, $state, $sce, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, clientService, eInvoiceService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editInvoice) {
+    var invoiceViewReportController = function($scope, $rootScope, $state, $sce, $auth, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, clientService, eInvoiceService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
@@ -62,6 +62,10 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                     '<applet width="0" height="0" id="appletPdfSign' + (new Date()).getTime() + '" code="com.myerp.digitalsignature.applet.PDFSignatureApplet.class" archive="/scripts/SignApplet40-1.0-SNAPSHOT.jar, /scripts/itextpdf-5.5.9.jar, /scripts/bcprov-jdk15on-1.56.jar, /scripts/bcpkix-jdk15on-1.56.jar, /scripts/bcprov-ext-jdk15on-1.56.jar, /scripts/commons-codec-1.9.jar">' +
                     '  <param name="pdfBase64Field" value="'+ dataBase64 +'">' +
                     '  <param name="selectedCertField" value="' + $scope.Token.TokenSerialNumber + '">' +
+                    '  <param name="idField" value="' + $scope.EditInvoice.ID + '">' +
+                    '  <param name="versionField" value="' + $scope.EditInvoice.Version + '">' +
+                    '  <param name="statusField" value="' + $scope.Constants.InvoiceStatus[1].Code + '">' +
+                    '  <param name="jwtTokenField" value="' + $auth.getToken() + '">' +
                     '</applet>'
 
                 $scope.appletHtml = $sce.trustAsHtml(appletString);

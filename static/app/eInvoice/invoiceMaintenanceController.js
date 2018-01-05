@@ -16,7 +16,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.selectViewReport = false;
 
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
-                $scope.EditInvoice.Status = $scope.Constants.Status[1].Code;
+                $scope.EditInvoice.Status = $scope.Constants.InvoiceStatus[0].Code;
                 $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
                 $scope.EditInvoice.RecCreatedByUser = $rootScope.currentUser.Name;
                 $scope.EditInvoice.RecCreated = new Date();
@@ -247,7 +247,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             _invoiceLine.AmountVat = new BigNumber(0);
             _invoiceLine.AmountPayment = new BigNumber(0);
 
-            _invoiceLine.Status = $scope.Constants.Status[1].Code;
+            _invoiceLine.Status = $scope.Constants.InvoiceStatus[0].Code;
             _invoiceLine.RecCreatedByID = $rootScope.currentUser.ID;
             _invoiceLine.RecCreatedByUser = $rootScope.currentUser.Name;
             _invoiceLine.RecCreated = new Date();

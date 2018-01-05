@@ -31,6 +31,11 @@ define(['angular'], function (angular) {
             {Code : 5, Name : '5%' },
             {Code : 10, Name : '10%' },
         ],
+        InvoiceStatus: [
+            {Code : 0, Name : 'Draft'},
+            {Code : 1, Name : 'Signed'},
+            {Code : 2, Name : 'Sended'},
+        ],
         InvoiceForms: [
             {Code : 'E', Name : 'HĐ Điện tử (TT32)'},
         ],

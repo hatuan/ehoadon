@@ -202,9 +202,30 @@ function appletDebug(_info) {
     console.log(_info); 
 }
 
-function sendSignedToServer(_pdfSignedBase64) {
-    console.log(_pdfSignedBase64); 
-    var pdfData = base64ToArrayBuffer(_pdfSignedBase64);
-    
-    Object.saveAs(pdfData, "signed.pdf", "application/pdf");
+function sendSignedToServer(pdfSignedBase64, pdfSignedBase64MD5, invoiceID, invoiceVersion, invoiceStatus, jwtToken) {
+    var postData = {
+        'InvoiceID' : invoiceID,
+        'PDFBase64' : pdfSignedBase64,
+        'PDFBase64MD5' : pdfSignedBase64MD5,
+        'Status' : invoiceStatus,
+        'Version' : invoiceVersion
+    };
+
+    $.ajax({
+        url: '/api/einvoiceFiles',
+        method: "POST",
+        async: false,
+        contentType: "application/json;charset=utf-8",
+        dataType: "json", 
+        data: JSON.stringify(postData),
+        beforeSend: function (xhr) {   //Include the bearer token in header
+            xhr.setRequestHeader("Authorization", jwtToken);
+        }
+    })
+    .done(function() {
+        alert( "POST einvoiceFile" );
+    })
+    .fail(function() {
+        alert( "POST einvoiceFile error" );
+    });
 }

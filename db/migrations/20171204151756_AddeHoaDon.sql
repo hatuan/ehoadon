@@ -157,6 +157,9 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
     id bigint NOT NULL DEFAULT id_generator(),
     form_release_id bigint NOT NULL,
     original_invoice_id bigint,
+    invoice_file_id uuid,
+    signed_by bigint,
+    signed_date timestamp with time zone,
     invoice_date date,
     invoice_no character varying NOT NULL,
     pay_type character varying NOT NULL, 
@@ -199,6 +202,7 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
 );
 CREATE INDEX IF NOT EXISTS idx_ehd_invoice_no ON ehd_invoice USING btree (invoice_no, client_id);
 CREATE INDEX IF NOT EXISTS idx_ehd_invoice_form_release_id ON ehd_invoice USING btree (form_release_id, client_id);
+CREATE INDEX IF NOT EXISTS idx_ehd_invoice_invoice_file_id ON ehd_invoice USING btree (invoice_file_id);
 
 CREATE TABLE IF NOT EXISTS ehd_invoice_line
 (
