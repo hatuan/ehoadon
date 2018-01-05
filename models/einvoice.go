@@ -533,7 +533,7 @@ func PostEInvoiceFile(postData EInvoiceFile) (EInvoice, TransactionalInformation
 		" signed_date = :signed_date, " +
 		" status = :status, " +
 		" version = :version + 1 " +
-		" WHERE id = :id AND version = :version")
+		" WHERE id = :id AND version = :version AND status=0")
 
 	result, err := stmt.Exec(postData)
 	if err != nil {
