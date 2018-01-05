@@ -6,6 +6,7 @@
 # Folders
 _obj
 _test
+invoice_files
 
 # Architecture specific extensions/prefixes
 *.[568vq]
