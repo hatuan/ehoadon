@@ -8,6 +8,8 @@ _obj
 _test
 invoice_files
 dist
+node_modules
+.vagrant
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -30,4 +32,4 @@ _testmain.go
 debug
 
 # external packages folder
-vendor/
+/vendor/**/.git
