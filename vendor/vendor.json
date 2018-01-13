@@ -1,0 +1,133 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "PU7+qFYTapAa15U/MnFPTnacn5g=",
+			"path": "erpvietnam/sql-parser/dynamic-where",
+			"revision": "e5fc291b0ed5533c4b4d0d92164db9794ba69304",
+			"revisionTime": "2016-09-28T02:51:28Z"
+		},
+		{
+			"checksumSHA1": "1cCBq+IYWyWq/Dg0Sj6ATKzjKCc=",
+			"path": "github.com/Gurpartap/logrus-stack",
+			"revision": "89c00d8a28f43c567d92eb81a2945301a6a9fbb9",
+			"revisionTime": "2017-07-10T17:09:04Z"
+		},
+		{
+			"checksumSHA1": "i63ROr3dG0sbvSlfb7vpicy4bR8=",
+			"path": "github.com/codegangsta/negroni",
+			"revision": "c262547a5086067ebe455c81db5cc52eb298ac3c",
+			"revisionTime": "2017-08-09T18:06:16Z"
+		},
+		{
+			"checksumSHA1": "IkAYIhxmvTQKEJvclIZJoVh9ats=",
+			"path": "github.com/dgrijalva/jwt-go",
+			"revision": "a539ee1a749a2b895533f979515ac7e6e0f5b650",
+			"revisionTime": "2017-06-08T00:51:49Z"
+		},
+		{
+			"checksumSHA1": "AZcW/5d7TKL2kYIjdMLL1LwPAeo=",
+			"path": "github.com/dgrijalva/jwt-go/request",
+			"revision": "a539ee1a749a2b895533f979515ac7e6e0f5b650",
+			"revisionTime": "2017-06-08T00:51:49Z"
+		},
+		{
+			"checksumSHA1": "BkinTXlLlb+qk5sAcC/Mwiyh0/Y=",
+			"path": "github.com/facebookgo/stack",
+			"revision": "751773369052141c013c6e827a71e8f35c07879c",
+			"revisionTime": "2016-02-09T18:44:15Z"
+		},
+		{
+			"checksumSHA1": "IkPM2QLv9urri7S49wzroQx9oXA=",
+			"path": "github.com/gorilla/context",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"revisionTime": "2016-08-17T18:46:32Z"
+		},
+		{
+			"checksumSHA1": "VQCWhB87h6+5rzZM7uKK6N7q1RI=",
+			"path": "github.com/gorilla/mux",
+			"revision": "24fca303ac6da784b9e8269f724ddeb0b2eea5e7",
+			"revisionTime": "2017-09-05T17:10:44Z"
+		},
+		{
+			"checksumSHA1": "GKB96ojS6AY/uBnfLWqZBsxTBY4=",
+			"path": "github.com/gorilla/securecookie",
+			"revision": "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983",
+			"revisionTime": "2017-02-24T19:38:04Z"
+		},
+		{
+			"checksumSHA1": "SkZ4o/B5OZTUwsQiHiyvMt9G2BI=",
+			"path": "github.com/gorilla/sessions",
+			"revision": "a3acf13e802c358d65f249324d14ed24aac11370",
+			"revisionTime": "2017-10-08T21:47:40Z"
+		},
+		{
+			"checksumSHA1": "/2/F1VEyXQhSVk6/sxUPW8yKggI=",
+			"path": "github.com/jmoiron/sqlx",
+			"revision": "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f",
+			"revisionTime": "2017-04-30T19:46:03Z"
+		},
+		{
+			"checksumSHA1": "3s9o70B0rOa5DsO+wXYT7aae6GE=",
+			"path": "github.com/jmoiron/sqlx/reflectx",
+			"revision": "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f",
+			"revisionTime": "2017-04-30T19:46:03Z"
+		},
+		{
+			"checksumSHA1": "ALdCwbzBmgi66VcOnK0x+F5Q0B4=",
+			"path": "github.com/lib/pq",
+			"revision": "83612a56d3dd153a94a629cd64925371c9adad78",
+			"revisionTime": "2017-11-26T05:04:59Z"
+		},
+		{
+			"checksumSHA1": "QPjV8nrnzjkHGgLYwlqYCOSbwH4=",
+			"path": "github.com/lib/pq/oid",
+			"revision": "83612a56d3dd153a94a629cd64925371c9adad78",
+			"revisionTime": "2017-11-26T05:04:59Z"
+		},
+		{
+			"checksumSHA1": "+RPbt/bqx8qmTbdc2bL0cjCbVNg=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "36e9d2ebbde5e3f13ab2e25625fd453271d6522e",
+			"revisionTime": "2018-01-03T17:44:51Z"
+		},
+		{
+			"checksumSHA1": "3Mjoxq3Tf6liCH8869JpBRNpSfs=",
+			"path": "github.com/shopspring/decimal",
+			"revision": "aed1bfe463fa3c9cc268d60dcc1491db613bff7e",
+			"revisionTime": "2017-09-11T12:58:34Z"
+		},
+		{
+			"checksumSHA1": "t5W90J4d7vhrs6+LDp0BalvCZEU=",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "89742aefa4b206dcf400792f3bd35b542998eb3b",
+			"revisionTime": "2017-08-22T13:27:46Z"
+		},
+		{
+			"checksumSHA1": "1MGpGDQqnUoRpv7VEcQrXOBydXE=",
+			"path": "golang.org/x/crypto/pbkdf2",
+			"revision": "74b34b9dd60829a9fcaf56a59e81c3877a8ecd2c",
+			"revisionTime": "2017-09-02T17:19:23Z"
+		},
+		{
+			"checksumSHA1": "nqWNlnMmVpt628zzvyo6Yv2CX5Q=",
+			"path": "golang.org/x/crypto/ssh/terminal",
+			"revision": "74b34b9dd60829a9fcaf56a59e81c3877a8ecd2c",
+			"revisionTime": "2017-09-02T17:19:23Z"
+		},
+		{
+			"checksumSHA1": "dp+OSc8jJIOd6h1mXoAmD3GGAAs=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "a5054c7c1385fd50d9394475365355a87a7873ec",
+			"revisionTime": "2017-09-05T14:23:55Z"
+		},
+		{
+			"checksumSHA1": "gVfCD++7aVcdKF2spv6XkEM/wYw=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "a5054c7c1385fd50d9394475365355a87a7873ec",
+			"revisionTime": "2017-09-05T14:23:55Z"
+		}
+	],
+	"rootPath": "erpvietnam/ehoadon"
+}
