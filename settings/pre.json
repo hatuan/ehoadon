@@ -1,8 +1,8 @@
 {
 	"listen_url":"0.0.0.0:443",
-	"privatekey_path": ".\\settings\\keys\\server.key",
-	"publickey_path": ".\\settings\\keys\\server.key.pub",
-	"certkey_path": ".\\settings\\keys\\server.crt",
+	"privatekey_path": "./settings/keys/server.key",
+	"publickey_path": "./settings/keys/server.key.pub",
+	"certkey_path": "./settings/keys/server.crt",
 	"jwt_expiration_delta": 72,
 	"database" : {
 		"driver_name":"postgres",
@@ -12,5 +12,5 @@
 		"port":"5432",
 		"host":"127.0.0.1"
 	},
-	"invoice_file_path": ".\\static\\invoice_files\\"
+	"invoice_file_path": "./static/invoice_files/"
 }
