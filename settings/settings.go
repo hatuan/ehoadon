@@ -25,7 +25,8 @@ type DatabaseInfo struct {
 }
 
 type settings struct {
-	ListenURL          string       `json:"listen_url"`
+	ListenHTTP         string       `json:"listen_http"`
+	ListenHTTPS        string       `json:"listen_https"`
 	PrivateKeyPath     string       `json:"privatekey_path"`
 	PublicKeyPath      string       `json:"publickey_path"`
 	CertKeyPath        string       `json:"certkey_path"`
@@ -50,6 +51,10 @@ func init() {
 		env = "preproduction"
 	}
 	LoadSettingsByEnv(env)
+}
+
+func Env() string {
+	return env
 }
 
 func LoadSettingsByEnv(env string) {
