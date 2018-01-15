@@ -1,45 +1,25 @@
 var gulp = require('gulp'),
-    webserver = require('gulp-webserver'),
     del = require('del'),
-    sass = require('gulp-sass'),
-    karma = require('gulp-karma'),
+    util     = require('gulp-util'),
+    notifier = require('node-notifier'),
+    child    = require('child_process'),
     jshint = require('gulp-jshint'),
-    sourcemaps = require('gulp-sourcemaps'),
-    spritesmith = require('gulp.spritesmith'),
-    browserify = require('browserify'),
-    source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer'),
+    browserify = require('gulp-browserify'),
     uglify = require('gulp-uglify'),
-    gutil = require('gulp-util'),
-    ngAnnotate = require('browserify-ngannotate');
-
+    minifyHtml = require("gulp-minify-html"),
+    rename = require('gulp-rename'),
+    ngAnnotate = require('gulp-ng-annotate');
+    
 var CacheBuster = require('gulp-cachebust');
 var cachebust = new CacheBuster();
-
 /////////////////////////////////////////////////////////////////////////////////////
 //
 // cleans the build output
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-gulp.task('clean', function (cb) {
-    del([
-        'dist'
-    ], cb);
-});
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// runs bower to install frontend dependencies
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-gulp.task('bower', function () {
-
-    var install = require("gulp-install");
-
-    return gulp.src(['./bower.json'])
-        .pipe(install());
+gulp.task('clean', function () {
+    return del(['dist']);
 });
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -48,13 +28,10 @@ gulp.task('bower', function () {
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-gulp.task('build-css', ['clean'], function () {
-    return gulp.src('./styles/*')
-        .pipe(sourcemaps.init())
-        .pipe(sass())
+gulp.task('build-css', function () {
+    return gulp.src('./static/styles/**/*')
         .pipe(cachebust.resources())
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(gulp.dest('./dist'));
+        .pipe(gulp.dest('./dist/static/styles'));
 });
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -85,32 +62,11 @@ gulp.task('build-template-cache', ['clean'], function () {
 /////////////////////////////////////////////////////////////////////////////////////
 
 gulp.task('jshint', function () {
-    gulp.src('/js/*.js')
+    gulp.src('./static/app/**/*.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'));
 });
 
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// runs karma tests
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-gulp.task('test', ['build-js'], function () {
-    var testFiles = [
-        './test/unit/*.js'
-    ];
-
-    return gulp.src(testFiles)
-        .pipe(karma({
-            configFile: 'karma.conf.js',
-            action: 'run'
-        }))
-        .on('error', function (err) {
-            console.log('karma tests failed: ' + err);
-            throw err;
-        });
-});
 /////////////////////////////////////////////////////////////////////////////////////
 //
 // Build a minified Javascript bundle - the order of the js files is determined
@@ -118,25 +74,86 @@ gulp.task('test', ['build-js'], function () {
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-gulp.task('build-js', ['clean'], function () {
-    var b = browserify({
-        entries: './js/app.js',
-        debug: true,
-        paths: ['./js/controllers', './js/services', './js/directives'],
-        transform: [ngAnnotate]
-    });
+gulp.task('build-js', function () {
+    var jsFiles= [
+        './static/app/**/*.js'
+    ];
 
-    return b.bundle()
-        .pipe(source('bundle.js'))
-        .pipe(buffer())
-        .pipe(cachebust.resources())
-        .pipe(sourcemaps.init({
-            loadMaps: true
+    return gulp.src(jsFiles)
+        .pipe(ngAnnotate()) //ngAnnotate() before uglify!
+        .pipe(uglify({ mangle: false }))
+        .pipe(gulp.dest('./dist/static/app'));
+});
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// Build a minified HTML
+//
+/////////////////////////////////////////////////////////////////////////////////////
+
+gulp.task('build-html', function () {
+    var htmlFiles= [
+        './static/app/**/*.html'
+    ];
+
+    return gulp.src(htmlFiles)
+        .pipe(minifyHtml({
+            empty: true,
+            spare: true,
+            quotes: true
         }))
-        .pipe(uglify())
-        .on('error', gutil.log)
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('./dist/js/'));
+        .pipe(gulp.dest('./dist/static/app'));
+});
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// Copy other file
+//
+/////////////////////////////////////////////////////////////////////////////////////
+gulp.task('copy', function () {
+    return gulp.src(['settings/**/*', 
+            '!settings/**/*.go', 
+            'static/favicon.ico', 
+            'static/index.html', 
+            'static/main.js', 
+            'static/assets/**/*', 
+            'static/bower_components/**/*', 
+            'static/jsons/**/*', 
+            'static/l10n/**/*', 
+            'static/reports/**/*', 
+            'static/scripts/**/*', 
+            'static/styles/**/*'], {
+        base:"."
+    })
+    .pipe(gulp.dest('./dist'));
+});
+
+gulp.task('server:build', function() {
+    process.env['CGO_ENABLED'] = 0;
+    process.env['GOOS'] = 'linux';
+
+    var build =  child.exec('go build -ldflags "-w -s" -a -installsuffix cgo -o ./dist/ehoadon', function(err, stdout, stderr) {
+
+        // Something wrong
+        if (stderr.length) {
+            util.log(util.colors.red('Something wrong with this version :'));
+            var lines = build.stderr.toString()
+                .split('\n').filter(function(line) {
+                                return line.length
+                            });
+        
+            for (var l in lines)
+                util.log(util.colors.red(
+                    'Error (go build): ' + lines[l]
+                ));
+                notifier.notify({
+                    title: 'Error (go build)',
+                    message: lines
+                });
+        }
+    });
+    
+    return build;
 });
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -145,65 +162,12 @@ gulp.task('build-js', ['clean'], function () {
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-gulp.task('build', ['clean', 'bower', 'build-css', 'build-template-cache', 'jshint', 'build-js'], function () {
-    return gulp.src('index.html')
+gulp.task('build', ['jshint', 'build-js', 'build-html', 'copy'], function () {
+    return gulp.src(['./static/index.html'])
         .pipe(cachebust.references())
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('./dist/static'));
 });
 
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// watches file system and triggers a build when a modification is detected
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-gulp.task('watch', function () {
-    return gulp.watch(['./index.html', './partials/*.html', './styles/*.*css', './js/**/*.js'], ['build']);
-});
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// launches a web server that serves files in the current directory
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-gulp.task('webserver', ['watch', 'build'], function () {
-    gulp.src('.')
-        .pipe(webserver({
-            livereload: false,
-            directoryListing: true,
-            open: "http://localhost:8000/dist/index.html"
-        }));
-});
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// launch a build upon modification and publish it to a running server
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-gulp.task('dev', ['watch', 'webserver']);
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// generates a sprite png and the corresponding sass sprite map.
-// This is not included in the recurring development build and needs to be run separately
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-gulp.task('sprite', function () {
-
-    var spriteData = gulp.src('./images/*.png')
-        .pipe(spritesmith({
-            imgName: 'todo-sprite.png',
-            cssName: '_todo-sprite.scss',
-            algorithm: 'top-down',
-            padding: 5
-        }));
-
-    spriteData.css.pipe(gulp.dest('./dist'));
-    spriteData.img.pipe(gulp.dest('./dist'))
-});
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
@@ -211,4 +175,6 @@ gulp.task('sprite', function () {
 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-gulp.task('default', ['sprite', 'build', 'test']);
+gulp.task('default', ['clean'], function () {
+    gulp.start(['build'], ['server:build']);
+});
