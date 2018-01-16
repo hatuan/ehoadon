@@ -137,7 +137,7 @@ gulp.task('server:build', function() {
         // Something wrong
         if (stderr.length) {
             util.log(util.colors.red('Something wrong with this version :'));
-            var lines = build.stderr.toString()
+            var lines = stderr.toString()
                 .split('\n').filter(function(line) {
                                 return line.length
                             });

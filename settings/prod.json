@@ -8,10 +8,10 @@
 	"database" : {
 		"driver_name":"postgres",
 		"user":"postgres",
-		"password":"postgres",
+		"password":"O4JDDXIb",
 		"name":"ehoadon",
 		"port":"5432",
-		"host":"127.0.0.1"
+		"host":"ehoadon_data"
 	},
 	"invoice_file_path": "./static/invoice_files/"
 }
