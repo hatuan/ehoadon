@@ -253,6 +253,7 @@ func (c *Client) Update() TransactionalInformation {
 		return TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 	}
 
+	c.ClientID = &id
 	err = c.Get(*c.ClientID)
 	if err == sql.ErrNoRows {
 		return TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrClientNotFound.Error()}}
