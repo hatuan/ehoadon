@@ -122,11 +122,19 @@ gulp.task('copy', function () {
             'static/l10n/**/*', 
             'static/reports/**/*', 
             'static/scripts/**/*', 
-            'static/styles/**/*'], {
+            'static/styles/**/*',
+            'db/migrations/*', 
+            'goose'], {
         base:"."
     })
     .pipe(gulp.dest('./dist'));
 });
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// server:build
+//
+/////////////////////////////////////////////////////////////////////////////////////
 
 gulp.task('server:build', function() {
     process.env['CGO_ENABLED'] = 0;
@@ -167,7 +175,6 @@ gulp.task('build', ['jshint', 'build-js', 'build-html', 'copy'], function () {
         .pipe(cachebust.references())
         .pipe(gulp.dest('./dist/static'));
 });
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 //

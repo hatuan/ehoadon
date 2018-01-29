@@ -1,12 +1,12 @@
 package main
 
 import (
-	"erpvietnam/ehoadon/log"
-	"erpvietnam/ehoadon/routers"
-	"erpvietnam/ehoadon/settings"
 	"net/http"
 
+	"erpvietnam/ehoadon/log"
 	"erpvietnam/ehoadon/middleware"
+	"erpvietnam/ehoadon/routers"
+	"erpvietnam/ehoadon/settings"
 
 	"github.com/codegangsta/negroni"
 )
