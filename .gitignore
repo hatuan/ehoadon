@@ -10,6 +10,7 @@ invoice_files
 dist
 node_modules
 .vagrant
+.idea
 
 # Architecture specific extensions/prefixes
 *.[568vq]
