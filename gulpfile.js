@@ -8,7 +8,8 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     minifyHtml = require("gulp-minify-html"),
     rename = require('gulp-rename'),
-    ngAnnotate = require('gulp-ng-annotate');
+    ngAnnotate = require('gulp-ng-annotate'),
+    lec = require('gulp-line-ending-corrector');
     
 var CacheBuster = require('gulp-cachebust');
 var cachebust = new CacheBuster();
@@ -82,6 +83,7 @@ gulp.task('build-js', function () {
     return gulp.src(jsFiles)
         .pipe(ngAnnotate()) //ngAnnotate() before uglify!
         .pipe(uglify({ mangle: false }))
+        .pipe(lec())
         .pipe(gulp.dest('./dist/static/app'));
 });
 
@@ -110,23 +112,48 @@ gulp.task('build-html', function () {
 // Copy other file
 //
 /////////////////////////////////////////////////////////////////////////////////////
-gulp.task('copy', function () {
+gulp.task('copy', ['copy-other', 'copy-js'], function () {
+});
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// Copy other file
+//
+/////////////////////////////////////////////////////////////////////////////////////
+gulp.task('copy-other', function () {
     return gulp.src(['settings/**/*', 
             '!settings/**/*.go', 
             'static/favicon.ico', 
             'static/index.html', 
-            'static/main.js', 
             'static/assets/**/*', 
             'static/bower_components/**/*', 
+            '!static/bower_components/**/*.js', 
             'static/jsons/**/*', 
             'static/l10n/**/*', 
             'static/reports/**/*', 
             'static/scripts/**/*', 
+            '!static/scripts/**/*.js', 
             'static/styles/**/*',
+            '!static/styles/**/*.js',
             'db/migrations/*', 
             'goose'], {
         base:"."
     })
+    .pipe(gulp.dest('./dist'));
+});
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+// Copy other js file
+//
+/////////////////////////////////////////////////////////////////////////////////////
+gulp.task('copy-js', function () {
+    return gulp.src(['static/bower_components/**/*.js', 
+            'static/scripts/**/*.js',
+            'static/styles/**/*.js'], {
+        base:"."
+    })
+    .pipe(lec())
     .pipe(gulp.dest('./dist'));
 });
 
@@ -171,9 +198,7 @@ gulp.task('server:build', function() {
 /////////////////////////////////////////////////////////////////////////////////////
 
 gulp.task('build', ['jshint', 'build-js', 'build-html', 'copy'], function () {
-    return gulp.src(['./static/index.html'])
-        .pipe(cachebust.references())
-        .pipe(gulp.dest('./dist/static'));
+   
 });
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,7 @@
     "gulp-cachebust": "0.0.9",
     "gulp-concat": "^2.6.1",
     "gulp-jshint": "^2.1.0",
+    "gulp-line-ending-corrector": "^1.0.2",
     "gulp-minify-html": "^1.0.6",
     "gulp-ng-annotate": "^2.1.0",
     "gulp-ng-html2js": "^0.2.2",
