@@ -48,7 +48,7 @@ Vagrant.configure("2") do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
   config.vm.synced_folder "./", "/home/vagrant/go/src/erpvietnam/ehoadon", type: "nfs"
-
+  
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
@@ -71,5 +71,5 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
-  config.vm.provision :shell, path: "bootstrap.sh"
+  config.vm.provision :shell, path: "bootstrap.sh", binary: true
 end

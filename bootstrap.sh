@@ -43,7 +43,7 @@ if [ ! -e "/vagrant/go.tar.gz" ]; then
 	URL="https://storage.googleapis.com/golang/$FILE"
 
 	echo "Downloading $FILE ..."
-	curl --silent $URL -o "$HOMEPATH/go.tar.gz"
+	curl --silent --insecure $URL -o "$HOMEPATH/go.tar.gz"
 else
 	# Go binary given
 	echo "Using given binary ..."

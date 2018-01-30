@@ -1,5 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "go.useCodeSnippetsOnFunctionSuggest": true,
-    "go.gocodeAutoBuild": true
+    "go.gocodeAutoBuild": true,
+    "files.eol": "\n",
 }
