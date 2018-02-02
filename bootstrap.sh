@@ -36,6 +36,12 @@ echo "Downloading docker-compose ..."
 sudo curl -fsSL https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
+echo "Node install ..."
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo apt-get install -y build-essential
+sudo npm install --global gulp-cli
+
 if [ ! -e "/vagrant/go.tar.gz" ]; then
 	# No given go binary
 	# Download golang
@@ -84,3 +90,12 @@ touch "$HOMEPATH/.bashrc"
     echo 'export PATH=$PATH:$GOPATH/bin'
 
 } >> "$HOMEPATH/.bashrc"
+
+# reload .bashrc
+# https://stackoverflow.com/questions/2518127/how-do-i-reload-bashrc-without-logging-out-and-back-in
+source ~/.bashrc
+go get -u github.com/derekparker/delve/cmd/dlv
+
+# add group & user alias
+sudo groupadd --non-unique --gid 1000 user
+echo "user:x:1000:1000::/home/vagrant:/bin/bash" | sudo tee --append /etc/passwd > /dev/null
