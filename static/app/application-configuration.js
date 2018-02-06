@@ -2,10 +2,9 @@
  * Created by tuanha-01 on 5/6/2016.
  */
 "use strict";
-//'kendo.core.min', 'kendo.angular.min', 'kendo.numerictextbox.min', 'kendo.culture.en', 'kendo.culture.us', 'kendo.culture.vi', 'kendo.culture.vn',
-define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'angular-ui-select', 'myApp.navBar', 'myApp.Capitalize', 'myApp.Constants'], function(angularAMD) {
-
-    var app = angular.module("myApp", ['ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'ui.select', 'myApp.NavBar', 'myApp.Capitalize', 'myApp.Constants']);
+//'kendo.core.min', 'kendo.angular.min', 'kendo.numerictextbox.min', 'kendo.culture.en', 'kendo.culture.us', 'kendo.culture.vi', 'kendo.culture.vn', 'angular-sanitize', 'angular-touch', 'metronic-app', 'metronic-layout'
+define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'angular-sanitize', 'angular-touch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'metronic-app', 'metronic-layout', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants'], function(angularAMD) {
+    var app = angular.module("myApp", ['ngSanitize', 'ngTouch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants']);
 
     app.config(function(blockUIConfig) {
 
@@ -151,11 +150,34 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
 
     }]);
     
-    app.config(function(uiSelectConfig) {
-        uiSelectConfig.theme = 'bootstrap';
-      });
-      
+    /* angular-ui-select */
+    //app.config(function(uiSelectConfig) {
+    //    uiSelectConfig.theme = 'bootstrap';
+    //});
+
+    /* Setup global settings */
+    app.factory('settings', ['$rootScope', function($rootScope) {
+        // supported languages
+        var settings = {
+            layout: {
+                pageSidebarClosed: false, // sidebar menu state
+                pageContentWhite: true, // set page content layout
+                pageBodySolid: false, // solid body color state
+                pageAutoScrollOnLoad: 1000 // auto scroll to top on page load
+            },
+            assetsPath: 'metronic/assets',
+            globalPath: 'metronic/assets/global',
+            layoutPath: 'metronic/assets/layouts/layout3',
+        };
+        
+        $rootScope.settings = settings;
+        return settings
+    }]);
+    
     app.controller('indexController', ['$scope', '$rootScope', '$http', 'blockUI', function($scope, $rootScope, $http, blockUI) {
+        $scope.$on('$viewContentLoaded', function() {
+            App.initComponents(); // init core components
+        });
 
         $scope.initializeController = function() {
             $rootScope.displayContent = false;
@@ -204,7 +226,69 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
 
     }]);
 
-    app.run(['$state', '$rootScope', '$location', '$auth', 'globalizeWrapper', 'amMoment', '$window', function($state, $rootScope, $location, $auth, globalizeWrapper, amMoment, $window) {
+    app.directive('ngSpinnerBar', ['$rootScope', '$state',
+        function($rootScope, $state) {
+            return {
+                link: function(scope, element, attrs) {
+                    // by defult hide the spinner bar
+                    element.addClass('hide'); // hide spinner bar by default
+
+                    // display the spinner bar whenever the route changes(the content part started loading)
+                    $rootScope.$on('$stateChangeStart', function() {
+                        element.removeClass('hide'); // show spinner bar
+                        Layout.closeMainMenu();
+                    });
+
+                    // hide the spinner bar on rounte change success(after the content loaded)
+                    $rootScope.$on('$stateChangeSuccess', function(event) {
+                        element.addClass('hide'); // hide spinner bar
+                        $('body').removeClass('page-on-load'); // remove page loading indicator
+                        Layout.setAngularJsMainMenuActiveLink('match', null, event.currentScope.$state); // activate selected link in the sidebar menu
+                    
+                        // auto scorll to page top
+                        setTimeout(function () {
+                            App.scrollTop(); // scroll to the top on content load
+                        }, $rootScope.settings.layout.pageAutoScrollOnLoad);     
+                    });
+
+                    // handle errors
+                    $rootScope.$on('$stateNotFound', function() {
+                        element.addClass('hide'); // hide spinner bar
+                    });
+
+                    // handle errors
+                    $rootScope.$on('$stateChangeError', function() {
+                        element.addClass('hide'); // hide spinner bar
+                    });
+                }
+            };
+        }
+    ])
+
+    // Handle global LINK click
+    app.directive('a', function() {
+        return {
+            restrict: 'E',
+            link: function(scope, elem, attrs) {
+                if (attrs.ngClick || attrs.href === '' || attrs.href === '#') {
+                    elem.on('click', function(e) {
+                        e.preventDefault(); // prevent link click for above criteria
+                    });
+                }
+            }
+        };
+    });
+
+    // Handle Dropdown Hover Plugin Integration
+    app.directive('dropdownMenuHover', function () {
+        return {
+            link: function (scope, elem) {
+            elem.dropdownHover();
+            }
+        };  
+    });
+
+    app.run(['$state', '$rootScope', '$location', '$auth', 'globalizeWrapper', 'amMoment', '$window', 'settings', function($state, $rootScope, $location, $auth, globalizeWrapper, amMoment, $window, settings) {
 
         //kendo.culture("vi-VN");
 
@@ -246,6 +330,10 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
             //console.log("globalizeWrapper.getLocale() = " + globalizeWrapper.getLocale());
             Globalize.locale(globalizeWrapper.getLocale());
         });
+
+        $rootScope.$state = $state; // state to be accessed from view
+        $rootScope.$settings = settings; // state to be accessed from view
+        
     }]);
 
     angular.isUndefinedOrNull = function(val) {

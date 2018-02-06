@@ -1,0 +1,140 @@
+<!-- BEGIN HEADER TOP -->
+<div class="page-header-top">
+    <div class="container">
+        <!-- BEGIN LOGO -->
+        <div class="page-logo">
+            <a ui-sref="home">
+                <img src="{{settings.layoutPath}}/img/logo-default.png" alt="logo" class="logo-default"> </a>
+        </div>
+        <!-- END LOGO -->
+        <!-- BEGIN RESPONSIVE MENU TOGGLER -->
+        <a href="javascript:;" class="menu-toggler"></a>
+        <!-- END RESPONSIVE MENU TOGGLER -->
+        <!-- BEGIN TOP NAVIGATION MENU -->
+        <div class="top-menu">
+            <ul class="nav navbar-nav pull-right" ng-if="isAuthenticated()">
+                <li><a ui-sref="home.about">About</a></li>
+                <li>
+                    <a id="preferenceLink" title="Preference" ui-sref="preference">Preference</a>
+                </li>
+                <li class="droddown dropdown-separator">
+                    <span class="separator"></span>
+                </li>
+                <li class="dropdown dropdown-user dropdown-dark">
+                    <a data-toggle="dropdown" href="" id="dropdownUser" data-close-others="true">{{currentUser.Name}} <b class="caret"></b></a>
+                    <ul class="dropdown-menu dropdown-menu-default" role="menu" aria-labelledby="dropdownUser">
+                        <li role="presentation"><a role="menuitem" , tabIndex="-1" ui-sref="managerUser">Manage User</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation"><a role="menuitem" tabindex=-1 ui-sref="logoff">Log off</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav pull-right" ng-if="!isAuthenticated()">
+                <li><a id = "loginLink" ui-sref="login">Log in</a></li>
+            </ul>
+        </div>
+        <!-- END TOP NAVIGATION MENU -->
+    </div>
+</div>
+<!-- END HEADER TOP -->
+<!-- BEGIN HEADER MENU -->
+<div class="page-header-menu" ng-if="isAuthenticated()">
+    <div class="container">
+        <!-- BEGIN HEADER SEARCH BOX -->
+        <!--<form class="search-form" action="extra_search.html" method="GET"> -->
+        <!--    <div class="input-group"> -->
+        <!--        <input type="text" class="form-control" placeholder="Search" name="query"> -->
+        <!--        <span class="input-group-btn"> -->
+        <!--            <a href="javascript:;" class="btn submit"> -->
+        <!--                <i class="icon-magnifier"></i> -->
+        <!--            </a> -->
+        <!--        </span> -->
+        <!--    </div> -->
+        <!--</form> -->
+        <!-- END HEADER SEARCH BOX -->
+        <!-- BEGIN MEGA MENU -->
+        <!-- DOC: Apply "hor-menu-light" class after the "hor-menu" class below to have a horizontal menu with white background -->
+        <!-- DOC: Remove dropdown-menu-hover and data-close-others="true" attributes below to disable the dropdown opening on mouse hover -->
+        <div class="hor-menu">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a ui-sref="home">Dashboard</a>
+                </li>
+                <li class="menu-dropdown classic-menu-dropdown ">
+                    <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Phát Hành Hóa Đơn
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu pull-left">
+                        <li>
+                            <a ui-sref="eInvoiceFormTypes" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Tạo mẫu hóa đơn </a>
+                        </li>
+                        <li>
+                            <a ui-sref="eInvoiceFormReleases" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Thông báo phát hành hóa đơn </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-dropdown classic-menu-dropdown ">
+                    <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Quản Lý Hóa Đơn
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu pull-left">
+                        <li>
+                            <a ui-sref="eInvoices" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Hóa Đơn GTGT </a>
+                        </li>
+                        <li>
+                            <a ui-sref="#" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Phê duyệt hóa đơn </a>
+                        </li>
+                        <li>
+                            <a ui-sref="#" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Xử lý hóa đơn </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-dropdown classic-menu-dropdown ">
+                    <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Danh mục
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu pull-left">
+                        <li>
+                            <a ui-sref="eInvoiceCustomers" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Khách hàng </a>
+                        </li>
+                        <li>
+                            <a ui-sref="eInvoiceItems" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Hàng hóa dịch vụ </a>
+                        </li>
+                        <li>
+                            <a ui-sref="eInvoiceItemUoms" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Đơn vị tính </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-dropdown classic-menu-dropdown ">
+                    <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Quản trị hệ thống
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu pull-left">
+                        <li>
+                            <a ui-sref="#" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Người sử dụng </a>
+                        </li>
+                        <li>
+                            <a ui-sref="eInvoiceClient" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Thông tin đơn vị </a>
+                        </li>
+                        <li>
+                            <a ui-sref="#" id="sidebar_menu_link_profile">
+                                <i class="icon-user"></i> Tham số hệ thống </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+         <!-- END MEGA MENU -->
+    </div>
+</div>
+<!-- END HEADER MENU -->

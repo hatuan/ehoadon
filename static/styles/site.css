@@ -68,10 +68,11 @@ html, body {
     }
 }
 
-/* Menu Auto Dropdown when hover */
+/* Menu Auto Dropdown when hover 
 .dropdown:hover .dropdown-menu {
     display: block;
 }
+*/
 
 select.custom::-ms-expand {
     padding: 0px;

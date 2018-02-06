@@ -5,8 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
     <title>eInvoice</title>
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta content="Phần mềm hóa đơn điện tử điện toán đám mây tốt nhất" name="description" />
+    <meta content="tuanhoanganh@yahoo.com" name="author" />
+    <meta content="hoa don, hóa đơn, hoa don dien tu, hóa đơn điện tử­, hoa don online, hóa đơn online, hoa don cloud, hóa đơn cloud, hoa don dam may, hóa đơn đám mây" name="keywords" />
+    <meta name="application-name" content="eInvoice">
+    
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" type="text/css"/>
+    <link rel="stylesheet" href="/metronic/assets/global/plugins/simple-line-icons/simple-line-icons.min.css" type="text/css" />
     <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/bower_components/angular-block-ui/dist/angular-block-ui.min.css"/>
@@ -21,7 +28,7 @@
     <link rel="stylesheet" href="styles/stimulsoft.designer.office2013.whiteblue.css">
     <link rel="stylesheet" href="styles/stimulsoft.viewer.office2013.whiteblue.css">
     <!-- angular-ui-select -->
-    <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.min.css">
+    <!-- <link rel="stylesheet" href="bower_components/angular-ui-select/dist/select.min.css"> -->
     <!--
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2-bootstrap.css">
@@ -29,8 +36,15 @@
     <!-- select2 -->
     <link rel="stylesheet" href="bower_components/select2/dist/css/select2.min.css">
     <link rel="stylesheet" href="bower_components/select2-bootstrap-theme/dist/select2-bootstrap.min.css">
+    <!-- BEGIN THEME STYLES -->
+    <!-- DOC: To use 'rounded corners' style just load 'components-rounded.css' stylesheet instead of 'components.css' in the below style tag -->
+    <link rel="stylesheet" href="/metronic/assets/global/css/components-rounded.min.css" id="style_components" type="text/css" />
+    <link rel="stylesheet" href="/metronic/assets/global/css/plugins.min.css"  type="text/css" />
+    <link rel="stylesheet" href="/metronic/assets/layouts/layout3/css/layout.min.css" type="text/css" />
+    <link rel="stylesheet" href="/metronic/assets/layouts/layout3/css/themes/default.min.css" type="text/css" id="style_color" />
+    <link rel="stylesheet" href="/metronic/assets/layouts/layout3/css/custom.css" type="text/css" />
+    <!-- END THEME STYLES -->
     <link rel="stylesheet" href="/styles/site.css">
-    
     <style type="text/css">
         /**
          * Hide when Angular is not yet loaded and initialized
@@ -48,16 +62,61 @@
         })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
     </script>
 </head>
-<body>
+<body ng-controller="indexController" ng-init="initializeController()" class="page-on-load">
     <!--[if lte IE 9]>
       <p>You are using an <strong>outdated</strong> browser. Please upgrade your browser to improve your experience.</p>
     <![endif]-->
     <div class="splash" ng-cloak="">
         <h2>Loading</h2>
     </div>	
-    <div ng-controller="indexController" ng-init="initializeController()" ng-cloak>
-        <div ng-include="'/app/main/navBar.html'"></div>
-        <div ui-view="master" class="container-fluid body-content"></div>
+    <!-- BEGIN PAGE SPINNER -->
+    <div ng-spinner-bar class="page-spinner-bar">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+    </div>
+    <!-- END PAGE SPINNER -->
+    <div class="page-wrapper" ng-cloak>
+        <div class="page-wrapper-row">
+            <div class="page-wrapper-top">
+                <!-- BEGIN HEADER -->
+                <div ng-include="'/app/main/header.html'" data-ng-controller="HeaderController" class="page-header"></div>
+                <!-- END HEADER -->
+            </div>
+        </div>
+        <div class="page-wrapper-row full-height">
+            <div class="page-wrapper-middle">
+                <!-- BEGIN CONTAINER -->
+                <div class="page-container">
+                    <!-- BEGIN PAGE HEAD -->
+                    <!-- <div data-ng-include="'tpl/page-head.html'" data-ng-controller="PageHeadController" class="page-head"> </div> -->
+                    <!-- END PAGE HEAD -->
+                    <!-- BEGIN PAGE CONTENT -->
+                    <div class="page-content">
+                        <div class="container-fluid">
+                             <!-- BEGIN ACTUAL CONTENT -->
+                            <div ui-view="master" class="fade-in-up"></div>
+                             <!-- END ACTUAL CONTENT -->
+                        </div>
+                    </div>
+                    <!-- END PAGE CONTENT -->
+                    <!-- BEGIN QUICK SIDEBAR -->
+                    <!--<a href="javascript:;" class="page-quick-sidebar-toggler"> -->
+                    <!--    <i class="icon-login"></i> -->
+                    <!--</a> -->
+                    <!--<div data-ng-include="'tpl/quick-sidebar.html'" data-ng-controller="QuickSidebarController" class="page-quick-sidebar-wrapper"></div> -->
+                    <!-- END QUICK SIDEBAR -->
+                </div>
+                <!-- END CONTAINER -->
+            </div>
+        </div>
+        <div class="page-wrapper-row">
+            <div class="page-wrapper-bottom">
+                <!-- BEGIN FOOTER -->
+                <!-- <div data-ng-include="'tpl/footer.html'" data-ng-controller="FooterController"> </div> -->
+                <!-- END FOOTER -->
+            </div>
+        </div>
     </div>
 
     <script src="/bower_components/cldrjs/dist/cldr.js"></script>
@@ -70,7 +129,8 @@
     <script src="/bower_components/globalize/dist/globalize/plural.js"></script>
     <script src="/bower_components/globalize/dist/globalize/currency.js"></script>
     <script src="/bower_components/globalize/dist/globalize/date.js"></script>
-    <script src="/scripts/site.js"></script>
+    
     <script data-main="/app/main.js" src="/bower_components/requirejs/require.js"></script>
+    <script src="/scripts/site.js"></script>
 </body>
 </html>
