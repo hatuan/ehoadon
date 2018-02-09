@@ -1,6 +1,7 @@
 define([
 	"./core",
 	"./common/create-error/unsupported-feature",
+	"./common/runtime-bind",
 	"./common/validate/cldr",
 	"./common/validate/default-locale",
 	"./common/validate/parameter-presence",
@@ -8,22 +9,26 @@ define([
 	"./common/validate/parameter-type/number",
 	"./common/validate/parameter-type/plain-object",
 	"./common/validate/parameter-type/string",
-	"./number/format",
+	"./number/formatter-fn",
 	"./number/format-properties",
 	"./number/numbering-system",
-	"./number/parse",
+	"./number/numbering-system-digits-map",
+	"./number/parser-fn",
 	"./number/parse-properties",
 	"./number/pattern",
 	"./number/symbol",
+	"./util/loose-matching",
+	"./util/remove-literal-quotes",
 	"./util/string/pad",
 
 	"cldr/event",
 	"cldr/supplemental"
-], function( Globalize, createErrorUnsupportedFeature, validateCldr, validateDefaultLocale,
-	validateParameterPresence, validateParameterRange, validateParameterTypeNumber,
-	validateParameterTypePlainObject, validateParameterTypeString, numberFormat,
-	numberFormatProperties, numberNumberingSystem, numberParse, numberParseProperties,
-	numberPattern, numberSymbol, stringPad ) {
+], function( Globalize, createErrorUnsupportedFeature, runtimeBind, validateCldr,
+	validateDefaultLocale, validateParameterPresence, validateParameterRange,
+	validateParameterTypeNumber, validateParameterTypePlainObject, validateParameterTypeString,
+	numberFormatterFn, numberFormatProperties, numberNumberingSystem,
+	numberNumberingSystemDigitsMap, numberParserFn, numberParseProperties, numberPattern,
+	numberSymbol, looseMatching, removeLiteralQuotes, stringPad ) {
 
 function validateDigits( properties ) {
 	var minimumIntegerDigits = properties[ 2 ],
@@ -63,12 +68,14 @@ function validateDigits( properties ) {
  */
 Globalize.numberFormatter =
 Globalize.prototype.numberFormatter = function( options ) {
-	var cldr, pattern, properties;
+	var args, cldr, pattern, properties, returnFn;
 
 	validateParameterTypePlainObject( options, "options" );
 
 	options = options || {};
 	cldr = this.cldr;
+
+	args = [ options ];
 
 	validateDefaultLocale( cldr );
 
@@ -86,11 +93,11 @@ Globalize.prototype.numberFormatter = function( options ) {
 
 	validateDigits( properties );
 
-	return function( value ) {
-		validateParameterPresence( value, "value" );
-		validateParameterTypeNumber( value, "value" );
-		return numberFormat( value, properties );
-	};
+	returnFn = numberFormatterFn( properties );
+
+	runtimeBind( args, cldr, returnFn, [ properties ] );
+
+	return returnFn;
 };
 
 /**
@@ -103,12 +110,14 @@ Globalize.prototype.numberFormatter = function( options ) {
  */
 Globalize.numberParser =
 Globalize.prototype.numberParser = function( options ) {
-	var cldr, pattern, properties;
+	var args, cldr, pattern, properties, returnFn;
 
 	validateParameterTypePlainObject( options, "options" );
 
 	options = options || {};
 	cldr = this.cldr;
+
+	args = [ options ];
 
 	validateDefaultLocale( cldr );
 
@@ -120,15 +129,15 @@ Globalize.prototype.numberParser = function( options ) {
 		pattern = numberPattern( options.style || "decimal", cldr );
 	}
 
-	properties = numberParseProperties( pattern, cldr );
+	properties = numberParseProperties( pattern, cldr, options );
 
 	cldr.off( "get", validateCldr );
 
-	return function( value ) {
-		validateParameterPresence( value, "value" );
-		validateParameterTypeString( value, "value" );
-		return numberParse( value, properties );
-	};
+	returnFn = numberParserFn( properties );
+
+	runtimeBind( args, cldr, returnFn, [ properties ] );
+
+	return returnFn;
 };
 
 /**
@@ -170,8 +179,11 @@ Globalize.prototype.parseNumber = function( value, options ) {
  */
 Globalize._createErrorUnsupportedFeature = createErrorUnsupportedFeature;
 Globalize._numberNumberingSystem = numberNumberingSystem;
+Globalize._numberNumberingSystemDigitsMap = numberNumberingSystemDigitsMap;
 Globalize._numberPattern = numberPattern;
 Globalize._numberSymbol = numberSymbol;
+Globalize._looseMatching = looseMatching;
+Globalize._removeLiteralQuotes = removeLiteralQuotes;
 Globalize._stringPad = stringPad;
 Globalize._validateParameterTypeNumber = validateParameterTypeNumber;
 Globalize._validateParameterTypeString = validateParameterTypeString;

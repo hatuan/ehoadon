@@ -1,5 +1,7 @@
 define([
 	"cldr",
+	"./common/runtime-bind",
+	"./common/validate",
 	"./common/validate/cldr",
 	"./common/validate/default-locale",
 	"./common/validate/parameter-presence",
@@ -8,31 +10,106 @@ define([
 	"./common/validate/parameter-type/string",
 	"./core",
 	"./date/expand-pattern",
-	"./date/format",
 	"./date/format-properties",
-	"./date/parse",
+	"./date/formatter-fn",
 	"./date/parse-properties",
-	"./date/tokenizer",
+	"./date/parser-fn",
 	"./date/tokenizer-properties",
+	"./date/to-parts-formatter-fn",
 
 	"cldr/event",
 	"cldr/supplemental",
 	"./number"
-], function( Cldr, validateCldr, validateDefaultLocale, validateParameterPresence,
-	validateParameterTypeDate, validateParameterTypePlainObject, validateParameterTypeString,
-	Globalize, dateExpandPattern, dateFormat, dateFormatProperties, dateParse, dateParseProperties,
-	dateTokenizer, dateTokenizerProperties ) {
+], function( Cldr, runtimeBind, validate, validateCldr, validateDefaultLocale,
+	validateParameterPresence, validateParameterTypeDate, validateParameterTypePlainObject,
+	validateParameterTypeString, Globalize, dateExpandPattern, dateFormatProperties,
+	dateFormatterFn, dateParseProperties, dateParserFn, dateTokenizerProperties,
+	dateToPartsFormatterFn ) {
+
+function optionsHasStyle( options ) {
+	return options.skeleton !== undefined ||
+		options.date !== undefined ||
+		options.time !== undefined ||
+		options.datetime !== undefined ||
+		options.raw !== undefined;
+}
 
 function validateRequiredCldr( path, value ) {
 	validateCldr( path, value, {
 		skip: [
 			/dates\/calendars\/gregorian\/dateTimeFormats\/availableFormats/,
 			/dates\/calendars\/gregorian\/days\/.*\/short/,
+			/dates\/timeZoneNames\/zone/,
+			/dates\/timeZoneNames\/metazone/,
+			/globalize-iana/,
+			/supplemental\/metaZones/,
 			/supplemental\/timeData\/(?!001)/,
 			/supplemental\/weekData\/(?!001)/
 		]
 	});
 }
+
+function validateOptionsPreset( options ) {
+	validateOptionsPresetEach( "date", options );
+	validateOptionsPresetEach( "time", options );
+	validateOptionsPresetEach( "datetime", options );
+}
+
+function validateOptionsPresetEach( type, options ) {
+	var value = options[ type ];
+	validate(
+		"E_INVALID_OPTIONS",
+		"Invalid `{{type}: \"{value}\"}`.",
+		value === undefined || [ "short", "medium", "long", "full" ].indexOf( value ) !== -1,
+		{ type: type, value: value }
+	);
+}
+
+function validateOptionsSkeleton( pattern, skeleton ) {
+	validate(
+		"E_INVALID_OPTIONS",
+		"Invalid `{skeleton: \"{value}\"}` based on provided CLDR.",
+		skeleton === undefined || ( typeof pattern === "string" && pattern ),
+		{ type: "skeleton", value: skeleton }
+	);
+}
+
+function validateRequiredIana( timeZone ) {
+	return function( path, value ) {
+
+		if ( !/globalize-iana/.test( path ) ) {
+			return;
+		}
+
+		validate(
+			"E_MISSING_IANA_TZ",
+			"Missing required IANA timezone content for `{timeZone}`: `{path}`.",
+			value,
+			{
+				path: path.replace( /globalize-iana\//, "" ),
+				timeZone: timeZone
+			}
+		);
+	};
+}
+
+/**
+ * .loadTimeZone( json )
+ *
+ * @json [JSON]
+ *
+ * Load IANA timezone data.
+ */
+Globalize.loadTimeZone = function( json ) {
+	var customData = {
+			"globalize-iana": json
+		};
+
+	validateParameterPresence( json, "json" );
+	validateParameterTypePlainObject( json, "json" );
+
+	Cldr.load( customData );
+};
 
 /**
  * .dateFormatter( options )
@@ -51,19 +128,71 @@ function validateRequiredCldr( path, value ) {
  */
 Globalize.dateFormatter =
 Globalize.prototype.dateFormatter = function( options ) {
-	var cldr, numberFormatters, pad, pattern, properties;
+	var args, dateToPartsFormatter, returnFn;
+
+	validateParameterTypePlainObject( options, "options" );
+
+	options = options || {};
+	if ( !optionsHasStyle( options ) ) {
+		options.skeleton = "yMd";
+	}
+	args = [ options ];
+
+	dateToPartsFormatter = this.dateToPartsFormatter( options );
+	returnFn = dateFormatterFn( dateToPartsFormatter );
+	runtimeBind( args, this.cldr, returnFn, [ dateToPartsFormatter ] );
+
+	return returnFn;
+};
+
+/**
+ * .dateToPartsFormatter( options )
+ *
+ * @options [Object] see date/expand_pattern for more info.
+ *
+ * Return a date formatter function (of the form below) according to the given options and the
+ * default/instance locale.
+ *
+ * fn( value )
+ *
+ * @value [Date]
+ *
+ * Return a function that formats a date to parts according to the given `format`
+ * and the default/instance
+ * locale.
+ */
+Globalize.dateToPartsFormatter =
+Globalize.prototype.dateToPartsFormatter = function( options ) {
+	var args, cldr, numberFormatters, pad, pattern, properties, returnFn,
+		timeZone;
 
 	validateParameterTypePlainObject( options, "options" );
 
 	cldr = this.cldr;
-	options = options || { skeleton: "yMd" };
+	options = options || {};
+	if ( !optionsHasStyle( options ) ) {
+		options.skeleton = "yMd";
+	}
 
+	validateOptionsPreset( options );
 	validateDefaultLocale( cldr );
 
+	timeZone = options.timeZone;
+	validateParameterTypeString( timeZone, "options.timeZone" );
+
+	args = [ options ];
+
 	cldr.on( "get", validateRequiredCldr );
+	if ( timeZone ) {
+		cldr.on( "get", validateRequiredIana( timeZone ) );
+	}
 	pattern = dateExpandPattern( options, cldr );
-	properties = dateFormatProperties( pattern, cldr );
+	validateOptionsSkeleton( pattern, options.skeleton );
+	properties = dateFormatProperties( pattern, cldr, timeZone );
 	cldr.off( "get", validateRequiredCldr );
+	if ( timeZone ) {
+		cldr.off( "get", validateRequiredIana( timeZone ) );
+	}
 
 	// Create needed number formatters.
 	numberFormatters = properties.numberFormatters;
@@ -74,11 +203,11 @@ Globalize.prototype.dateFormatter = function( options ) {
 		});
 	}
 
-	return function( value ) {
-		validateParameterPresence( value, "value" );
-		validateParameterTypeDate( value, "value" );
-		return dateFormat( value, numberFormatters, properties );
-	};
+	returnFn = dateToPartsFormatterFn( numberFormatters, properties );
+
+	runtimeBind( args, cldr, returnFn, [ numberFormatters, properties ] );
+
+	return returnFn;
 };
 
 /**
@@ -91,32 +220,45 @@ Globalize.prototype.dateFormatter = function( options ) {
  */
 Globalize.dateParser =
 Globalize.prototype.dateParser = function( options ) {
-	var cldr, numberParser, parseProperties, pattern, tokenizerProperties;
+	var args, cldr, numberParser, parseProperties, pattern, returnFn, timeZone,
+		tokenizerProperties;
 
 	validateParameterTypePlainObject( options, "options" );
 
 	cldr = this.cldr;
-	options = options || { skeleton: "yMd" };
+	options = options || {};
+	if ( !optionsHasStyle( options ) ) {
+		options.skeleton = "yMd";
+	}
 
+	validateOptionsPreset( options );
 	validateDefaultLocale( cldr );
 
+	timeZone = options.timeZone;
+	validateParameterTypeString( timeZone, "options.timeZone" );
+
+	args = [ options ];
+
 	cldr.on( "get", validateRequiredCldr );
+	if ( timeZone ) {
+		cldr.on( "get", validateRequiredIana( timeZone ) );
+	}
 	pattern = dateExpandPattern( options, cldr );
-	tokenizerProperties = dateTokenizerProperties( pattern, cldr );
-	parseProperties = dateParseProperties( cldr );
+	validateOptionsSkeleton( pattern, options.skeleton );
+	tokenizerProperties = dateTokenizerProperties( pattern, cldr, timeZone );
+	parseProperties = dateParseProperties( cldr, timeZone );
 	cldr.off( "get", validateRequiredCldr );
+	if ( timeZone ) {
+		cldr.off( "get", validateRequiredIana( timeZone ) );
+	}
 
 	numberParser = this.numberParser({ raw: "0" });
 
-	return function( value ) {
-		var tokens;
+	returnFn = dateParserFn( numberParser, parseProperties, tokenizerProperties );
 
-		validateParameterPresence( value, "value" );
-		validateParameterTypeString( value, "value" );
+	runtimeBind( args, cldr, returnFn, [ numberParser, parseProperties, tokenizerProperties ] );
 
-		tokens = dateTokenizer( value, numberParser, tokenizerProperties );
-		return dateParse( value, tokens, parseProperties ) || null;
-	};
+	return returnFn;
 };
 
 /**
@@ -134,6 +276,23 @@ Globalize.prototype.formatDate = function( value, options ) {
 	validateParameterTypeDate( value, "value" );
 
 	return this.dateFormatter( options )( value );
+};
+
+/**
+ * .formatDateToParts( value, options )
+ *
+ * @value [Date]
+ *
+ * @options [Object] see date/expand_pattern for more info.
+ *
+ * Formats a date or number to parts according to the given options and the default/instance locale.
+ */
+Globalize.formatDateToParts =
+Globalize.prototype.formatDateToParts = function( value, options ) {
+	validateParameterPresence( value, "value" );
+	validateParameterTypeDate( value, "value" );
+
+	return this.dateToPartsFormatter( options )( value );
 };
 
 /**

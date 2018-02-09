@@ -3,3 +3,16 @@
     margin: unset; 
     height: 60px;
 }
+
+.footer-copyright {
+    float: left;
+}
+
+.footer-support {
+    list-style: none outside;
+    float: right;
+}
+
+.footer-support>li {
+    display: inline-block;
+}

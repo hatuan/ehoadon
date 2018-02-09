@@ -44,6 +44,10 @@
     <link rel="stylesheet" href="/metronic/assets/layouts/layout3/css/themes/default.min.css" type="text/css" id="style_color" />
     <link rel="stylesheet" href="/metronic/assets/layouts/layout3/css/custom.css" type="text/css" />
     <!-- END THEME STYLES -->
+    <!-- BEGIN DATATABLE -->
+    <link rel="stylesheet" href="/metronic/assets/global/plugins/datatables/datatables.min.css" type="text/css" />
+    <link rel="stylesheet" href="/metronic/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" type="text/css" />
+    <!-- END DATATABLE -->
     <link rel="stylesheet" href="/styles/site.css">
     <style type="text/css">
         /**
@@ -89,11 +93,11 @@
                 <!-- BEGIN CONTAINER -->
                 <div class="page-container">
                     <!-- BEGIN PAGE HEAD -->
-                    <!-- <div data-ng-include="'tpl/page-head.html'" data-ng-controller="PageHeadController" class="page-head"> </div> -->
+                    <!-- <div data-ng-include="'/app/main/page-head.html'" data-ng-controller="PageHeadController" class="page-head" ng-if="isAuthenticated()"> </div> -->
                     <!-- END PAGE HEAD -->
                     <!-- BEGIN PAGE CONTENT -->
                     <div class="page-content">
-                        <div class="container-fluid">
+                        <div class="container">
                              <!-- BEGIN ACTUAL CONTENT -->
                             <div ui-view="master" class="fade-in-up"></div>
                              <!-- END ACTUAL CONTENT -->
@@ -113,7 +117,7 @@
         <div class="page-wrapper-row">
             <div class="page-wrapper-bottom">
                 <!-- BEGIN FOOTER -->
-                <!-- <div data-ng-include="'tpl/footer.html'" data-ng-controller="FooterController"> </div> -->
+                <div data-ng-include="'/app/main/footer.html'"> </div>
                 <!-- END FOOTER -->
             </div>
         </div>

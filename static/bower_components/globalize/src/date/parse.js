@@ -1,4 +1,5 @@
 define([
+	"zoned-date-time",
 	"./is-leap-year",
 	"./last-day-of-month",
 	"./pattern-re",
@@ -6,7 +7,7 @@ define([
 	"../common/create-error/unsupported-feature",
 	"../util/date/set-month",
 	"../util/out-of-range"
-], function( dateIsLeapYear, dateLastDayOfMonth, datePatternRe, dateStartOf,
+], function( ZonedDateTime, dateIsLeapYear, dateLastDayOfMonth, datePatternRe, dateStartOf,
 	createErrorUnsupportedFeature, dateSetMonth, outOfRange ) {
 
 /**
@@ -21,7 +22,7 @@ define([
  * ref: http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns
  */
 return function( value, tokens, properties ) {
-	var amPm, day, daysOfYear, era, hour, hour12, timezoneOffset, valid,
+	var amPm, day, daysOfYear, month, era, hour, hour12, timezoneOffset, valid,
 		YEAR = 0,
 		MONTH = 1,
 		DAY = 2,
@@ -32,6 +33,11 @@ return function( value, tokens, properties ) {
 		date = new Date(),
 		truncateAt = [],
 		units = [ "year", "month", "day", "hour", "minute", "second", "milliseconds" ];
+
+	// Create globalize date with given timezone data.
+	if ( properties.timeZoneData ) {
+		date = new ZonedDateTime( date, properties.timeZoneData() );
+	}
 
 	if ( !tokens.length ) {
 		return null;
@@ -105,7 +111,10 @@ return function( value, tokens, properties ) {
 				if ( outOfRange( value, 1, 12 ) ) {
 					return false;
 				}
-				dateSetMonth( date, value - 1 );
+
+				// Setting the month later so that we have the correct year and can determine
+				// the correct last day of February in case of leap year.
+				month = value;
 				truncateAt.push( MONTH );
 				break;
 
@@ -219,12 +228,16 @@ return function( value, tokens, properties ) {
 				break;
 
 			// Zone
-			case "Z":
 			case "z":
+			case "Z":
 			case "O":
+			case "v":
+			case "V":
 			case "X":
 			case "x":
-				timezoneOffset = token.value - date.getTimezoneOffset();
+				if ( typeof token.value === "number" ) {
+					timezoneOffset = token.value;
+				}
 				break;
 		}
 
@@ -247,6 +260,10 @@ return function( value, tokens, properties ) {
 		date.setFullYear( date.getFullYear() * -1 + 1 );
 	}
 
+	if ( month !== undefined ) {
+		dateSetMonth( date, month - 1 );
+	}
+
 	if ( day !== undefined ) {
 		if ( outOfRange( day, 1, dateLastDayOfMonth( date ) ) ) {
 			return null;
@@ -264,8 +281,8 @@ return function( value, tokens, properties ) {
 		date.setHours( date.getHours() + 12 );
 	}
 
-	if ( timezoneOffset ) {
-		date.setMinutes( date.getMinutes() + timezoneOffset );
+	if ( timezoneOffset !== undefined ) {
+		date.setMinutes( date.getMinutes() + timezoneOffset - date.getTimezoneOffset() );
 	}
 
 	// Truncate date at the most precise unit defined. Eg.
@@ -273,6 +290,11 @@ return function( value, tokens, properties ) {
 	// => new Date( <current Year>, 12, 31, 0, 0, 0, 0 );
 	truncateAt = Math.max.apply( null, truncateAt );
 	date = dateStartOf( date, units[ truncateAt ] );
+
+	// Get date back from globalize date.
+	if ( date instanceof ZonedDateTime ) {
+		date = date.toDate();
+	}
 
 	return date;
 };

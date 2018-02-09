@@ -1,7 +1,10 @@
 define([
+	"../common/create-error/invalid-parameter-value",
 	"../common/format-message",
-	"../common/create-error/invalid-parameter-value"
-], function( formatMessage, createErrorInvalidParameterValue ) {
+	"../common/validate/skeleton",
+	"./expand-pattern/get-best-match-pattern"
+], function( createErrorInvalidParameterValue, formatMessage, validateSkeleton,
+	dateExpandPatternGetBestMatchPattern ) {
 
 /**
  * expandPattern( options, cldr )
@@ -24,9 +27,11 @@ define([
  * - { datetime: "full" } returns "EEEE, MMMM d, y 'at' h:mm:ss a zzzz";
  * - { raw: "dd/mm" } returns "dd/mm";
  */
-
 return function( options, cldr ) {
-	var dateSkeleton, result, skeleton, timeSkeleton, type;
+	var dateSkeleton, result, skeleton, timeSkeleton, type,
+
+		// Using easier to read variables.
+		getBestMatchPattern = dateExpandPatternGetBestMatchPattern;
 
 	function combineDateTime( type, datePattern, timePattern ) {
 		return formatMessage(
@@ -41,33 +46,52 @@ return function( options, cldr ) {
 	switch ( true ) {
 		case "skeleton" in options:
 			skeleton = options.skeleton;
-			result = cldr.main([
-				"dates/calendars/gregorian/dateTimeFormats/availableFormats",
+
+			// Preferred hour (j).
+			skeleton = skeleton.replace( /j/g, function() {
+				return cldr.supplemental.timeData.preferred();
+			});
+
+			validateSkeleton( skeleton );
+
+			// Try direct map (note that getBestMatchPattern handles it).
+			// ... or, try to "best match" the whole skeleton.
+			result = getBestMatchPattern(
+				cldr,
 				skeleton
-			]);
-			if ( !result ) {
-				timeSkeleton = skeleton.split( /[^hHKkmsSAzZOvVXx]/ ).slice( -1 )[ 0 ];
-				dateSkeleton = skeleton.split( /[^GyYuUrQqMLlwWdDFgEec]/ )[ 0 ];
-				if ( /(MMMM|LLLL).*[Ec]/.test( dateSkeleton ) ) {
-					type = "full";
-				} else if ( /MMMM/g.test( dateSkeleton ) ) {
-					type = "long";
-				} else if ( /MMM/g.test( dateSkeleton ) || /LLL/g.test( dateSkeleton ) ) {
-					type = "medium";
-				} else {
-					type = "short";
-				}
-				result = combineDateTime( type,
-					cldr.main([
-						"dates/calendars/gregorian/dateTimeFormats/availableFormats",
-						dateSkeleton
-					]),
-					cldr.main([
-						"dates/calendars/gregorian/dateTimeFormats/availableFormats",
-						timeSkeleton
-					])
-				);
+			);
+			if ( result ) {
+				break;
 			}
+
+			// ... or, try to "best match" the date and time parts individually.
+			timeSkeleton = skeleton.split( /[^hHKkmsSAzZOvVXx]/ ).slice( -1 )[ 0 ];
+			dateSkeleton = skeleton.split( /[^GyYuUrQqMLlwWdDFgEec]/ )[ 0 ];
+			dateSkeleton = getBestMatchPattern(
+				cldr,
+				dateSkeleton
+			);
+			timeSkeleton = getBestMatchPattern(
+				cldr,
+				timeSkeleton
+			);
+
+			if ( /(MMMM|LLLL).*[Ec]/.test( dateSkeleton ) ) {
+				type = "full";
+			} else if ( /MMMM|LLLL/.test( dateSkeleton ) ) {
+				type = "long";
+			} else if ( /MMM|LLL/.test( dateSkeleton ) ) {
+				type = "medium";
+			} else {
+				type = "short";
+			}
+
+			if ( dateSkeleton && timeSkeleton ) {
+				result = combineDateTime( type, dateSkeleton, timeSkeleton );
+			} else {
+				result = dateSkeleton || timeSkeleton;
+			}
+
 			break;
 
 		case "date" in options:

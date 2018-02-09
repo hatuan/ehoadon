@@ -27,7 +27,7 @@
 	} else if ( typeof exports === "object" ) {
 
 		// Node, CommonJS
-		module.exports = factory( require( "cldrjs" ), require( "globalize" ) );
+		module.exports = factory( require( "cldrjs" ), require( "../globalize" ) );
 	} else {
 
 		// Extend global
@@ -36,9 +36,11 @@
 }(this, function( Cldr, Globalize ) {
 
 var alwaysArray = Globalize._alwaysArray,
+	createError = Globalize._createError,
 	isPlainObject = Globalize._isPlainObject,
-	validate = Globalize._validate,
+	runtimeBind = Globalize._runtimeBind,
 	validateDefaultLocale = Globalize._validateDefaultLocale,
+	validate = Globalize._validate,
 	validateParameterPresence = Globalize._validateParameterPresence,
 	validateParameterType = Globalize._validateParameterType,
 	validateParameterTypePlainObject = Globalize._validateParameterTypePlainObject;

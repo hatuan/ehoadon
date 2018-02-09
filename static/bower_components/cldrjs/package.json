@@ -1,6 +1,6 @@
 {
   "name": "cldrjs",
-  "version": "0.4.4",
+  "version": "0.4.8",
   "description": "Simple CLDR traverser",
   "keywords": [
     "utility",
@@ -44,9 +44,6 @@
       "url": "https://github.com/rxaviers/cldrjs/blob/master/LICENSE-MIT"
     }
   ],
-  "peerDependencies": {
-    "cldr-data": ">=25"
-  },
   "devDependencies": {
     "cldr-data-downloader": "0.2.x",
     "grunt": "0.4.x",

@@ -1,5 +1,5 @@
 /*!
- * Globalize v1.0.1
+ * Globalize v1.3.0
  *
  * http://github.com/jquery/globalize
  *
@@ -7,7 +7,7 @@
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2016-01-20T16:57Z
+ * Date: 2017-07-03T21:37Z
  */
 (function( root, factory ) {
 
@@ -25,7 +25,7 @@
 	} else if ( typeof exports === "object" ) {
 
 		// Node, CommonJS
-		module.exports = factory( require( "cldrjs" ), require( "globalize" ) );
+		module.exports = factory( require( "cldrjs" ), require( "../globalize" ) );
 	} else {
 
 		// Global
@@ -37,8 +37,8 @@ var alwaysArray = Globalize._alwaysArray,
 	formatMessage = Globalize._formatMessage,
 	numberNumberingSystem = Globalize._numberNumberingSystem,
 	numberPattern = Globalize._numberPattern,
+	runtimeBind = Globalize._runtimeBind,
 	stringPad = Globalize._stringPad,
-	validate = Globalize._validate,
 	validateCldr = Globalize._validateCldr,
 	validateDefaultLocale = Globalize._validateDefaultLocale,
 	validateParameterPresence = Globalize._validateParameterPresence,
@@ -54,14 +54,6 @@ var validateParameterTypeCurrency = function( value, name ) {
 		value === undefined || typeof value === "string" && ( /^[A-Za-z]{3}$/ ).test( value ),
 		"3-letter currency code string as defined by ISO 4217"
 	);
-};
-
-
-
-
-var validatePluralModulePresence = function() {
-	validate( "E_MISSING_PLURAL_MODULE", "Plural module not loaded.",
-		Globalize.plural !== undefined, {} );
 };
 
 
@@ -156,6 +148,34 @@ var currencyNameFormat = function( formattedNumber, pluralForm, properties ) {
 		unitPatterns[ "unitPattern-count-other" ];
 
 	return formatMessage( unitPattern, [ formattedNumber, displayName ]);
+};
+
+
+
+
+var currencyFormatterFn = function( numberFormatter, pluralGenerator, properties ) {
+	var fn;
+
+	// Return formatter when style is "code" or "name".
+	if ( pluralGenerator && properties ) {
+		fn = function currencyFormatter( value ) {
+			validateParameterPresence( value, "value" );
+			validateParameterTypeNumber( value, "value" );
+			return currencyNameFormat(
+				numberFormatter( value ),
+				pluralGenerator( value ),
+				properties
+			);
+		};
+
+	// Return formatter when style is "symbol" or "accounting".
+	} else {
+		fn = function currencyFormatter( value ) {
+			return numberFormatter( value );
+		};
+	}
+
+	return fn;
 };
 
 
@@ -311,16 +331,18 @@ function validateRequiredCldr( path, value ) {
  */
 Globalize.currencyFormatter =
 Globalize.prototype.currencyFormatter = function( currency, options ) {
-	var cldr, numberFormatter, plural, properties, style;
+	var args, cldr, numberFormatter, pluralGenerator, properties, returnFn, style;
 
 	validateParameterPresence( currency, "currency" );
 	validateParameterTypeCurrency( currency, "currency" );
 
 	validateParameterTypePlainObject( options, "options" );
 
-	options = options || {};
-	style = options.style || "symbol";
 	cldr = this.cldr;
+	options = options || {};
+
+	args = [ currency, options ];
+	style = options.style || "symbol";
 
 	validateDefaultLocale( cldr );
 
@@ -340,18 +362,23 @@ Globalize.prototype.currencyFormatter = function( currency, options ) {
 
 	// Return formatter when style is "symbol" or "accounting".
 	if ( style === "symbol" || style === "accounting" ) {
-		return this.numberFormatter( options );
-	}
+		numberFormatter = this.numberFormatter( options );
+
+		returnFn = currencyFormatterFn( numberFormatter );
+
+		runtimeBind( args, cldr, returnFn, [ numberFormatter ] );
 
 	// Return formatter when style is "code" or "name".
-	validatePluralModulePresence();
-	numberFormatter = this.numberFormatter( options );
-	plural = this.pluralGenerator();
-	return function( value ) {
-		validateParameterPresence( value, "value" );
-		validateParameterTypeNumber( value, "value" );
-		return currencyNameFormat( numberFormatter( value ), plural( value ), properties );
-	};
+	} else {
+		numberFormatter = this.numberFormatter( options );
+		pluralGenerator = this.pluralGenerator();
+
+		returnFn = currencyFormatterFn( numberFormatter, pluralGenerator, properties );
+
+		runtimeBind( args, cldr, returnFn, [ numberFormatter, pluralGenerator, properties ] );
+	}
+
+	return returnFn;
 };
 
 /**

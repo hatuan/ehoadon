@@ -25,7 +25,7 @@
 	} else if ( typeof exports === "object" ) {
 
 		// Node, CommonJS
-		module.exports = factory( require( "cldrjs" ), require( "globalize" ) );
+		module.exports = factory( require( "cldrjs" ), require( "../globalize" ) );
 	} else {
 
 		// Global
@@ -37,8 +37,8 @@ var alwaysArray = Globalize._alwaysArray,
 	formatMessage = Globalize._formatMessage,
 	numberNumberingSystem = Globalize._numberNumberingSystem,
 	numberPattern = Globalize._numberPattern,
+	runtimeBind = Globalize._runtimeBind,
 	stringPad = Globalize._stringPad,
-	validate = Globalize._validate,
 	validateCldr = Globalize._validateCldr,
 	validateDefaultLocale = Globalize._validateDefaultLocale,
 	validateParameterPresence = Globalize._validateParameterPresence,

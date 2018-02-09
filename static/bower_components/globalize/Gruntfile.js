@@ -79,7 +79,7 @@ module.exports = function( grunt ) {
 			},
 			test: {
 				src: [ "test/*.js", "test/functional/**/*.js", "test/unit/**/*.js",
-					"!test/config.js" ],
+					"test/compiler/**/*.js", "!test/config.js", "!test/compiler/_compiled/**" ],
 				options: {
 					jshintrc: "test/.jshintrc"
 				}
@@ -94,13 +94,27 @@ module.exports = function( grunt ) {
 		jscs: {
 			source: [ "src/**/*.js", "!src/build/**" ],
 			grunt: "Gruntfile.js",
-			test: [ "test/*.js", "test/functional/**/*.js", "test/unit/**/*.js" ],
+			test: [ "test/*.js", "test/functional/**/*.js", "test/unit/**/*.js",
+				"test/compiler/**/*.js", "!test/compiler/_compiled/**" ],
 			dist: [ "dist/globalize*.js", "dist/globalize/*.js" ]
+		},
+		mochaTest: {
+			test: {
+				options: {
+					reporter: "spec"
+				},
+				src: [ "test/compiler/*.js" ]
+			}
 		},
 		qunit: {
 			functional: {
 				options: {
-					urls: [ "http://localhost:<%= connect.options.port %>/functional.html" ]
+					urls: [
+
+						// Use es5-shim here due to .bind(), which is not present on phantomjs v1.9.
+						// But, it should be on v2.x.
+						"http://localhost:<%= connect.options.port %>/functional-es5-shim.html"
+					]
 				}
 			},
 			unit: {
@@ -118,7 +132,13 @@ module.exports = function( grunt ) {
 				paths: {
 					cldr: "../external/cldrjs/dist/cldr",
 					"make-plural": "../external/make-plural/make-plural",
-					messageformat: "../external/messageformat/messageformat"
+					messageformat: "../external/messageformat/messageformat",
+					"zoned-date-time": "../node_modules/zoned-date-time/src/zoned-date-time"
+				},
+				shim: {
+					"zoned-date-time": {
+						exports: "ZonedDateTime"
+					}
 				},
 				skipSemiColonInsertion: true,
 				skipModuleInsertion: true,
@@ -131,14 +151,33 @@ module.exports = function( grunt ) {
 				//    Only for root id's (the ones in src, not in src's subpaths). Note there's no
 				//    conditional code checking for this type.
 				onBuildWrite: function( id, path, contents ) {
-					var name = camelCase( id.replace( /util\/|common\//, "" ) );
+					var messageformat,
+						name = camelCase( id.replace( /util\/|common\//, "" ) );
 
 					// MakePlural
 					if ( ( /make-plural/ ).test( id ) ) {
 						return contents
 
+							// Remove browserify wrappers.
+							.replace( /^\(function\(f\){if\(typeof exports==="object"&&type.*/, "" )
+							.replace( /\},\{\}\]\},\{\},\[1\]\)\(1\)[\s\S]*?$/, "" )
+
+							// Remove browserify exports.
+							.replace( /Object.defineProperty\(exports[\s\S]*?\n}\);/, "" )
+							.replace( "exports['default'] = MakePlural;", "" )
+							.replace( "module.exports = exports['default'];", "" )
+
+							// Remove self-tests.
+							.replace( /var Tests =[\s\S]*?\n}\)\(\);/, "" )
+							.replace( "this.tests = new Tests(this);", "" )
+							.replace( /this.fn.test =[\s\S]*?bind\(this\);/, "" )
+							.replace( "this.tests.add(type, cat, examples);", "" )
+
+							// Remove load method.
+							.replace( /load: \{[\s\S]*?\n        \}/, "" )
+
 							// Replace its wrapper into var assignment.
-							.replace( /\(function \(global\) {/, [
+							.replace( /\(function \(global\) \{/, [
 								"var MakePlural;",
 								"/* jshint ignore:start */",
 								"MakePlural = (function() {"
@@ -149,51 +188,104 @@ module.exports = function( grunt ) {
 								"/* jshint ignore:end */"
 							].join( "\n" ) )
 
-							// Remove if (!MakePlural.rules...) {...}
-							.replace( /if \(!MakePlural.rules \|\|[\s\S]*?}/, "" )
-
-							// Remove function xhr_require(src, url) {...}
-							.replace( /function xhr_require\(src, [\s\S]*?}/, "" )
-
-							// Remove function test(...) {...}
-							.replace( /function test\(lc, fn, [\s\S]*?return ok;\n}/, "" )
-
-							// Remove MakePlural.load = function(.*) {...return MakePlural;.*};
-							.replace( /MakePlural.load = function\([\s\S]*?return MakePlural;\n};/, "" );
+							// Wrap everything into a var assignment.
+							.replace( /^/, [
+								"var MakePlural;",
+								"/* jshint ignore:start */",
+								"MakePlural = (function() {"
+							].join( "\n" ) )
+							.replace( /$/, [
+								"return MakePlural;",
+								"}());",
+								"/* jshint ignore:end */"
+							].join( "\n" ) );
 
 					// messageformat
 					} else if ( ( /messageformat/ ).test( id ) ) {
 						return contents
 
-							// Replace its wrapper into var assignment.
-							.replace( /\(function \( root \) {/, [
+							// Remove browserify wrappers.
+							.replace( /^\(function\(f\)\{if\(typeof exports==="object"&&type.*/, "" )
+							.replace( "},{}],2:[function(require,module,exports){", "" )
+							.replace( /\},\{"\.\/messageformat-parser":1,"make-plural\/plural.*/, "" )
+							.replace( /\},\{\}\]\},\{\},\[2\]\)\(2\)[\s\S]*?$/, "" )
+
+							// Set `MessageFormat.plurals` and remove `make-plural/plurals`
+							// completely. This is populated by Globalize on demand.
+							.replace( /var _cp = \[[\s\S]*?$/, "" )
+							.replace(
+								"MessageFormat.plurals = require('make-plural/plurals')",
+								"MessageFormat.plurals = {}"
+							)
+
+							// Set `MessageFormat._parse`
+							.replace(
+								"MessageFormat._parse = require('./messageformat-parser').parse;",
+								""
+							)
+							.replace( /module\.exports = \(function\(\) \{([\s\S]*?)\n\}\)\(\);/, [
+								"MessageFormat._parse = (function() {",
+								"$1",
+								"}()).parse;"
+							].join( "\n" ) )
+
+							// Remove unused code.
+							.replace( /if \(!pluralFunc\) \{\n[\s\S]*?\n  \}/, "" )
+							.replace( /if \(!locale\) \{\n[\s\S]*?  \}\n/, "this.lc = [locale];" )
+							.replace( /(MessageFormat\.formatters) = \{[\s\S]*?\n\};/, "$1 = {};" )
+							.replace( /MessageFormat\.prototype\.setIntlSupport[\s\S]*?\n\};/, "" )
+
+							// Wrap everything into a var assignment.
+							.replace( "module.exports = MessageFormat;", "" )
+							.replace( /^/, [
 								"var MessageFormat;",
 								"/* jshint ignore:start */",
 								"MessageFormat = (function() {"
 							].join( "\n" ) )
-							.replace( /if \(typeof exports !== 'undefined'[\s\S]*/, [
+							.replace( /$/, [
 								"return MessageFormat;",
 								"}());",
 								"/* jshint ignore:end */"
-							].join( "\n" ) )
+							].join( "\n" ) );
 
-							// Remove MessageFormat.getPluralFunc = function(...) {...}
-							.replace( /MessageFormat.getPluralFunc = function[\s\S]*?return null;\n  }/, "" )
+					// message-runtime
+					} else if ( ( /message-runtime/ ).test( id ) ) {
+						messageformat = require( "./external/messageformat/messageformat" );
+						delete messageformat.prototype.runtime.fmt;
+						delete messageformat.prototype.runtime.pluralFuncs;
+						contents = contents.replace( "Globalize._messageFormat = {};", [
+							"/* jshint ignore:start */",
+							"Globalize._messageFormat = (function() {",
+							messageformat.prototype.runtime.toString(),
+							"return {number: number, plural: plural, select: select};",
+							"}());",
+							"/* jshint ignore:end */"
+						].join( "\n" ) );
 
-							// ... and code that uses it.
-							.replace( /if \(!pluralFunc\) {\n[\s\S]*?}/, "" );
-
+					// ZonedDateTime
+					} else if ( ( /zoned-date-time/ ).test( id ) ) {
+						contents = contents.replace(
+							"module.exports = ZonedDateTime;",
+							"return ZonedDateTime;"
+						);
+						contents = "var ZonedDateTime = (function() {\n" + contents + "}());";
 					}
 
 					// 1, and 2: Remove define() wrap.
 					// 3: Remove empty define()'s.
 					contents = contents
-						.replace( /define\([^{]*?{/, "" ) /* 1 */
+						.replace( /define\([^{]*?\{/, "" ) /* 1 */
 						.replace( rdefineEnd, "" ) /* 2 */
 						.replace( /define\(\[[^\]]+\]\)[\W\n]+$/, "" ); /* 3 */
 
+					// Type b (not as simple as a single return)
+					if ( [ "util/globalize-date" ].indexOf( id ) !== -1 ) {
+						contents = "var " + name[ 0 ].toUpperCase() +
+							name.slice( 1 ) + " = (function() {" +
+							contents + "}());";
+
 					// Type a (single return)
-					if ( ( /\// ).test( id ) ) {
+					} else if ( ( /\// ).test( id ) ) {
 						contents = contents
 							.replace( /\nreturn/, "\nvar " + name + " =" );
 					}
@@ -316,6 +408,136 @@ module.exports = function( grunt ) {
 									endFile: "src/build/outro.js"
 								}
 							}
+						},
+						{
+							name: "globalize.unit",
+							include: [ "unit" ],
+							exclude: [
+								"cldr",
+								"./core",
+								"./number",
+								"./plural"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-unit.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize-runtime",
+							include: [ "core-runtime" ],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-core-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.currency-runtime",
+							include: [ "currency-runtime" ],
+							exclude: [
+								"./core-runtime",
+								"./number-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-currency-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.date-runtime",
+							include: [ "date-runtime" ],
+							exclude: [
+								"./core-runtime",
+								"./number-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-date-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.message-runtime",
+							include: [ "message-runtime" ],
+							exclude: [ "./core-runtime" ],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-message-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.number-runtime",
+							include: [ "number-runtime" ],
+							exclude: [
+								"./core-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-number-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.plural-runtime",
+							include: [ "plural-runtime" ],
+							exclude: [
+								"./core-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-plural-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.relative-time-runtime",
+							include: [ "relative-time-runtime" ],
+							exclude: [
+								"./core-runtime",
+								"./number-runtime",
+								"./plural-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-relative-time-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
+						},
+						{
+							name: "globalize.unit-runtime",
+							include: [ "unit-runtime" ],
+							exclude: [
+								"./core-runtime",
+								"./number-runtime",
+								"./plural-runtime"
+							],
+							create: true,
+							override: {
+								wrap: {
+									startFile: "src/build/intro-unit-runtime.js",
+									endFile: "src/build/outro.js"
+								}
+							}
 						}
 					]
 				}
@@ -336,19 +558,28 @@ module.exports = function( grunt ) {
 					return replaceConsts( content );
 				}
 			},
-			core: {
+			coreAndRuntime: {
 				expand: true,
 				cwd: "dist/.build/",
-				src: [ "globalize.js" ],
+				src: [ "globalize.js", "globalize-runtime.js" ],
 				dest: "dist/"
 			},
 			modules: {
 				expand: true,
 				cwd: "dist/.build/",
-				src: [ "globalize*.js", "!globalize.js" ],
+				src: [ "globalize*.js", "!globalize.js", "!*runtime*.js" ],
 				dest: "dist/globalize",
 				rename: function( dest, src ) {
 					return require( "path" ).join( dest, src.replace( /globalize\./, "" ) );
+				}
+			},
+			runtimeModules: {
+				expand: true,
+				cwd: "dist/.build/",
+				src: [ "globalize.*runtime.js" ],
+				dest: "dist/globalize-runtime",
+				rename: function( dest, src ) {
+					return require( "path" ).join( dest, src.replace( /(globalize\.|-runtime)/g, "" ) );
 				}
 			},
 			allInOneNode: {
@@ -368,7 +599,21 @@ module.exports = function( grunt ) {
 					"tmp/globalize/number.min.js": [ "dist/globalize/number.js" ],
 					"tmp/globalize/plural.min.js": [ "dist/globalize/plural.js" ],
 					"tmp/globalize/message.min.js": [ "dist/globalize/message.js" ],
-					"tmp/globalize/relative-time.min.js": [ "dist/globalize/relative-time.js" ]
+					"tmp/globalize/relative-time.min.js": [ "dist/globalize/relative-time.js" ],
+					"tmp/globalize/unit.min.js": [ "dist/globalize/unit.js" ],
+
+					"tmp/globalize-runtime.min.js": [ "dist/globalize-runtime.js" ],
+					"tmp/globalize-runtime/currency.min.js": [
+						"dist/globalize-runtime/currency.js"
+					],
+					"tmp/globalize-runtime/date.min.js": [ "dist/globalize-runtime/date.js" ],
+					"tmp/globalize-runtime/message.min.js": [ "dist/globalize-runtime/message.js" ],
+					"tmp/globalize-runtime/number.min.js": [ "dist/globalize-runtime/number.js" ],
+					"tmp/globalize-runtime/plural.min.js": [ "dist/globalize-runtime/plural.js" ],
+					"tmp/globalize-runtime/relative-time.min.js": [
+						"dist/globalize-runtime/relative-time.js"
+					],
+					"tmp/globalize-runtime/unit.min.js": [ "dist/globalize-runtime/unit.js" ]
 				}
 			}
 		},
@@ -377,7 +622,9 @@ module.exports = function( grunt ) {
 		"compare_size": {
 			files: [
 				"tmp/globalize.min.js",
-				"tmp/globalize/*min.js"
+				"tmp/globalize/*min.js",
+				"tmp/globalize-runtime.min.js",
+				"tmp/globalize-runtime/*min.js"
 			],
 			options: {
 				compress: {
@@ -437,6 +684,7 @@ module.exports = function( grunt ) {
 		// TODO fix issues, enable
 		// "jscs:dist",
 		"test:functional",
+		"mochaTest",
 		"uglify",
 		"compare_size",
 		"commitplease"
