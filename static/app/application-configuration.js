@@ -3,8 +3,8 @@
  */
 "use strict";
 //'kendo.core.min', 'kendo.angular.min', 'kendo.numerictextbox.min', 'kendo.culture.en', 'kendo.culture.us', 'kendo.culture.vi', 'kendo.culture.vn', 'angular-sanitize', 'angular-touch', 'metronic-app', 'metronic-layout'
-define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'angular-sanitize', 'angular-touch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'metronic-app', 'metronic-layout', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants'], function(angularAMD) {
-    var app = angular.module("myApp", ['ngSanitize', 'ngTouch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants']);
+define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'angular-sanitize', 'angular-touch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'metronic-app', 'metronic-layout', 'bootstrap-hover-dropdown', 'angular-ui-grid', 'angular-smart-table', 'lodash', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants'], function(angularAMD, $) {
+    var app = angular.module("myApp", ['ngSanitize', 'ngTouch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'smart-table', 'ui.grid', 'ui.grid.selection', 'ui.grid.pagination', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants']);
 
     app.config(function(blockUIConfig) {
 
@@ -14,7 +14,8 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
         blockUIConfig.delay = 1;
         // Disable automatically blocking of the user interface
         blockUIConfig.autoBlock = false;
-
+        // Provide a custom template to use
+        blockUIConfig.template = '<div class=\"block-ui-overlay\"><div class=\"page-spinner-bar\"> <div class=\"bounce1\"></div> <div class=\"bounce2\"></div> <div class=\"bounce3\"></div> </div> </div>';
     });
 
     app.config(['$authProvider', function($authProvider) {
@@ -155,6 +156,63 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
     //    uiSelectConfig.theme = 'bootstrap';
     //});
 
+    /* smart-table st-ratio */
+    app.directive('stRatio',function(){
+        return {
+          link:function(scope, element, attr){
+            var ratio=+(attr.stRatio);
+            
+            element.css('width',ratio+'%');
+            
+          }
+        };
+    });
+
+    /* smart-table st-sentinel */
+    app.directive('stSentinel', ['$parse', function ($parse){
+        return {
+            require: '^stTable',
+            scope: false,
+            link: function(scope, element, attr, ctrl){
+                scope.$watch(function(){
+                    return ctrl.tableState();
+                }, function (newVal, oldValue){
+                    var onChangeFn = $parse(attr.stSentinel);
+                    onChangeFn(scope, {tableState: newVal});
+                }, true);
+            }
+        }
+    }]);
+
+    /* smart-table st-default-selection */
+    app.directive('stDefaultSelection', function () {
+        return {
+            require: 'stTable',
+            restrict: 'A',
+            scope: {
+                selection: '=stDefaultSelection',
+            },
+            link: function link(scope, element, attrs, controller) {
+                scope.$watch('selection', function (newValue, oldValue) {
+                    pagination = controller.tableState().pagination;
+
+                    if (pagination != null && pagination.number != null && newValue != null) {
+                        var selectionMode = 'single',
+                            pagination = controller.tableState().pagination;
+        
+                        var rows = controller.getFilteredCollection(),
+                            indexOfRow = rows.indexOf(newValue) + 1,
+                            finalPage = Math.ceil(indexOfRow / pagination.number) - 1;
+        
+                        if (indexOfRow > -1) {
+                            controller.slice(finalPage * pagination.number, pagination.number);
+                        }
+                    }
+                }, true);
+            }
+        };
+    });
+
     /* Setup global settings */
     app.factory('settings', ['$rootScope', function($rootScope) {
         // supported languages
@@ -173,7 +231,13 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
         $rootScope.settings = settings;
         return settings
     }]);
-    
+   
+    app.controller('PageHeadController', ['$scope', function($scope) {
+        $scope.$on('$includeContentLoaded', function() {        
+            
+        });
+    }]);
+
     app.controller('indexController', ['$scope', '$rootScope', '$http', 'blockUI', function($scope, $rootScope, $http, blockUI) {
         $scope.$on('$viewContentLoaded', function() {
             App.initComponents(); // init core components
@@ -283,10 +347,14 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
     app.directive('dropdownMenuHover', function () {
         return {
             link: function (scope, elem) {
-            elem.dropdownHover();
+                elem.dropdownHover();
             }
         };  
     });
+
+    // lodash
+    // allow DI for use in controllers, unit tests
+    app.constant('_', window._);
 
     app.run(['$state', '$rootScope', '$location', '$auth', 'globalizeWrapper', 'amMoment', '$window', 'settings', function($state, $rootScope, $location, $auth, globalizeWrapper, amMoment, $window, settings) {
 
@@ -334,6 +402,9 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
         $rootScope.$state = $state; // state to be accessed from view
         $rootScope.$settings = settings; // state to be accessed from view
         
+        // lodash
+        // use in views, ng-repeat="x in _.range(3)"
+        $rootScope._ = window._;
     }]);
 
     angular.isUndefinedOrNull = function(val) {

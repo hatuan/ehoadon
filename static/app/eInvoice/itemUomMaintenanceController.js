@@ -76,13 +76,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceItemUom
             $uibModalInstance.dismiss('cancel');
         };
 
-        $scope.itemUomUpdateCompleted = function() {
-            var _result = new Object();
+        $scope.itemUomUpdateCompleted = function(response) {
+            var _result = {};
+            $scope.EditItemUom = response.Data.eInvoiceItemUom;
             _result.EditItemUom = $scope.EditItemUom;
             $uibModalInstance.close(_result);
         };
 
-        $scope.itemUomUpdateError = function() {
+        $scope.itemUomUpdateError = function(response) {
             alertsService.RenderErrorMessage(response.Error);
         }
     };

@@ -21,11 +21,20 @@
                     <span class="separator"></span>
                 </li>
                 <li class="dropdown dropdown-user dropdown-dark">
-                    <a data-toggle="dropdown" href="" id="dropdownUser" data-close-others="true">{{currentUser.Name}} <b class="caret"></b></a>
-                    <ul class="dropdown-menu dropdown-menu-default" role="menu" aria-labelledby="dropdownUser">
-                        <li role="presentation"><a role="menuitem" , tabIndex="-1" ui-sref="managerUser">Manage User</a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li role="presentation"><a role="menuitem" tabindex=-1 ui-sref="logoff">Log off</a></li>
+                    <a href="javascript:;" class="dropdown-toggle" dropdown-menu-hover data-toggle="dropdown" data-close-others="true">
+                        <img alt="" class="img-circle" src="{{settings.layoutPath}}/img/avatar.png">
+                        <span class="username username-hide-mobile">{{currentUser.Name}}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-default">
+                        <li>
+                            <a ui-sref="managerUser">
+                                <i class="icon-user"></i> My Profile </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li >
+                            <a ui-sref="logoff">
+                                <i class="icon-key"></i> Log off</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -38,7 +47,7 @@
 </div>
 <!-- END HEADER TOP -->
 <!-- BEGIN HEADER MENU -->
-<div class="page-header-menu" ng-if="isAuthenticated()">
+<div class="page-header-menu">
     <div class="container">
         <!-- BEGIN HEADER SEARCH BOX -->
         <!--<form class="search-form" action="extra_search.html" method="GET"> -->
@@ -56,64 +65,64 @@
         <!-- DOC: Apply "hor-menu-light" class after the "hor-menu" class below to have a horizontal menu with white background -->
         <!-- DOC: Remove dropdown-menu-hover and data-close-others="true" attributes below to disable the dropdown opening on mouse hover -->
         <div class="hor-menu">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav"  ng-if="isAuthenticated()">
                 <li class="active">
                     <a ui-sref="home">Dashboard</a>
                 </li>
-                <li class="menu-dropdown classic-menu-dropdown ">
+                <li class="menu-dropdown mega-menu-dropdown ">
                     <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Phát Hành Hóa Đơn
                         <i class="fa fa-angle-down"></i>
                     </a>
                     <ul class="dropdown-menu pull-left">
                         <li>
                             <a ui-sref="eInvoiceFormTypes" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Tạo mẫu hóa đơn </a>
+                                <i class="icon-note"></i> Tạo mẫu hóa đơn </a>
                         </li>
                         <li>
                             <a ui-sref="eInvoiceFormReleases" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Thông báo phát hành hóa đơn </a>
+                                <i class="icon-docs"></i> Thông báo phát hành hóa đơn </a>
                         </li>
                     </ul>
                 </li>
-                <li class="menu-dropdown classic-menu-dropdown ">
+                <li class="menu-dropdown mega-menu-dropdown ">
                     <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Quản Lý Hóa Đơn
                         <i class="fa fa-angle-down"></i>
                     </a>
                     <ul class="dropdown-menu pull-left">
                         <li>
                             <a ui-sref="eInvoices" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Hóa Đơn GTGT </a>
+                                <i class="icon-notebook"></i> Hóa Đơn GTGT </a>
                         </li>
                         <li>
                             <a ui-sref="#" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Phê duyệt hóa đơn </a>
+                                <i class="icon-layers"></i> Phê duyệt hóa đơn </a>
                         </li>
                         <li>
                             <a ui-sref="#" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Xử lý hóa đơn </a>
+                                <i class="icon-eye"></i> Xử lý hóa đơn </a>
                         </li>
                     </ul>
                 </li>
-                <li class="menu-dropdown classic-menu-dropdown ">
+                <li class="menu-dropdown mega-menu-dropdown">
                     <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Danh mục
                         <i class="fa fa-angle-down"></i>
                     </a>
                     <ul class="dropdown-menu pull-left">
                         <li>
                             <a ui-sref="eInvoiceCustomers" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Khách hàng </a>
+                                <i class="icon-users"></i> Khách hàng </a>
                         </li>
                         <li>
                             <a ui-sref="eInvoiceItems" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Hàng hóa dịch vụ </a>
+                                <i class="icon-list"></i> Hàng hóa dịch vụ </a>
                         </li>
                         <li>
                             <a ui-sref="eInvoiceItemUoms" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Đơn vị tính </a>
+                                <i class="icon-list"></i> Đơn vị tính </a>
                         </li>
                     </ul>
                 </li>
-                <li class="menu-dropdown classic-menu-dropdown ">
+                <li class="menu-dropdown mega-menu-dropdown">
                     <a data-hover="megamenu-dropdown" data-close-others="true" data-toggle="dropdown" href="javascript:;"> Quản trị hệ thống
                         <i class="fa fa-angle-down"></i>
                     </a>
@@ -124,11 +133,11 @@
                         </li>
                         <li>
                             <a ui-sref="eInvoiceClient" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Thông tin đơn vị </a>
+                                <i class="icon-info"></i> Thông tin đơn vị </a>
                         </li>
                         <li>
                             <a ui-sref="#" id="sidebar_menu_link_profile">
-                                <i class="icon-user"></i> Tham số hệ thống </a>
+                                <i class="icon-settings"></i> Tham số hệ thống </a>
                         </li>
                     </ul>
                 </li>

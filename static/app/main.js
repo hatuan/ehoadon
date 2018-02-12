@@ -60,6 +60,9 @@ require.config({
         'bignumber': 'bower_components/bignumber.js/bignumber.min',
         'metronic-app': 'metronic/assets/global/scripts/app.min',
         'metronic-layout': 'metronic/assets/layouts/layout3/scripts/layout.min',
+        'angular-ui-grid': 'bower_components/angular-ui-grid/ui-grid.min',
+        'angular-smart-table': 'bower_components/angular-smart-table/dist/smart-table.min',
+        'lodash': 'bower_components/lodash/dist/lodash.min',
         'digitalsignature': 'scripts/digitalsignature',
         'ajaxService': 'app/common/services/ajaxServices',
         'alertsService': 'app/common/services/alertsServices',
@@ -126,6 +129,9 @@ require.config({
         'select2': ['jquery', 'bootstrap'],
         'metronic-app': ['bootstrap', 'angular'],
         'metronic-layout': ['metronic-app'],
+        'angular-ui-grid': ['angular'],
+        'angular-smart-table': ['angular'],
+        'lodash': ['jquery'],
         'digitalsignature': ['jquery']
     },
 

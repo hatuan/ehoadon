@@ -7,8 +7,8 @@ define(['angular'], function (angular) {
     var constantModule = angular.module('myApp.Constants', [])
     constantModule.constant('Constants', {
         Status: [
-            {Code : 0, Name : 'Deactive'},
-            {Code : 1, Name : 'Active'},
+            {Code : 0, Name : 'Blocked'},
+            {Code : 1, Name : 'Actived'},
         ],
         BooleanTypes: [
             {Code : 0, Name : ''},

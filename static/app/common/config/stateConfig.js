@@ -11,6 +11,7 @@ define(['angularAMD'], function (angularAMD) {
         $stateProvider
             .state('login', {
                 url: '/login',
+                data: {pageTitle: ''},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/user/login.html',
@@ -24,6 +25,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('logoff', {
                 url: '/logoff',
+                data: {pageTitle: ''},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/main/home.html',
@@ -48,6 +50,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('home', {
                 url: '/',
+                data: {pageTitle: 'Dashboard'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/main/home.html',
@@ -61,6 +64,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('preference', {
                 url: '/preference',
+                data: {pageTitle: 'Preference'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/user/preference.html',
@@ -74,6 +78,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoiceClient', {
                 url: "/eInvoiceClient",
+                data: {pageTitle: 'Client Information'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/clientMaintenance.html',
@@ -90,6 +95,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoiceCustomers', {
                 url: "/eInvoiceCustomers",
+                data: {pageTitle: 'Customers List'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/customers.html',
@@ -106,6 +112,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoiceItemUoms', {
                 url: "/eInvoiceItemUoms",
+                data: {pageTitle: 'Uoms List'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/itemUoms.html',
@@ -122,6 +129,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoiceItems', {
                 url: "/eInvoiceItems",
+                data: {pageTitle: 'Items List'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/items.html',
@@ -138,6 +146,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoiceFormTypes', {
                 url: "/eInvoiceFormTypes",
+                data: {pageTitle: 'FormTypes List'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/formTypes.html',
@@ -151,6 +160,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoiceFormReleases', {
                 url: "/eInvoiceFormReleases",
+                data: {pageTitle: 'FormReleases List'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/formReleases.html',
@@ -164,6 +174,7 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoices', {
                 url: "/eInvoices",
+                data: {pageTitle: 'Invoices List'},
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/invoices.html',

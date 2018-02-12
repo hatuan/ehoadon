@@ -4,9 +4,9 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceItemUomService', 'app/eInvoice/itemUomMaintenanceController'], function (angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceItemUomService'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$confirm', 'alertsService', 'Constants', 'eInvoiceItemUomService'];
 
-    var einvoiceItemUomsController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceItemUomService) {
+    var einvoiceItemUomsController = function ($scope, $rootScope, $state, $window, moment, $uibModal, $confirm, alertsService, Constants, eInvoiceItemUomService) {
 
         $scope.initializeController = function () {
             $rootScope.applicationModule = "eInvoiceItemUoms";
@@ -41,7 +41,10 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             });
 
             $scope.eInvoiceItemUoms = [];
+            $scope.eInvoiceItemUomsSafe = [];
+            $scope.selectedRow = null;
             $scope.FilteredItems = [];
+            $scope.isLoading = true;
             $scope.getItemUoms();
         };
 
@@ -60,17 +63,23 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             }
         }
 
-        $scope.delete = function () {
-            if($scope.Selection.length <= 0)
-                return;
-            var deleteEInvoiceItemUoms = $scope.createDeleteItemUomObject()
-            eInvoiceItemUomService.deleteItemUom(deleteEInvoiceItemUoms, 
-                function (response, status) {
-                    $scope.getItemUoms();
-                }, 
-                function (response, status){
-                    alertsService.RenderErrorMessage(response.Error);
-                });    
+        $scope.delete = function (_index, _item) {
+            $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
+            .then(function() {
+                $scope.Selection.push(_item["ID"]);
+                var deleteEInvoiceItems = $scope.createDeleteItemUomObject()
+                eInvoiceItemUomService.deleteItemUom(deleteEInvoiceItems, 
+                    function (response, status) {
+                        $scope.Selection = [];
+                        //$scope.getItemUoms();
+                        $scope.eInvoiceItemUoms.splice($scope.eInvoiceItemUoms.indexOf(_item), 1);
+                        $scope.eInvoiceItemUomsSafe.splice($scope.eInvoiceItemUomsSafe.indexOf(_item), 1);
+                    }, 
+                    function (response, status){
+                        $scope.Selection = [];
+                        alertsService.RenderErrorMessage(response.Error);
+                });  
+            });
         }
 
         $scope.toggleSelection = function (_id) {
@@ -96,9 +105,12 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];
             $scope.FilteredItems = [];
+            $scope.eInvoiceItemUomsSafe = response.Data.eInvoiceItemUoms;
+            $scope.isLoading = false;
         };
 
         $scope.einvoiceItemUomsInquiryError = function (response, status) {
+            $scope.isLoading = false;
             alertsService.RenderErrorMessage(response.Error);
         }
 
@@ -119,7 +131,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             return deleteItemUoms;
         }
 
-        $scope.edit = function (_itemUom) {
+        $scope.edit = function (_index, _itemUom) {
             var modalInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -141,13 +153,29 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
-                
+                if (_itemUom) { //edit
+                    angular.copy(_result.EditItemUom, $scope.eInvoiceItemUoms[_index]);
+                    //var _indexSafe = $scope.eInvoiceItemUomsSafe.indexOf(_itemUom);
+                    //angular.copy(_result.EditItemUom, $scope.eInvoiceItemUomsSafe[_indexSafe]);
+                } else { //add
+                    $scope.eInvoiceItemUoms.push(_result.EditItemUom);
+                    $scope.eInvoiceItemUomsSafe.push(_result.EditItemUom);
+
+                    $scope.selectedRow = _result.EditItemUom;
+                }
             }, function() {
                 //dismissed 
             })['finally'](function() {
                 modalInstance = undefined;
             });    
         };
+
+        $scope.tableChange = function(tableState){
+            if ( !$scope.isLoading && tableState.sort) {
+                $scope.SortExpression = tableState.sort.predicate;
+                $scope.SortDirection = tableState.sort.reverse ? "DESC":"ASC";   
+            }
+        }
     };
 
     einvoiceItemUomsController.$inject = injectParams;
