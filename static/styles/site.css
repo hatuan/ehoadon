@@ -54,9 +54,44 @@ html, body {
   margin: 12% auto;
 }
 
-/*********************
-*** select style *****
-*********************/
+
+.gridStyle {
+    width: 100%;
+    height: 512px;
+}
+
+/* Menu Auto Dropdown when hover 
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+*/
+
+/********* smart-table sort arrow ****/
+.sort-header {
+    cursor: pointer;
+}
+.sort-header:after {
+    font-family: FontAwesome;
+    content: '  \f0dc';
+    color: lightgrey;
+}
+.st-sort-ascent:before {
+    content: '';
+}
+.st-sort-ascent:after {
+    font-family: FontAwesome;
+    content: '  \f0de';
+}
+.st-sort-descent:before {
+    content: '';
+}
+.st-sort-descent:after{
+    font-family: FontAwesome;
+    content: '  \f0dd';
+}
+/*************************************/
+
+/********** select style **********/
 @-moz-document url-prefix() {
     select.form-control {
         padding-right: 25px;
@@ -67,12 +102,6 @@ html, body {
         appearance: none;
     }
 }
-
-/* Menu Auto Dropdown when hover 
-.dropdown:hover .dropdown-menu {
-    display: block;
-}
-*/
 
 select.custom::-ms-expand {
     padding: 0px;
