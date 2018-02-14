@@ -93,13 +93,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceCustome
             $uibModalInstance.dismiss('cancel');
         };
 
-        $scope.customerUpdateCompleted = function() {
+        $scope.customerUpdateCompleted = function(response) {
             var _result = new Object();
+            $scope.EditCustomer = response.Data.eInvoiceCustomer;
             _result.EditCustomer = $scope.EditCustomer;
             $uibModalInstance.close(_result);
         };
 
-        $scope.customerUpdateError = function() {
+        $scope.customerUpdateError = function(response) {
             alertsService.RenderErrorMessage(response.Error);
         }
     };

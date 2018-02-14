@@ -1,66 +1,73 @@
-<div ng-init="initializeController()">
-    <div class="page-header">
-        <div class="row">
-            <div class="col-sm-8">
-                <h2 class="pull-left">
-                    Danh mục khách hàng
-                </h2>
+<div class="row" ng-init="initializeController()">
+    <div class="col-md-12">
+        <!-- BEGIN: ACCORDION DEMO -->
+        <div class="portlet light portlet-fit portlet-datatable bordered">
+            <div class="portlet-title">
+                <div class="caption font-green-sharp">
+                    <i class="icon-settings font-green-sharp"></i>
+                    <span class="caption-subject bold uppercase">Danh mục khách hàng</span>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline green" ng-click="edit()">
+                        <i class="fa fa-plus"></i>
+                        <span class="hidden-480"> New </span>
+                    </a>
+                </div>
+            </div>
+            <div class="portlet-body"> 
+                <div class="table-scrollable"  >
+                    <!-- 
+                    <div class="gridStyle" ui-grid="gridOptions" ui-grid-selection ui-grid-resize-columns></div>
+                    -->
+                    <table st-table="eInvoiceCustomersDisplay" st-safe-src="eInvoiceCustomers" st-sentinel="tableChange(tableState)" st-default-selection="selectedRow" class="table table-striped table-bordered table-advance table-hover" id="table_items">
+                        <thead>
+                            <tr role="row" class="heading">
+                                <th st-sort="Code" st-ratio="10" st-sort-default="true" st-skip-natural="true">Code</th>
+                                <th st-sort="Description" st-skip-natural="true" st-ratio="20">Description</th>
+                                <th st-ratio="15">Vat Code</th>
+                                <th st-ratio="10">Representative Name</th>
+                                <th st-ratio="10">Representative Position</th>
+                                <th st-ratio="10">Contact Name</th>
+                                <th st-ratio="10">Comment</th>
+                                <th st-ratio="5">Status</th>
+                                <th st-ratio="10"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="eInvoiceCustomer in eInvoiceCustomersDisplay">
+                                <td st-ratio="10"><a ng-click="$event.stopPropagation(); edit($index, eInvoiceCustomer);">{{eInvoiceCustomer.Code}}</a></td>
+                                <td>{{eInvoiceCustomer.Description}}</td>
+                                <td>{{eInvoiceCustomer.VatNumber}}</td>
+                                <td>{{eInvoiceCustomer.RepresentativeName}}</td>
+                                <td>{{eInvoiceCustomer.RepresentativePosition}}</td>
+                                <td>{{eInvoiceCustomer.ContactName}}</td>
+                                <td>{{eInvoiceCustomer.Comment}}</td>
+                                <td st-ratio="10">
+                                    <div ng-repeat="status in Constants.Status|filter:{Code:eInvoiceCustomer.Status}"><span class="label label-sm" ng-class="{'label-danger': eInvoiceCustomer.Status!=1, 'label-success': eInvoiceCustomer.Status==1}"> {{status.Name}} </span></div>
+                                </td>
+                                <td st-ratio="20">
+                                    <a ng-click="$event.stopPropagation(); edit($index, eInvoiceCustomer);" class="btn btn-outline btn-circle btn-sm purple">
+                                        <i class="fa fa-edit"></i></a>
+                                    <a ng-click="$event.stopPropagation(); delete($index, eInvoiceCustomer);" class="btn btn-outline btn-circle dark btn-sm black">
+                                        <i class="fa fa-trash-o"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="text-center" colspan="4">
+                                    <div id="table_uoms_page" st-pagination="" st-items-by-page="PageSize" st-displayed-pages="7"></div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="btn-toolbar margin-bottom-15" role="toolbar" aria-label="Toolbar">
-        <div class="btn-group" role="group" aria-label="First group">
-            <a class="btn btn-default" role="button" id="btn-toolbar-refresh" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-add" ng-click="edit()"><span class="glyphicon glyphicon-plus"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-search" ng-class="{'active':Search!=''}" aria-pressed="Search!=''"  ng-click="showSearch()"><span class="glyphicon glyphicon-search"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-delete" ng-click="delete()"><span class="glyphicon glyphicon-remove"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-check-all" ng-click="selectAll()"><span class="glyphicon glyphicon-ok"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-help"><span class="glyphicon glyphicon-question-sign"></span></a>
-        </div>
-    </div>
-    <div class="margin-bottom-15" uib-collapse="!isSearched">
-		<div class="well" search-form search-condition-objects="searchConditionObjects" search-callback="getCustomers(param)"/>
-	</div>
-    <div class="row">
-        <div class="col-md-12 margin-bottom-15">
-            <div class="table-responsive constrained">
-                <table class="table table-bordered table-striped" style="table-layout: fixed;">
-                    <thead>
-                        <th class="col-md-1" style="text-align: center"></th>
-                        <th class="col-md-2">Code</th>
-                        <th class="col-md-3">Description</th>
-                        <th class="col-md-2">Vat Code</th>
-                        <th class="col-md-2">Representative Name</th>
-                        <th class="col-md-1">Representative Position</th>
-                        <th class="col-md-2">Contact Name</th>
-                        <th class="col-md-2">Comment</th>
-                        <th class="col-md-1">Status</th>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="eInvoiceCustomer in (FilteredItems = (eInvoiceCustomers|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
-                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceCustomer.ID)">
-                                <input type="checkbox" id="{{eInvoiceCustomer.ID}}" value="{{eInvoiceCustomer.ID}}" ng-checked="Selection.indexOf(eInvoiceCustomer.ID) > -1"/>
-                            </td>
-                            <td><a ng-click="edit(eInvoiceCustomer)">{{eInvoiceCustomer.Code}}</a></td>
-                            <td>{{eInvoiceCustomer.Description}}</td>
-                            <td>{{eInvoiceCustomer.VatNumber}}</td>
-                            <td>{{eInvoiceCustomer.RepresentativeName}}</td>
-                            <td>{{eInvoiceCustomer.RepresentativePosition}}</td>
-                            <td>{{eInvoiceCustomer.ContactName}}</td>
-                            <td>{{eInvoiceCustomer.Comment}}</td>
-                            <td>
-                                <div ng-repeat="status in Constants.Status|filter:{Code:eInvoiceCustomer.Status}">{{status.Name}}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <ul uib-pagination class="margin-bottom-15" total-items="TotalRows" ng-model="CurrentPage" items-per-page='PageSize'></ul>
-    <div class="margin-bottom-15">
-        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">
-            <div ng-bind-html="MessageBox"></div>
-        </alert>
     </div>
 </div>
+<!-- END MAIN CONTENT -->
+<!-- BEGIN MAIN JS-->
+<script>
+</script>
+<!-- BEGIN MAIN JS -->

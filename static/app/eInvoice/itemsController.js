@@ -141,7 +141,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             });
             modalInstance.result.then(function(_result) {
                 if (_item) { //edit
-                    angular.copy(_result.EditItem, $scope.eInvoiceItems[_index]); //it will copy to $scope.eInvoiceItemUomsSafe
+                    angular.copy(_result.EditItem, $scope.eInvoiceItemsDisplay[_index]);
                 } else { //add
                     $scope.eInvoiceItems.push(_result.EditItem);
                     $scope.eInvoiceItemsDisplay.push(_result.EditItem);

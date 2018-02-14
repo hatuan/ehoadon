@@ -4,9 +4,9 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceCustomerService', 'app/eInvoice/customerMaintenanceController'], function (angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceCustomerService'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$confirm', 'alertsService', 'Constants', 'eInvoiceCustomerService'];
 
-    var einvoiceCustomersController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceCustomerService) {
+    var einvoiceCustomersController = function ($scope, $rootScope, $state, $window, moment, $uibModal, $confirm, alertsService, Constants, eInvoiceCustomerService) {
 
         $scope.initializeController = function () {
             $rootScope.applicationModule = "eInvoiceCustomers";
@@ -41,6 +41,9 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             });
 
             $scope.eInvoiceCustomers = [];
+            $scope.eInvoiceCustomersDisplay = [];
+            $scope.selectedRow = null;
+            $scope.isLoading = true;
             $scope.FilteredItems = [];
             $scope.getCustomers();
         };
@@ -60,17 +63,23 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             }
         }
 
-        $scope.delete = function () {
-            if($scope.Selection.length <= 0)
-                return;
-            var deleteEInvoiceCustomers = $scope.createDeleteCustomerObject()
-            eInvoiceCustomerService.deleteCustomer(deleteEInvoiceCustomers, 
-                function (response, status) {
-                    $scope.getCustomers();
-                }, 
-                function (response, status){
-                    alertsService.RenderErrorMessage(response.Error);
-                });    
+        $scope.delete = function (_index, _item) {
+            $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
+            .then(function() {
+                $scope.Selection = [];
+                $scope.Selection.push(_item["ID"]);
+                var deleteEInvoiceCustomers = $scope.createDeleteItemObject()
+                eInvoiceCustomerService.deleteItem(deleteEInvoiceCustomers, 
+                    function (response, status) {
+                        $scope.Selection = [];
+                        $scope.eInvoiceCustomers.splice($scope.eInvoiceCustomers.indexOf(_item), 1);
+                        $scope.eInvoiceCustomersDisplay.splice($scope.eInvoiceCustomersDisplay.indexOf(_item), 1);
+                    }, 
+                    function (response, status){
+                        $scope.Selection = [];
+                        alertsService.RenderErrorMessage(response.Error);
+                });  
+            });
         }
 
         $scope.toggleSelection = function (_id) {
@@ -93,12 +102,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.einvoiceCustomersInquiryCompleted = function (response, status) {
             alertsService.RenderSuccessMessage(response.ReturnMessage);
             $scope.eInvoiceCustomers = response.Data.eInvoiceCustomers;
+            $scope.eInvoiceCustomersDisplay = response.Data.eInvoiceCustomers;
+            $scope.isLoading = false;
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];
             $scope.FilteredItems = [];
         };
 
         $scope.einvoiceCustomersInquiryError = function (response, status) {
+            $scope.isLoading = false;
             alertsService.RenderErrorMessage(response.Error);
         }
 
@@ -119,7 +131,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             return deleteCustomers;
         }
 
-        $scope.edit = function (_customer) {
+        $scope.edit = function (_index, _customer) {
             var modalInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -141,13 +153,26 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
-                
+                if (_customer) { //edit
+                    angular.copy(_result.EditCustomer, $scope.eInvoiceCustomersDisplay[_index]);
+                } else { //add
+                    $scope.eInvoiceCustomers.push(_result.EditCustomer);
+                    $scope.eInvoiceCustomersDisplay.push(_result.EditCustomer);
+                    $scope.selectedRow = _result.EditItemUom; 
+                }
             }, function() {
                 //dismissed 
             })['finally'](function() {
                 modalInstance = undefined;
             });    
         };
+
+        $scope.tableChange = function(tableState){
+            if (!$scope.isLoading && tableState.sort) {
+                $scope.SortExpression = tableState.sort.predicate;
+                $scope.SortDirection = tableState.sort.reverse ? "DESC":"ASC";   
+            }
+        }
     };
 
     einvoiceCustomersController.$inject = injectParams;
