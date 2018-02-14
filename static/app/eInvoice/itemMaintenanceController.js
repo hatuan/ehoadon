@@ -127,6 +127,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'eInv
 
         $scope.itemUpdateCompleted = function(response, status) {
             var _result = new Object();
+            $scope.EditItem = response.Data.eInvoiceItem;
             _result.EditItem = $scope.EditItem;
             $uibModalInstance.close(_result);
         };

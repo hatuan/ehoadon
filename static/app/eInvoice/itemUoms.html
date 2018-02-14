@@ -29,7 +29,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- <tr ng-repeat="eInvoiceItemUom in (FilteredItems = (eInvoiceItemUoms|limitTo: PageSize: (CurrentPage - 1) * PageSize))"> -->
                             <tr ng-repeat="eInvoiceItemUom in eInvoiceItemUoms">
                                 <td st-ratio="20"><a ng-click="$event.stopPropagation(); edit($index, eInvoiceItemUom);">{{eInvoiceItemUom.Code}}</a></td>
                                 <td st-ratio="50">{{eInvoiceItemUom.Description}}</td>
@@ -52,7 +51,6 @@
                             </tr>
                         </tfoot>
                     </table>
-                    <!-- <ul uib-pagination class="margin-bottom-15" total-items="TotalRows" ng-model="CurrentPage" items-per-page='PageSize'></ul> -->
                 </div>
             </div>
         </div>
@@ -61,6 +59,5 @@
 <!-- END MAIN CONTENT -->
 <!-- BEGIN MAIN JS-->
 <script>
-    
 </script>
 <!-- BEGIN MAIN JS -->

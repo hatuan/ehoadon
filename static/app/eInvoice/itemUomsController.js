@@ -148,20 +148,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             });
             modalInstance.rendered.then(function(result) {
                 $('.modal .modal-body').css('overflow-y', 'auto');
-                //$('.modal .modal-body').css('max-height', $(window).height() * 0.7);
-                //$('.modal .modal-body').css('height', $(window).height() * 0.7);
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
                 if (_itemUom) { //edit
-                    angular.copy(_result.EditItemUom, $scope.eInvoiceItemUoms[_index]);
-                    //var _indexSafe = $scope.eInvoiceItemUomsSafe.indexOf(_itemUom);
-                    //angular.copy(_result.EditItemUom, $scope.eInvoiceItemUomsSafe[_indexSafe]);
+                    angular.copy(_result.EditItemUom, $scope.eInvoiceItemUoms[_index]); //it will copy to $scope.eInvoiceItemUomsSafe
                 } else { //add
                     $scope.eInvoiceItemUoms.push(_result.EditItemUom);
                     $scope.eInvoiceItemUomsSafe.push(_result.EditItemUom);
-
-                    $scope.selectedRow = _result.EditItemUom;
+                    $scope.selectedRow = _result.EditItemUom; 
                 }
             }, function() {
                 //dismissed 
@@ -171,7 +166,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         };
 
         $scope.tableChange = function(tableState){
-            if ( !$scope.isLoading && tableState.sort) {
+            if (!$scope.isLoading && tableState.sort) {
                 $scope.SortExpression = tableState.sort.predicate;
                 $scope.SortDirection = tableState.sort.reverse ? "DESC":"ASC";   
             }
