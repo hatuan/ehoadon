@@ -145,7 +145,12 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
 
         $scope.formReleaseUpdateCompleted = function(response, status) {
             var _result = new Object();
-            _result.EditFormRelease = $scope.EditFormRelease;
+            _result.EditFormRelease = response.Data.eInvoiceFormRelease;
+            _result.EditFormRelease.ReleaseDate = new moment.unix(_result.EditFormRelease.ReleaseDate).toDate();
+            _result.EditFormRelease.StartDate = new moment.unix(_result.EditFormRelease.StartDate).toDate();
+
+            _result.EditFormRelease.NumberFormDescription = $filter('filter')($scope.Constants.InvoiceTypes, {Code:_result.EditFormRelease.FormTypeInvoiceType})[0].Name + " - " + _result.EditFormRelease.FormTypeNumberForm + " - " + _result.EditFormRelease.FormTypeSymbol;
+            _result.EditFormRelease.NumberReleaseDescription = "Total Release : " +  _result.EditFormRelease.ReleaseTotal + " (From : " + _result.EditFormRelease.ReleaseFrom + " - To : " + _result.EditFormRelease.ReleaseTo + ")";
             $uibModalInstance.close(_result);
         };
 

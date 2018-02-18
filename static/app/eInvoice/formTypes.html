@@ -1,66 +1,71 @@
-<div ng-init="initializeController()">
-    <div class="page-header">
-        <div class="row">
-            <div class="col-sm-8">
-                <h2 class="pull-left">
-                    Danh sách mẫu hóa đơn
-                </h2>
+<div class="row" ng-init="initializeController()">
+    <div class="col-md-12">
+        <!-- BEGIN: ACCORDION DEMO -->
+        <div class="portlet light portlet-fit portlet-datatable bordered">
+            <div class="portlet-title">
+                <div class="caption font-green-sharp">
+                    <i class="icon-settings font-green-sharp"></i>
+                    <span class="caption-subject bold uppercase">Danh sách mẫu hóa đơn</span>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline green" ng-click="edit()">
+                        <i class="fa fa-plus"></i>
+                        <span class="hidden-480"> New </span>
+                    </a>
+                </div>
+            </div>
+            <div class="portlet-body"> 
+                <div class="table-scrollable"  >
+                    <!-- 
+                    <div class="gridStyle" ui-grid="gridOptions" ui-grid-selection ui-grid-resize-columns></div>
+                    -->
+                    <table st-table="eInvoiceFormTypesDisplay" st-safe-src="eInvoiceFormTypes" st-sentinel="tableChange(tableState)" st-default-selection="selectedRow" class="table table-striped table-bordered table-advance table-hover" id="table_items">
+                        <thead>
+                            <tr role="row" class="heading">
+                                <th st-sort="RecCreated" st-ratio="10" st-sort-default="true" st-skip-natural="true">Date Created</th>
+                                <th st-ratio="20">Inv Form</th>
+                                <th st-ratio="10">Inv Type</th>
+                                <th st-ratio="10">Number Form</th>
+                                <th st-ratio="10">Symbol</th>
+                                <th st-ratio="20"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="eInvoiceFormType in eInvoiceFormTypesDisplay">
+                                <td>{{eInvoiceFormType.RecCreated | date:'dd/MM/yyyy'}}</td>
+                                <td>
+                                    <div ng-repeat="invFormType in Constants.InvoiceForms|filter:{Code:eInvoiceFormType.InvoiceForm}">{{invFormType.Name}}</div>
+                                </td>
+                                <td>
+                                    <div ng-repeat="invType in Constants.InvoiceTypes|filter:{Code:eInvoiceFormType.InvoiceType}">{{invType.Name}}</div>
+                                </td>
+                                <td>{{eInvoiceFormType.NumberForm}}</td>
+                                <td>{{eInvoiceFormType.Symbol}}</td>
+                                <td>
+                                    <a ng-click="$event.stopPropagation(); edit($index, eInvoiceFormType);" class="btn btn-outline btn-circle btn-sm purple">
+                                        <i class="fa fa-edit"></i></a>
+                                    <a ng-click="$event.stopPropagation(); viewReport($index, eInvoiceFormType);" class="btn btn-outline btn-circle btn-sm purple">
+                                        <i class="fa fa-book"></i></a>
+                                    <a ng-click="$event.stopPropagation(); delete($index, eInvoiceFormType);" class="btn btn-outline btn-circle dark btn-sm black">
+                                    <i class="fa fa-trash-o"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="text-center" colspan="4">
+                                    <div st-pagination="" st-items-by-page="PageSize" st-displayed-pages="7"></div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="btn-toolbar margin-bottom-15" role="toolbar" aria-label="Toolbar">
-        <div class="btn-group" role="group" aria-label="First group">
-            <a class="btn btn-default" role="button" id="btn-toolbar-refresh" ng-click="refresh()"><span class="glyphicon glyphicon-refresh"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-add" ng-click="edit()"><span class="glyphicon glyphicon-plus"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-search" ng-class="{'active':Search!=''}" aria-pressed="Search!=''"  ng-click="showSearch()"><span class="glyphicon glyphicon-search"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-delete" ng-click="delete()"><span class="glyphicon glyphicon-remove"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-check-all" ng-click="selectAll()"><span class="glyphicon glyphicon-ok"></span></a>
-            <a class="btn btn-default" role="button" id="btn-toolbar-help"><span class="glyphicon glyphicon-question-sign"></span></a>
-        </div>
-    </div>
-    <div class="margin-bottom-15" uib-collapse="!isSearched">
-		<div class="well" search-form search-condition-objects="searchConditionObjects" search-callback="getCustomers(param)"/>
-	</div>
-    <div class="row">
-        <div class="col-md-12 margin-bottom-15">
-            <div class="table-responsive constrained">
-                <table class="table table-bordered table-striped" style="table-layout: fixed;">
-                    <thead>
-                        <th class="col-md-1" style="text-align: center"></th>
-                        <th class="col-md-1" style="text-align: center"></th>
-                        <th class="col-md-2">Date Created</th>
-                        <th class="col-md-3">Inv Form</th>
-                        <th class="col-md-1">Inv Type</th>
-                        <th class="col-md-1">Number Form</th>
-                        <th class="col-md-1">Symbol</th>
-                        <th class="col-md-1">Report</th>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="eInvoiceFormType in (FilteredItems = (eInvoiceFormTypes|limitTo: PageSize: (CurrentPage - 1) * PageSize))">
-                            <td style="text-align: center;" ng-click="toggleSelection(eInvoiceFormType.ID)">
-                                <input type="checkbox" id="{{eInvoiceFormType.ID}}" value="{{eInvoiceFormType.ID}}" ng-checked="Selection.indexOf(eInvoiceFormType.ID) > -1"/>
-                            </td>
-                            <td><a ng-click="edit(eInvoiceFormType)">Edit</a></td>
-                            <td>{{eInvoiceFormType.RecCreated | date:'dd/MM/yyyy'}}</td>
-                            <td>
-                                <div ng-repeat="invFormType in Constants.InvoiceForms|filter:{Code:eInvoiceFormType.InvoiceForm}">{{invFormType.Name}}</div>
-                            </td>
-                            <td>
-                                <div ng-repeat="invType in Constants.InvoiceTypes|filter:{Code:eInvoiceFormType.InvoiceType}">{{invType.Name}}</div>
-                            </td>
-                            <td>{{eInvoiceFormType.NumberForm}}</td>
-                            <td>{{eInvoiceFormType.Symbol}}</td>
-                            <td><a ng-click="viewReport(eInvoiceFormType)">View Report</a></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <ul uib-pagination class="margin-bottom-15" total-items="TotalRows" ng-model="CurrentPage" items-per-page='PageSize'></ul>
-    <div class="margin-bottom-15">
-        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">
-            <div ng-bind-html="MessageBox"></div>
-        </alert>
     </div>
 </div>
+<!-- END MAIN CONTENT -->
+<!-- BEGIN MAIN JS-->
+<script>
+</script>
+<!-- BEGIN MAIN JS -->

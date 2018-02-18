@@ -130,7 +130,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
         $scope.formTypeUpdateCompleted = function(response, status) {
             var _result = new Object();
             _result.SelectReports = false;
-            _result.EditFormType = $scope.EditFormType;
+            _result.EditFormType = response.Data.eInvoiceFormType;
 
             $uibModalInstance.close(_result);
         };

@@ -66,6 +66,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.delete = function (_index, _item) {
             $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
             .then(function() {
+                $scope.Selection = [];
                 $scope.Selection.push(_item["ID"]);
                 var deleteEInvoiceItems = $scope.createDeleteItemObject()
                 eInvoiceItemService.deleteItem(deleteEInvoiceItems, 

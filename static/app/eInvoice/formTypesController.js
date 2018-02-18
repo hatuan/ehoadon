@@ -4,9 +4,9 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 'eInvoiceFormTypeService', 'app/eInvoice/formTypeMaintenanceController', 'app/eInvoice/formTypeReportsController', 'app/eInvoice/formTypeViewReportController'], function (angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceFormTypeService'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$confirm', 'alertsService', 'Constants', 'eInvoiceFormTypeService'];
 
-    var einvoiceFormTypesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceFormTypeService) {
+    var einvoiceFormTypesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, $confirm, alertsService, Constants, eInvoiceFormTypeService) {
 
         $scope.initializeController = function () {
             $rootScope.applicationModule = "eInvoiceFormTypes";
@@ -25,23 +25,11 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.Selection=[];
 
             $scope.searchConditionObjects = [];
-            /*
-            $scope.searchConditionObjects.push({
-                ID: "ehd_form_type.code",
-                Name: "Code",
-                Type: "CODE", //CODE, FREE, DATE
-                ValueIn: "eInvoiceFormTypes",
-                Value: ""
-            },
-            {
-                ID: "ehd_form_type.description",
-                Name: "Description",
-                Type: "FREE", //CODE, FREE, DATE
-                ValueIn: "",
-                Value: ""
-            });
-            */
+            
             $scope.eInvoiceFormTypes = [];
+            $scope.eInvoiceFormTypesDisplay = [];
+            $scope.selectedRow = null;
+            $scope.isLoading = true;
             $scope.FilteredFormTypes = [];
             $scope.selectReports = false;
             $scope.getFormTypes();
@@ -62,17 +50,23 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             }
         }
 
-        $scope.delete = function () {
-            if($scope.Selection.length <= 0)
-                return;
-            var deleteEInvoiceFormTypes = $scope.createDeleteFormTypeObject()
-            eInvoiceFormTypeService.deleteFormType(deleteEInvoiceFormTypes, 
-                function (response, status) {
-                    $scope.getFormTypes();
-                }, 
-                function (response, status){
-                    alertsService.RenderErrorMessage(response.Error);
-                });    
+        $scope.delete = function (_index, _item) {
+            $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
+                .then(function() {
+                    $scope.Selection = [];
+                    $scope.Selection.push(_item["ID"]);
+                    var deleteEInvoiceFormTypes = $scope.createDeleteFormTypeObject()
+                    eInvoiceFormTypeService.deleteFormType(deleteEInvoiceFormTypes, 
+                        function (response, status) {
+                            $scope.Selection = [];
+                            $scope.eInvoiceFormTypes.splice($scope.eInvoiceFormTypes.indexOf(_item), 1);
+                            $scope.eInvoiceFormTypesDisplay.splice($scope.eInvoiceFormTypesDisplay.indexOf(_item), 1);
+                        }, 
+                        function (response, status){
+                            $scope.Selection = [];
+                            alertsService.RenderErrorMessage(response.Error);
+                    });  
+                });
         }
 
         $scope.toggleSelection = function (_id) {
@@ -99,12 +93,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $scope.eInvoiceFormTypes[i].RecCreated = new moment.unix($scope.eInvoiceFormTypes[i].RecCreated).toDate();
                 $scope.eInvoiceFormTypes[i].RecModified = new moment.unix($scope.eInvoiceFormTypes[i].RecModified).toDate();
             }
+            $scope.eInvoiceFormTypesDisplay = [].concat($scope.eInvoiceFormTypes);
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];
             $scope.FilteredFormTypes = [];
+            $scope.isLoading = false;
         };
 
         $scope.einvoiceFormTypesInquiryError = function (response, status) {
+            $scope.isLoading = false;
             alertsService.RenderErrorMessage(response.Error);
         }
 
@@ -125,7 +122,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             return deleteFormTypes;
         }
 
-        $scope.edit = function (_formType) {
+        $scope.edit = function (_index, _formType) {
             var modalInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -147,14 +144,20 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
-
                 _formType = _result.EditFormType;
                 $scope.selectReports = _result.SelectReports;
 
                 if($scope.selectReports) {
-                    $scope.showSelectReports(_formType);
+                    $scope.showSelectReports(_index, _formType);
+                } else {
+                    if (!angular.isUndefinedOrNull(_index)) { //edit
+                        angular.copy(_formType, $scope.eInvoiceFormTypesDisplay[_index]);
+                    } else { //add
+                        $scope.eInvoiceFormTypes.push(_formType);
+                        $scope.eInvoiceFormTypesDisplay.push(_formType);
+                        $scope.selectedRow = _formType; 
+                    }
                 }
-
             }, function(_result) {
                 //dismissed 
             })['finally'](function() {
@@ -162,7 +165,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             });    
         };
 
-        $scope.showSelectReports = function(_formType) {
+        $scope.showSelectReports = function(_index, _formType) {
             var modalSelectReportInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -184,16 +187,16 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalSelectReportInstance.result.then(function(_result) {
-                $scope.edit(_result.EditFormType);
+                $scope.edit(_index, _result.EditFormType);
             }, function(_result) { //dismiss
-                $scope.edit(_formType);
+                $scope.edit(_index, _formType);
             })['finally'](function() {
                 modalSelectReportInstance = undefined;
                 $scope.selectReports = false;
             });
         };
         
-        $scope.viewReport = function(_formType) {
+        $scope.viewReport = function(_index, _formType) {
             var modalViewReportInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -215,11 +218,20 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalViewReportInstance.result.then(function(_result) {
+
             }, function(_result) { //dismiss
+
             })['finally'](function() {
                 modalViewReportInstance = undefined;
             });
         };
+
+        $scope.tableChange = function(tableState){
+            if (!$scope.isLoading && tableState.sort) {
+                $scope.SortExpression = tableState.sort.predicate;
+                $scope.SortDirection = tableState.sort.reverse ? "DESC":"ASC";   
+            }
+        }
     };
 
     einvoiceFormTypesController.$inject = injectParams;
