@@ -4,9 +4,9 @@
 "use strict";
 
 define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myApp.Search', 'eInvoiceService', 'digitalsignature', 'reportjs-report', 'reportjs-viewer', 'app/eInvoice/invoiceMaintenanceController', 'app/eInvoice/invoiceViewReportController'], function (angularAMD, $) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', 'alertsService', 'Constants', 'eInvoiceService'];
+    var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$confirm', 'alertsService', 'Constants', 'eInvoiceService'];
 
-    var eInvoicesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, alertsService, Constants, eInvoiceService) {
+    var eInvoicesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, $confirm, alertsService, Constants, eInvoiceService) {
 
         $scope.initializeController = function () {
             $rootScope.applicationModule = "eInvoices";
@@ -25,23 +25,11 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             $scope.Selection=[];
 
             $scope.searchConditionObjects = [];
-            /*
-            $scope.searchConditionObjects.push({
-                ID: "ehd_form_type.code",
-                Name: "Code",
-                Type: "CODE", //CODE, FREE, DATE
-                ValueIn: "eInvoices",
-                Value: ""
-            },
-            {
-                ID: "ehd_form_type.description",
-                Name: "Description",
-                Type: "FREE", //CODE, FREE, DATE
-                ValueIn: "",
-                Value: ""
-            });
-            */
+
             $scope.eInvoices = [];
+            $scope.eInvoicesDisplay = [];
+            $scope.selectedRow = null;
+            $scope.isLoading = true;
             $scope.FilteredInvoices = [];
             $scope.selectViewReport = false;
             $scope.getInvoices();
@@ -62,17 +50,23 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             }
         }
 
-        $scope.delete = function () {
-            if($scope.Selection.length <= 0)
-                return;
-            var deleteEInvoiceInvoices = $scope.createDeleteInvoiceObject()
-            eInvoiceService.deleteInvoice(deleteEInvoiceInvoices, 
-                function (response, status) {
-                    $scope.getInvoices();
-                }, 
-                function (response, status){
-                    alertsService.RenderErrorMessage(response.Error);
-                });    
+        $scope.delete = function (_index, _item) {
+            $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
+            .then(function() {
+                $scope.Selection = [];
+                $scope.Selection.push(_item["ID"]);
+                var deleteEInvoiceInvoices = $scope.createDeleteInvoiceObject()
+                eInvoiceService.deleteInvoice(deleteEInvoiceInvoices, 
+                    function (response, status) {
+                        $scope.Selection = [];
+                        $scope.eInvoicesDisplay.splice($scope.eInvoicesDisplay.indexOf(_item), 1);
+                        $scope.eInvoices.splice($scope.eInvoices.indexOf(_item), 1);
+                    }, 
+                    function (response, status){
+                        $scope.Selection = [];
+                        alertsService.RenderErrorMessage(response.Error);
+                });  
+            });
         }
 
         $scope.toggleSelection = function (_id) {
@@ -99,12 +93,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 $scope.eInvoices[i].RecCreated = new moment.unix($scope.eInvoices[i].RecCreated).toDate();
                 $scope.eInvoices[i].RecModified = new moment.unix($scope.eInvoices[i].RecModified).toDate();
             }
+            $scope.eInvoicesDisplay = [].concat($scope.eInvoices);
+            $scope.isLoading = false;
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];
             $scope.FilteredInvoices = [];
         };
 
         $scope.eInvoicesInquiryError = function (response, status) {
+            $scope.isLoading = false;
             alertsService.RenderErrorMessage(response.Error);
         }
 
@@ -125,7 +122,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             return deleteInvoices;
         }
 
-        $scope.edit = function (_invoice) {
+        $scope.edit = function (_index, _invoice) {
             var modalInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -153,7 +150,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 $scope.selectViewReport = _result.selectViewReport;
 
                 if($scope.selectViewReport) {
-                    $scope.viewReport(_invoice);
+                    $scope.viewReport(_index, _invoice);
+                } else {
+                    if (!angular.isUndefinedOrNull(_index)) { //edit
+                        angular.copy(_invoice, $scope.eInvoicesDisplay[_index]);
+                    } else { //add
+                        $scope.eInvoices.push(_invoice);
+                        $scope.eInvoicesDisplay.push(_invoice);
+                        $scope.selectedRow = _invoice; 
+                    }
                 }
             }, function(_result) {
                 //dismissed 
@@ -162,7 +167,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             });    
         };
 
-        $scope.viewReport = function(_invoice) {
+        $scope.viewReport = function(_index, _invoice) {
             var modalViewReportInstance = $uibModal.open({
                 animation: true,
                 ariaLabelledBy: 'modal-title',
@@ -185,14 +190,21 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalViewReportInstance.result.then(function(_result) { //close
-                $scope.edit(_result.EditInvoice);
+                $scope.edit(_index, _result.EditInvoice);
             }, function() { //dismiss
-                $scope.edit(modalViewReportInstance.result.EditInvoice);
+                $scope.edit(_index, modalViewReportInstance.result.EditInvoice);
             })['finally'](function() {
                 modalViewReportInstance = undefined;
                 $scope.selectViewReport = false;
             });
         };
+
+        $scope.tableChange = function(tableState){
+            if (!$scope.isLoading && tableState.sort) {
+                $scope.SortExpression = tableState.sort.predicate;
+                $scope.SortDirection = tableState.sort.reverse ? "DESC":"ASC";   
+            }
+        }
     };
 
     eInvoicesController.$inject = injectParams;

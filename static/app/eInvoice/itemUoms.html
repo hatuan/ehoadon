@@ -19,7 +19,7 @@
                     <!-- 
                     <div class="gridStyle" ui-grid="gridOptions" ui-grid-selection ui-grid-resize-columns></div>
                     -->
-                    <table st-table="eInvoiceItemUoms" st-safe-src="eInvoiceItemUomsSafe" st-sentinel="tableChange(tableState)" st-default-selection="selectedRow" class="table table-striped table-bordered table-advance table-hover" id="table_uoms">
+                    <table st-table="eInvoiceItemUomsDisplay" st-safe-src="eInvoiceItemUoms" st-sentinel="tableChange(tableState)" st-default-selection="selectedRow" class="table table-striped table-bordered table-advance table-hover" id="table_uoms">
                         <thead>
                             <tr role="row" class="heading">
                                 <th st-sort="Code" st-ratio="20" st-sort-default="true" st-skip-natural="true">Code</th>
@@ -29,7 +29,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="eInvoiceItemUom in eInvoiceItemUoms">
+                            <tr ng-repeat="eInvoiceItemUom in eInvoiceItemUomsDisplay">
                                 <td st-ratio="20"><a ng-click="$event.stopPropagation(); edit($index, eInvoiceItemUom);">{{eInvoiceItemUom.Code}}</a></td>
                                 <td st-ratio="50">{{eInvoiceItemUom.Description}}</td>
                                 <td st-ratio="10">

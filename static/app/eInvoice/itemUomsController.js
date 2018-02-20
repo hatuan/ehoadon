@@ -40,8 +40,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 Value: ""
             });
 
+            $scope.eInvoiceItemUomsDisplay = [];
             $scope.eInvoiceItemUoms = [];
-            $scope.eInvoiceItemUomsSafe = [];
             $scope.selectedRow = null;
             $scope.FilteredItems = [];
             $scope.isLoading = true;
@@ -66,14 +66,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.delete = function (_index, _item) {
             $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
             .then(function() {
+                $scope.Selection = [];
                 $scope.Selection.push(_item["ID"]);
                 var deleteEInvoiceItems = $scope.createDeleteItemUomObject()
                 eInvoiceItemUomService.deleteItemUom(deleteEInvoiceItems, 
                     function (response, status) {
                         $scope.Selection = [];
                         //$scope.getItemUoms();
+                        $scope.eInvoiceItemUomsDisplay.splice($scope.eInvoiceItemUomsDisplay.indexOf(_item), 1);
                         $scope.eInvoiceItemUoms.splice($scope.eInvoiceItemUoms.indexOf(_item), 1);
-                        $scope.eInvoiceItemUomsSafe.splice($scope.eInvoiceItemUomsSafe.indexOf(_item), 1);
                     }, 
                     function (response, status){
                         $scope.Selection = [];
@@ -101,11 +102,11 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
 
         $scope.einvoiceItemUomsInquiryCompleted = function (response, status) {
             alertsService.RenderSuccessMessage(response.ReturnMessage);
-            $scope.eInvoiceItemUoms = response.Data.eInvoiceItemUoms;
+            $scope.eInvoiceItemUomsDisplay = response.Data.eInvoiceItemUoms;
             $scope.TotalRows = response.TotalRows;
             $scope.Selection = [];
             $scope.FilteredItems = [];
-            $scope.eInvoiceItemUomsSafe = response.Data.eInvoiceItemUoms;
+            $scope.eInvoiceItemUoms = response.Data.eInvoiceItemUoms;
             $scope.isLoading = false;
         };
 
@@ -151,11 +152,11 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
-                if (_itemUom) { //edit
-                    angular.copy(_result.EditItemUom, $scope.eInvoiceItemUoms[_index]); //it will copy to $scope.eInvoiceItemUomsSafe
+                if (!angular.isUndefinedOrNull(_index)) { //edit
+                    angular.copy(_result.EditItemUom, $scope.eInvoiceItemUomsDisplay[_index]); //it will copy to $scope.eInvoiceItemUoms
                 } else { //add
+                    $scope.eInvoiceItemUomsDisplay.push(_result.EditItemUom);
                     $scope.eInvoiceItemUoms.push(_result.EditItemUom);
-                    $scope.eInvoiceItemUomsSafe.push(_result.EditItemUom);
                     $scope.selectedRow = _result.EditItemUom; 
                 }
             }, function() {
