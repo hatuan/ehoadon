@@ -1,49 +1,51 @@
-<div ng-init="initializeController()">
-    <div class="page-header">
-        <div class="row">
-            <div class="col-sm-8">
-                <h2 class="pull-left">
-                    Preference
-                </h2>
+<div class="row" ng-init="initializeController()">
+    <div class="col-md-12">
+        <!-- BEGIN: ACCORDION DEMO -->
+        <div class="portlet light portlet-fit portlet-datatable bordered">
+            <div class="portlet-title">
+                <div class="caption font-green-sharp">
+                    <i class="icon-settings font-green-sharp"></i>
+                    <span class="caption-subject bold uppercase">Preference</span>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline green" ng-click="updatePreference(PreferenceForm)" ng-disabled="PreferenceForm.$invalid">
+                        <i class="fa fa-wrench"></i>
+                        <span class="hidden-480"> Set Preference </span>
+                    </a>
+                </div>
+            </div>
+            <div class="portlet-body"> 
+                <form ng-submit="updatePreference(PreferenceForm)" id="PreferenceForm" name="PreferenceForm" role="form" ng-validate="validationOptions">
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label class="control-label" for="Organization">Organization</label>
+                            <select class="form-control valid" id="Organization" name="Organization" ng-model="OrganizationID" ng-options="Organization.ID as Organization.Description for Organization in Organizations">
+                                <option value="">--Select Organization--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label class="control-label" for="CultureUI">Language</label>
+                            <select class="form-control valid" id="CultureUI" name="CultureUI" ng-model="CultureUIID" ng-options="CultureUI.ID as CultureUI.Name for CultureUI in CultureUIs">
+                                <option value="">--Select Languages--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-4">
+                            <label class="control-label" for="WorkingDate">Working Date</label>
+                            <!-- <input class="form-control" name="WorkingDate" ng-model="WorkingDate" id="WorkingDate" kendo-date-picker k-options="datePickerConfig"> -->
+                            <input type="text" class="form-control" name="WorkingDate" id="WorkingDate" uib-datepicker-popup="dd/MM/yyyy" ng-model="WorkingDate"/>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <h4>Set user preference</h4>
-    <br/>
-    <form ng-submit="updatePreference(PreferenceForm)" id="PreferenceForm" name="PreferenceForm" class="form-horizontal" role="form"
-        ng-validate="validationOptions">
-        <div class="form-group">
-            <label class="col-xs-2 control-label" for="Organization">Organization</label>
-            <div class="col-xs-2">
-                <select class="form-control valid" id="Organization" name="Organization" ng-model="OrganizationID" ng-options="Organization.ID as Organization.Description for Organization in Organizations">
-                    <option value="">--Select Organization--</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-xs-2 control-label" for="CultureUI">Language</label>
-            <div class="col-xs-2">
-                <select class="form-control valid" id="CultureUI" name="CultureUI" ng-model="CultureUIID" ng-options="CultureUI.ID as CultureUI.Name for CultureUI in CultureUIs">
-                    <option value="">--Select Languages--</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-xs-2 control-label" for="WorkingDate">Working Date</label>
-            <div class="col-xs-2">
-                <!-- <input class="form-control" name="WorkingDate" ng-model="WorkingDate" id="WorkingDate" kendo-date-picker k-options="datePickerConfig"> -->
-                
-                <input type="text" class="form-control" name="WorkingDate" id="WorkingDate" uib-datepicker-popup="dd/MM/yyyy" ng-model="WorkingDate"/>
-                
-            </div>
-
-        </div>
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Set Preference" ng-disabled="PreferenceForm.$invalid" class="btn btn-default" />
-            </div>
-        </div>
-
-    </form>
 </div>
+<!-- END MAIN CONTENT -->
+<!-- BEGIN MAIN JS-->
+<script>
+</script>
+<!-- BEGIN MAIN JS -->
