@@ -77,24 +77,24 @@ function getCertificateName (str) {
 function LoadCerts() {
     var html = "";
     var hasCert = false;
-
-    for (idx = 0; idx < document.applet.getCertArr().length; idx++) {
-        var serialNumber = document.applet.getCertArr()[idx].getSerialNumber();
+    var arrayCerts = document.activeX.GetCertArr();
+    for (idx = 0; idx < arrayCerts.length; idx++) {
+        var serialNumber = arrayCerts[idx].SerialNumber;
         var isExistedCertificate = false; //token da dang ky hay chua
         var isValidIssuer = true; //token co valid hay khong
         var isRevoked = false; //token co bi thu hoi khong
 
-        var issuer = document.applet.getCertArr()[idx].getIssuer();
-        var validFrom = document.applet.getCertArr()[idx].getValidFrom();
-        var validTo = document.applet.getCertArr()[idx].getValidTo();
-        var subject = document.applet.getCertArr()[idx].getSubject();
-        var fullSubject = document.applet.getCertArr()[idx].getFullSubject().replace(/("|')/g, "");
-        var certificateAlias = document.applet.getCertArr()[idx].getAlias();
+        var issuer = arrayCerts[idx].Issuer;
+        var validFrom = arrayCerts[idx].ValidFrom;
+        var validTo = arrayCerts[idx].ValidTo;
+        var subject = arrayCerts[idx].Subject;
+        var fullSubject = arrayCerts[idx].FullSubject.replace(/("|')/g, "");
+        var certificateAlias = arrayCerts[idx].Alias;
         var status ='';
         var name = getCertificateName(fullSubject);
         var taxCode = getTaxCode(fullSubject);
-        var certificateContent = document.applet.getCertArr()[idx].getCertificateContent();
-        var certificateVersion = document.applet.getCertArr()[idx].getCertificateVersion();
+        var certificateContent = arrayCerts[idx].CertificateContent;
+        var certificateVersion = arrayCerts[idx].CertificateVersion;
         
         /* 
         //Check usb token da dang ky voi ivan hay chua

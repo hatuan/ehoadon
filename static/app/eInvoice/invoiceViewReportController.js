@@ -53,30 +53,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                 // Get PDF data from MemoryStream object
                 var data = stream.toArray(); //or var data = $scope.report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf);
                 var dataBase64 = arrayBufferToBase64(data);
-                
-                /*
-                $scope.appletHtml = null;
-                
-                var appletString = 
-                    '<applet width="0" height="0" name="appletPdfSign" id="appletPdfSign' + (new Date()).getTime() + '" code="com.myerp.digitalsignature.applet.PDFSignatureByInitApplet.class" archive="/scripts/SignApplet40-1.0-SNAPSHOT.jar, /scripts/itextpdf-5.5.9.jar, /scripts/bcprov-jdk15on-1.56.jar, /scripts/bcpkix-jdk15on-1.56.jar, /scripts/bcprov-ext-jdk15on-1.56.jar, /scripts/commons-codec-1.9.jar">' +
-                    '  <param name="pdfBase64Field" value="'+ dataBase64 +'">' +
-                    '  <param name="selectedCertField" value="' + $scope.Token.TokenSerialNumber + '">' +
-                    '  <param name="idField" value="' + $scope.EditInvoice.ID + '">' +
-                    '  <param name="versionField" value="' + $scope.EditInvoice.Version + '">' +
-                    '  <param name="statusField" value="' + $scope.Constants.InvoiceStatus[1].Code + '">' +
-                    '  <param name="jwtTokenField" value="' + $auth.getToken() + '">' +
-                    '</applet>'
 
-                $scope.appletHtml = $sce.trustAsHtml(appletString);
-                */
-                var signedInfo = document.appletPdfSign.signDocument(dataBase64, 
+                var signedInfo = document.activeX.signDocument(dataBase64, 
                     $scope.Token.TokenSerialNumber, 
                     $scope.EditInvoice.ID, 
                     $scope.EditInvoice.Version + '', 
                     $scope.Constants.InvoiceStatus[1].Code + '', 
                     $auth.getToken());
                 
-
                 settings = null;
                 stream = null;
                 service = null;
@@ -84,11 +68,11 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                 dataBase64 = null;
 
                 var postData = {
-                    'InvoiceID' : signedInfo.getDocumentID(),
-                    'PDFBase64' : signedInfo.getSignedContent(),
-                    'PDFBase64MD5' : signedInfo.getSignedContentMD5(),
-                    'Status' : signedInfo.getSignedStatus(),
-                    'Version' : signedInfo.getDocumentVersion()
+                    'InvoiceID' : signedInfo.DocumentID,
+                    'PDFBase64' : signedInfo.SignedContent,
+                    'PDFBase64MD5' : signedInfo.SignedContentMD5,
+                    'Status' : signedInfo.SignedStatus,
+                    'Version' : signedInfo.DocumentVersion
                 };
                 $.ajax({
                     url: '/api/einvoiceFiles',
@@ -98,7 +82,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                     dataType: "json", 
                     data: JSON.stringify(postData),
                     beforeSend: function (xhr) {   //Include the bearer token in header
-                        xhr.setRequestHeader("Authorization", signedInfo.getJwtToken());
+                        xhr.setRequestHeader("Authorization", signedInfo.JwtToken);
                     }
                 })
                 .done(function(response) {

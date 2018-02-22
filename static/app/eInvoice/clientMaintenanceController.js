@@ -14,13 +14,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
             $scope.Token = {};
             $scope.Provinces = [];
 
-            $scope.appletHtml = null;
-
-            var appletString = 
-                '<applet width="0" height="0" id="applet" code="com.myerp.digitalsignature.applet.CertificateApplet.class" archive="/scripts/SignApplet40-1.0-SNAPSHOT.jar">' +
-                '</applet>'
-            $scope.appletHtml = $sce.trustAsHtml(appletString);
-
             $scope.getProvinces(function () { //success
                 $scope.getClient();
             });
