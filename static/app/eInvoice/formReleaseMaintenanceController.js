@@ -119,20 +119,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormRel
                     $scope.EditFormRelease.RecCreated = new Date();
                     $scope.EditFormRelease.RecModifiedByID = $rootScope.currentUser.ID;
                     $scope.EditFormRelease.RecModified = new Date();
-
-                    _postFormRelease = $scope.EditFormRelease;
-                    _postFormRelease.RecCreated = new moment($scope.EditFormRelease.RecCreated).unix();
-                    _postFormRelease.RecModified = new moment($scope.EditFormRelease.RecModified).unix();
                 } else {
                     $scope.EditFormRelease.RecModifiedByID = $rootScope.currentUser.ID;
                     $scope.EditFormRelease.RecModified = new Date();
 
-                    _postFormRelease = $scope.EditFormRelease;
-                    _postFormRelease.RecCreated = new moment($scope.EditFormRelease.RecCreated).unix();
-                    _postFormRelease.RecModifiedByID = $rootScope.currentUser.ID;
-                    _postFormRelease.RecModified = new moment($scope.EditFormRelease.RecModified).unix();
                 }
-                
+                _postFormRelease = _.assign({}, $scope.EditFormRelease);
+                _postFormRelease.RecCreated = new moment(_postFormRelease.RecCreated).unix();
+                _postFormRelease.RecModified = new moment(_postFormRelease.RecModified).unix();
                 _postFormRelease.ReleaseDate = new moment(_postFormRelease.ReleaseDate).unix();
                 _postFormRelease.StartDate = new moment(_postFormRelease.StartDate).unix();
                 eInvoiceFormReleaseService.updateFormRelease(_postFormRelease, $scope.formReleaseUpdateCompleted, $scope.formReleaseUpdateError)

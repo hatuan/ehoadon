@@ -16,6 +16,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.selectViewReport = false;
 
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
+                $scope.EditInvoice.InvoiceDate = $rootScope.Preference.WorkingDate;
                 $scope.EditInvoice.Status = $scope.Constants.InvoiceStatus[0].Code;
                 $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
                 $scope.EditInvoice.RecCreatedByUser = $rootScope.currentUser.Name;
@@ -26,7 +27,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
 
                 $scope.EditInvoice.InvoiceLines = [];
             } else {
-                
+                //invoice se duoc lay tai $scope.getInvoice sau khi thuc hien $scope.getFormReleases();    
             }
 
             $scope.getFormReleases();
@@ -86,6 +87,10 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
 
         $scope.validationOptions = {
             rules: {
+                "InvoiceDate": {
+                    date: true,
+                    required: true            
+                },
                 "CustomerVatNumber": {
                     required: true
                 },
@@ -124,42 +129,39 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
         $scope.ok = function(form, formDetail, _selectViewReport) {
             if (form.validate() && formDetail.validate()) {
                 
-                var _post = new Object();
+                var _post = {};
                 if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                     $scope.EditInvoice.RecCreatedByID = $rootScope.currentUser.ID;
                     $scope.EditInvoice.RecCreated = new Date();
                     $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
                     $scope.EditInvoice.RecModified = new Date();
-
-                    _post = $scope.EditInvoice;
-                    _post.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
-                    _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
                 } else {
                     $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
                     $scope.EditInvoice.RecModified = new Date();
-
-                    _post = $scope.EditInvoice;
-                    _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
                 }
+                _post = _.assign({}, $scope.EditInvoice);
+                _post.InvoiceDate = new moment(_post.InvoiceDate).unix();
+                _post.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
+                _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
                 
                 for (var i = 0, len = $scope.EditInvoice.InvoiceLines.length; i < len; i++) {
                     var invoiceLine = $scope.EditInvoice.InvoiceLines[i];
-                    var _postInvoiceLine = _post.InvoiceLines[i];
+                    var _postInvoiceLine = {};
 
                     if (angular.isUndefinedOrNull(invoiceLine.ID)) {
                         invoiceLine.RecCreatedByID = $rootScope.currentUser.ID;
                         invoiceLine.RecCreated = new Date();
                         invoiceLine.RecModifiedByID = $rootScope.currentUser.ID;
                         invoiceLine.RecModified = new Date();
-
-                        _postInvoiceLine.RecCreated = new moment(invoiceLine.RecCreated).unix();
-                        _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
                     } else {
                         invoiceLine.RecModifiedByID = $rootScope.currentUser.ID;
                         invoiceLine.RecModified = new Date();
-
-                        _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
                     }
+                    _postInvoiceLine = _.assign({}, invoiceLine);
+                    _postInvoiceLine.RecCreated = new moment(invoiceLine.RecCreated).unix();
+                    _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
+
+                    _post.InvoiceLines[i] = _postInvoiceLine;
                 }
                 $scope.selectViewReport = _selectViewReport;
                 eInvoiceService.updateInvoice(_post, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
@@ -173,6 +175,9 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
         $scope.invoiceUpdateCompleted = function(response, status) {
             var _result = new Object();
             _result.EditInvoice = response.Data.eInvoice;
+            _result.EditInvoice.InvoiceDate = new moment.unix(_result.EditInvoice.InvoiceDate).toDate();
+            _result.EditInvoice.RecCreated = new moment.unix(_result.EditInvoice.RecCreated).toDate();
+            _result.EditInvoice.RecModified = new moment.unix(_result.EditInvoice.RecModified).toDate();
             _result.selectViewReport = $scope.selectViewReport;
 
             $uibModalInstance.close(_result);
@@ -188,7 +193,12 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             eInvoiceService.getInvoice(
                 invoiceInquiry, 
                 function(response, status) { //success
-                    $scope.EditInvoice = response.Data.eInvoice;
+                    var _editInvoice = response.Data.eInvoice;
+                    _editInvoice.InvoiceDate = new moment.unix(_editInvoice.InvoiceDate).toDate();
+                    _editInvoice.RecCreated = new moment.unix(_editInvoice.RecCreated).toDate();
+                    _editInvoice.RecModified = new moment.unix(_editInvoice.RecModified).toDate();
+                    $scope.EditInvoice = _editInvoice;
+
                     setTimeout(function() {
                         for(var i = 0, len = $scope.EditInvoice.InvoiceLines.length; i < len; i ++) {
                             var _invoiceLine = $scope.EditInvoice.InvoiceLines[i];

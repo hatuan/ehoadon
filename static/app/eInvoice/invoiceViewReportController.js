@@ -138,7 +138,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                 invoiceInquiry, 
                 function(response, status) { //success
                     $scope.EditInvoice = response.Data.eInvoice;
-                    $scope.EditInvoice.InvoiceDate = new moment.unix($scope.EditInvoice.InvoiceDate).toDate();
                     $scope.getReport($scope.FormType.FormFileName, $scope.FormType.FormFile);        
                 },
                 function(response) { //error

@@ -104,6 +104,9 @@ define(['application-configuration', 'ajaxService', 'alertsService', 'organizati
             alertsService.RenderSuccessMessage(response.ReturnMessage);
             
             $rootScope.Preference = response.Data.Preference;
+            $rootScope.Preference.WorkingDateUnix = $rootScope.Preference.WorkingDate;
+            $rootScope.Preference.WorkingDate = new moment.unix($rootScope.Preference.WorkingDate).toDate();
+            
 
             setTimeout(function () {
                 $state.go('home');

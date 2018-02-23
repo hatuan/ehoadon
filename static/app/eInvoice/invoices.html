@@ -34,7 +34,7 @@
                                 <td>{{eInvoice.InvoiceNo}}</td>
                                 <td>{{eInvoice.FormTypeNumberForm}}</td>
                                 <td>{{eInvoice.FormTypeSymbol}}</td>
-                                <td>{{eInvoice.InvoiceDate}}</td>
+                                <td>{{eInvoice.InvoiceDate | date:'dd/MM/yyyy'}}</td>
                                 <td>{{eInvoice.CustomerVatNumber}}</td>
                                 <td>{{eInvoice.CustomerName}}</td>
                                 <td>{{eInvoice.TotalPayment|awnum:'amount'}}</td>

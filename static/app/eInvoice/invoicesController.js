@@ -90,6 +90,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             alertsService.RenderSuccessMessage(response.ReturnMessage);
             $scope.eInvoices = response.Data.eInvoices;
             for (var i = 0, len = $scope.eInvoices.length; i < len; i++) {
+                $scope.eInvoices[i].InvoiceDate = new moment.unix($scope.eInvoices[i].InvoiceDate).toDate();
                 $scope.eInvoices[i].RecCreated = new moment.unix($scope.eInvoices[i].RecCreated).toDate();
                 $scope.eInvoices[i].RecModified = new moment.unix($scope.eInvoices[i].RecModified).toDate();
             }
