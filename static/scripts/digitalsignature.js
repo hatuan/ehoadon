@@ -77,7 +77,15 @@ function getCertificateName (str) {
 function LoadCerts() {
     var html = "";
     var hasCert = false;
-    var arrayCerts = document.activeX.GetCertArr();
+    var myAx;
+    try {
+        myAx = new ActiveXObject("EInvoiceSignPlugin.EInvoiceSignActiveX");
+    } catch (ex) {
+        alert("Chức năng đọc chữ ký số chỉ hoạt động trên IE với Sercurity level : low và đã cài đặt plugin");
+        return;
+    }
+    
+    var arrayCerts = myAx.GetCertArr();
     for (idx = 0; idx < arrayCerts.length; idx++) {
         var serialNumber = arrayCerts[idx].SerialNumber;
         var isExistedCertificate = false; //token da dang ky hay chua

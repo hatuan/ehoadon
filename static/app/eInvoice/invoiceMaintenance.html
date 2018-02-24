@@ -9,14 +9,14 @@
                     <div class="col">
                         <div class="form-group">
                             <label class="control-label" for="FormNumber">Form Number</label>
-                            <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditInvoice.FormReleaseID" ng-options="s.ID as s.Description for s in eInvoiceFormTypes" required>
+                            <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditInvoice.FormReleaseID" ng-options="s.ID as s.Description for s in eInvoiceFormTypes" required ng-disabled="isViewState()">
                                 <option value="">--Select --</option>
                             </select>
                         </div>
                         <div class="row">
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="InvoiceDate">Inv Date</label>
-                                <input type="text" class="form-control" name="InvoiceDate" id="InvoiceDate" ng-model="EditInvoice.InvoiceDate" uib-datepicker-popup="d!/M!/yyyy" required/>
+                                <input type="text" class="form-control" name="InvoiceDate" id="InvoiceDate" ng-model="EditInvoice.InvoiceDate" uib-datepicker-popup="d!/M!/yyyy" required ng-readonly="isViewState()"/>
                             </div>
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="InvoiceNo">Inv Number</label>
@@ -41,21 +41,21 @@
                         <div class="row">
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="CustomerID">Customer</label>
-                                <select class="form-control" name="CustomerID" id="CustomerID" ng-model="EditInvoice.CustomerID">
+                                <select class="form-control" name="CustomerID" id="CustomerID" ng-model="EditInvoice.CustomerID" ng-disabled="isViewState()">
                                 </select>
                             </div>
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="CustomerVatNumber">Vat Number</label>
-                                <input type="text" class="form-control" name="CustomerVatNumber" id="CustomerVatNumber" ng-model="EditInvoice.CustomerVatNumber" required capitalize/>
+                                <input type="text" class="form-control" name="CustomerVatNumber" id="CustomerVatNumber" ng-model="EditInvoice.CustomerVatNumber" required capitalize ng-readonly="isViewState()"/>
                             </div>
                             <div class="form-group col-xs-6">
                                 <label class="control-label" for="CustomerName">Customer Name</label>
-                                <input type="text" class="form-control" name="CustomerName" id="CustomerName" ng-model="EditInvoice.CustomerName" required/>
+                                <input type="text" class="form-control" name="CustomerName" id="CustomerName" ng-model="EditInvoice.CustomerName" required ng-readonly="isViewState()"/>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="CustomerAddress">Customer Address</label>
-                            <input type="text" class="form-control" name="CustomerAddress" id="CustomerAddress" ng-model="EditInvoice.CustomerAddress" required/>
+                            <input type="text" class="form-control" name="CustomerAddress" id="CustomerAddress" ng-model="EditInvoice.CustomerAddress" required ng-readonly="isViewState()"/>
                         </div>
                     </div>
                 </div>
@@ -63,30 +63,30 @@
                     <div class="row">
                         <div class="form-group col-xs-4">
                             <label class="control-label" for="CustomerContactName">Contact Name</label>
-                            <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName"/>
+                            <input type="text" class="form-control" name="CustomerContactName" id="CustomerContactName" ng-model="EditInvoice.CustomerContactName" ng-readonly="isViewState()"/>
                         </div>
                         <div class="form-group col-xs-4">
                             <label class="control-label" for="CustomerContactPhone">Contact Phone</label>
-                            <input type="text" class="form-control" name="CustomerContactPhone" id="CustomerContactPhone" ng-model="EditInvoice.CustomerContactPhone"/>
+                            <input type="text" class="form-control" name="CustomerContactPhone" id="CustomerContactPhone" ng-model="EditInvoice.CustomerContactPhone" ng-readonly="isViewState()"/>
                         </div>
                         <div class="form-group col-xs-4">
                             <label class="control-label" for="CustomerContactEmail">Contact Email</label>
-                            <input type="text" class="form-control" name="CustomerContactEmail" id="CustomerContactEmail" ng-model="EditInvoice.CustomerContactEmail"/>
+                            <input type="text" class="form-control" name="CustomerContactEmail" id="CustomerContactEmail" ng-model="EditInvoice.CustomerContactEmail" ng-readonly="isViewState()"/>
                         </div>
                     </div>
                     <hr>
                     <div class="row">
                         <div class="form-group col-xs-3">
                             <label class="control-label" for="PayType">Pay Type</label>
-                            <input type="text" class="form-control" name="PayType" id="PayType" ng-model="EditInvoice.PayType"/>
+                            <input type="text" class="form-control" name="PayType" id="PayType" ng-model="EditInvoice.PayType" ng-readonly="isViewState()"/>
                         </div>
                         <div class="form-group col-xs-3">
                             <label class="control-label" for="CustomerBankAccount">Bank Account</label>
-                            <input type="text" class="form-control" name="CustomerBankAccount" id="CustomerBankAccount" ng-model="EditInvoice.CustomerBankAccount"/>
+                            <input type="text" class="form-control" name="CustomerBankAccount" id="CustomerBankAccount" ng-model="EditInvoice.CustomerBankAccount" ng-readonly="isViewState()"/>
                         </div>
                         <div class="form-group col-xs-6">
                             <label class="control-label" for="CustomerBankName">Bank Name</label>
-                            <input type="text" class="form-control" name="CustomerBankName" id="CustomerBankName" ng-model="EditInvoice.CustomerBankName"/>
+                            <input type="text" class="form-control" name="CustomerBankName" id="CustomerBankName" ng-model="EditInvoice.CustomerBankName" ng-readonly="isViewState()"/>
                         </div>
                     </div>
                     <hr>
@@ -137,29 +137,29 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <select class="form-control item-code" name="ItemID[]" id="ItemID_{{$index + 1}}" ng-model="invoiceLine.ItemID">
+                                                <select class="form-control item-code" name="ItemID[]" id="ItemID_{{$index + 1}}" ng-model="invoiceLine.ItemID" ng-disabled="isViewState()">
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:300px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="Description[]" id="Description_{{$index + 1}}" ng-model="invoiceLine.Description" />
+                                                <input type="text" class="form-control" name="Description[]" id="Description_{{$index + 1}}" ng-model="invoiceLine.Description" ng-readonly="isViewState()"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <select class="form-control item-code" name="UomID[]" id="UomID_{{$index + 1}}" ng-model="invoiceLine.UomID">
+                                                <select class="form-control item-code" name="UomID[]" id="UomID_{{$index + 1}}" ng-model="invoiceLine.UomID" ng-disabled="isViewState()">
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input class="form-control" name="Quantity[]" id="Quantity_{{$index + 1}}" ng-model="invoiceLine.Quantity" awnum="quantity" ng-change="validLine('Quantity', invoiceLine)"/>
+                                                <input class="form-control" name="Quantity[]" id="Quantity_{{$index + 1}}" ng-model="invoiceLine.Quantity" awnum="quantity" ng-change="validLine('Quantity', invoiceLine)" ng-readonly="isViewState()"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input class="form-control" name="UnitPrice[]" id="UnitPrice_{{$index + 1}}" ng-model="invoiceLine.UnitPrice" awnum="price" ng-change="validLine('UnitPrice', invoiceLine)"/>
+                                                <input class="form-control" name="UnitPrice[]" id="UnitPrice_{{$index + 1}}" ng-model="invoiceLine.UnitPrice" awnum="price" ng-change="validLine('UnitPrice', invoiceLine)" ng-readonly="isViewState()"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
@@ -169,18 +169,18 @@
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes" ng-change="validLine('VatType', invoiceLine)">
+                                                <select class="form-control" name="Vat[]" id="Vat_{{$index + 1}}" ng-model="invoiceLine.Vat" ng-options="s.Code as s.Name for s in Constants.VatTypes" ng-change="validLine('VatType', invoiceLine)" ng-disabled="isViewState()">
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount" ng-change="validLine('AmountVat', invoiceLine)" ng-readonly="invoiceLine.Vat==Constants.VatTypes[0].Code || invoiceLine.Vat==Constants.VatTypes[1].Code"/>
+                                                <input type="text" class="form-control" name="AmountVat[]" id="AmountVat_{{$index + 1}}" ng-model="invoiceLine.AmountVat" awnum="amount" ng-change="validLine('AmountVat', invoiceLine)" ng-readonly="invoiceLine.Vat==Constants.VatTypes[0].Code || invoiceLine.Vat==Constants.VatTypes[1].Code || isViewState()"/>
                                             </div>
                                         </div>
                                         <div class="col grid-static-col" style="width:150px; float:left;">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="AmountPayment[]" id="AmountPayment_{{$index + 1}}" ng-model="invoiceLine.AmountPayment" awnum="amount" ng-change="validLine('AmountPayment', invoiceLine)"/>
+                                                <input type="text" class="form-control" name="AmountPayment[]" id="AmountPayment_{{$index + 1}}" ng-model="invoiceLine.AmountPayment" awnum="amount" ng-change="validLine('AmountPayment', invoiceLine)" ng-readonly="isViewState()"/>
                                             </div>
                                         </div>
                                         <div class="col" style="width:50px; float:left;">
@@ -194,7 +194,7 @@
                         <div class="small form-clickable-section grid-footer">
                             <div class="row">
                                 <div class="col-sm-6 grid-buttons">
-                                    <button type="reset" class="btn btn-xs btn-default grid-add-row" ng-click="addLine()"> Add new row</button>
+                                    <button type="reset" class="btn btn-xs btn-default grid-add-row" ng-click="addLine()" ng-if="isEditState()"> Add new row</button>
                                 </div>
                             </div>
                         </div>
@@ -204,8 +204,12 @@
         <!-- </form> -->
     </div>
 </div>
-<div class="modal-footer">
-    <button class="btn btn-info pull-left" type="button" ng-click="ok(InvoiceMaintenanceForm, InvoiceLinesMaintenanceForm, true)">Report</button>
-    <button class="btn btn-primary" type="button" ng-click="ok(InvoiceMaintenanceForm, InvoiceLinesMaintenanceForm, false)">OK</button>
+<div class="modal-footer" ng-if="isViewState()">
+    <button class="btn btn-info pull-left" type="button" ng-click="report()">Report</button>
+    <button class="btn btn-primary" type="button" ng-click="edit()">Edit</button>
+    <button class="btn btn-warning" type="button" ng-click="close()">Close</button>
+</div>
+<div class="modal-footer" ng-if="isEditState()">
+    <button class="btn btn-primary" type="button" ng-click="ok(InvoiceMaintenanceForm, InvoiceLinesMaintenanceForm)">OK</button>
     <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
 </div>

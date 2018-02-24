@@ -14,6 +14,9 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.EditInvoice = editInvoice;
             $scope.EditInvoice.InvoiceLines = [];
             $scope.selectViewReport = false;
+            $scope.documentChanged = false;
+            $scope.documentState = $scope.Constants.DocumentStates.View;
+            $scope.originalDocument = {};
 
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                 $scope.EditInvoice.InvoiceDate = $rootScope.Preference.WorkingDate;
@@ -26,12 +29,21 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                 $scope.EditInvoice.RecModified = new Date();
 
                 $scope.EditInvoice.InvoiceLines = [];
+                $scope.documentState = $scope.Constants.DocumentStates.New;
             } else {
                 //invoice se duoc lay tai $scope.getInvoice sau khi thuc hien $scope.getFormReleases();    
             }
 
             $scope.getFormReleases();
         };
+
+        $scope.isViewState = function() {
+            return $scope.documentState === $scope.Constants.DocumentStates.View;
+        }
+
+        $scope.isEditState = function() {
+            return ($scope.documentState === $scope.Constants.DocumentStates.Edit || $scope.documentState === $scope.Constants.DocumentStates.New);
+        }
 
         $scope.$watch('$viewContentLoaded', 
             function() { 
@@ -126,7 +138,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             }
         };
 
-        $scope.ok = function(form, formDetail, _selectViewReport) {
+        $scope.ok = function(form, formDetail) {
             if (form.validate() && formDetail.validate()) {
                 
                 var _post = {};
@@ -163,24 +175,57 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
 
                     _post.InvoiceLines[i] = _postInvoiceLine;
                 }
-                $scope.selectViewReport = _selectViewReport;
                 eInvoiceService.updateInvoice(_post, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
             }
         };
+
+        $scope.report = function() {
+            var _result = {};
+            _result.EditInvoice = $scope.EditInvoice;
+            _result.selectViewReport = true;
+
+            $uibModalInstance.close(_result);
+        }
+
+        $scope.edit = function() {
+            $scope.documentChanged = false;
+            $scope.originalDocument = _.assign({}, $scope.EditInvoice);
+            $scope.documentState = $scope.Constants.DocumentStates.Edit;
+        };
         
         $scope.cancel = function() {
-            $uibModalInstance.dismiss('cancel');
+            $scope.documentChanged = false;
+            if ($scope.documentState == $scope.Constants.DocumentStates.New) {
+                $uibModalInstance.dismiss('cancel');    
+            } else {
+                $scope.documentState = $scope.Constants.DocumentStates.View;
+                //TODO : get document from server
+                $scope.EditInvoice = _.assign({}, $scope.originalDocument);
+            }
+        };
+
+        $scope.close = function() {
+            if(!$scope.documentChanged) {
+                $uibModalInstance.dismiss('cancel');
+            } else {
+                var _result = {};
+                _result.EditInvoice = _.assign({}, $scope.EditInvoice);
+                _result.selectViewReport = false;
+                $uibModalInstance.close(_result);    
+            }
         };
 
         $scope.invoiceUpdateCompleted = function(response, status) {
-            var _result = new Object();
-            _result.EditInvoice = response.Data.eInvoice;
-            _result.EditInvoice.InvoiceDate = new moment.unix(_result.EditInvoice.InvoiceDate).toDate();
-            _result.EditInvoice.RecCreated = new moment.unix(_result.EditInvoice.RecCreated).toDate();
-            _result.EditInvoice.RecModified = new moment.unix(_result.EditInvoice.RecModified).toDate();
-            _result.selectViewReport = $scope.selectViewReport;
+            var _result = {};
+            _result = response.Data.eInvoice;
+            _result.InvoiceDate = new moment.unix(_result.InvoiceDate).toDate();
+            _result.RecCreated = new moment.unix(_result.RecCreated).toDate();
+            _result.RecModified = new moment.unix(_result.RecModified).toDate();
 
-            $uibModalInstance.close(_result);
+            $scope.EditInvoice = _.assign({}, _result);
+            $scope.originalDocument = _.assign({}, $scope.EditInvoice);
+            $scope.documentState = $scope.Constants.DocumentStates.View;
+            $scope.documentChanged = true;
         };
 
         $scope.invoiceUpdateError = function(response, status) {

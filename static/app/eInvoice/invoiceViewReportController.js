@@ -39,8 +39,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
 
         $scope.signDocument = function() {
             if(!angular.isUndefinedOrNull($scope.report)) {
-                $("#pdfBase64").attr('value', '');
-                $("#selectedCert").attr('value', '');
                 var settings = new Stimulsoft.Report.Export.StiPdfExportSettings();
                 // Create an PDF service instance.
                 var service = new Stimulsoft.Report.Export.StiPdfExportService();
@@ -53,14 +51,32 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                 // Get PDF data from MemoryStream object
                 var data = stream.toArray(); //or var data = $scope.report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf);
                 var dataBase64 = arrayBufferToBase64(data);
+                var myAx;
+                try {
+                    myAx = new ActiveXObject("EInvoiceSignPlugin.EInvoiceSignActiveX");
+                } catch (ex) {
+                    alert("Chức năng đọc chữ ký số chỉ hoạt động trên IE với Sercurity level : low và đã cài đặt plugin");
+                    return;
+                }
 
-                var signedInfo = document.activeX.signDocument(dataBase64, 
-                    $scope.Token.TokenSerialNumber, 
-                    $scope.EditInvoice.ID, 
-                    $scope.EditInvoice.Version + '', 
-                    $scope.Constants.InvoiceStatus[1].Code + '', 
-                    $auth.getToken());
-                
+                try
+                {
+                    var signedInfo = myAx.SignDocument(dataBase64, 
+                        $scope.Token.TokenSerialNumber, 
+                        $scope.EditInvoice.ID, 
+                        $scope.EditInvoice.Version + '', 
+                        $scope.Constants.InvoiceStatus[1].Code + '', 
+                        $auth.getToken());
+                } catch(err) {
+                    settings = null;
+                    stream = null;
+                    service = null;
+                    data = null;
+                    dataBase64 = null;
+                    
+                    alert(err.message);
+                    return;
+                }     
                 settings = null;
                 stream = null;
                 service = null;
@@ -99,9 +115,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
         };
         
         $scope.$on('modal.closing', function(event, reason, closed){
-            //$("#pdfBase64").val(''); //set val of input
-            //$("#pdfBase64").attr('value', '') //set value of input
-            $scope.appletHtml = null;
             $uibModalInstance.result.EditInvoice = $scope.EditInvoice;
         });
 

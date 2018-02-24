@@ -55,5 +55,16 @@ define(['angular'], function (angular) {
             {Code : 3, Name: 'Hight'},
             {Code : 4, Name: 'Very Hight'},
         ],
+        DocumentStates: {
+            New: "New",
+            View: "View",
+            Edit: "Edit",
+        }
     })
+
+    constantModule.constant('DocumentStates', {
+        New: "New",
+        View: "View",
+        Edit: "Edit",
+    });
 });

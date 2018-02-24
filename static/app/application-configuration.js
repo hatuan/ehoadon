@@ -304,7 +304,7 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
                     });
 
                     // hide the spinner bar on rounte change success(after the content loaded)
-                    $rootScope.$on('$stateChangeSuccess', function(event) {
+                    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
                         element.addClass('hide'); // hide spinner bar
                         $('body').removeClass('page-on-load'); // remove page loading indicator
                         Layout.setAngularJsMainMenuActiveLink('match', null, event.currentScope.$state); // activate selected link in the sidebar menu
@@ -316,12 +316,12 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
                     });
 
                     // handle errors
-                    $rootScope.$on('$stateNotFound', function() {
+                    $rootScope.$on('$stateNotFound', function(event, unfoundState, fromState, fromParams) {
                         element.addClass('hide'); // hide spinner bar
                     });
 
                     // handle errors
-                    $rootScope.$on('$stateChangeError', function() {
+                    $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
                         element.addClass('hide'); // hide spinner bar
                     });
                 }

@@ -184,6 +184,7 @@ define(['angularAMD'], function (angularAMD) {
                 },
                 resolve: {
                     redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
+                    Preference: _getPreference,
                 }
             })
             ;
@@ -208,6 +209,24 @@ define(['angularAMD'], function (angularAMD) {
                 }, 10);
                 defer.resolve(); // always return defer.resolve()
             }
+            return defer.promise;
+        }
+
+        function _getPreference($q, $http, $rootScope, moment) {
+            var defer = $q.defer();
+            if($rootScope.Preference == null  || $rootScope.Preference == undefined) {
+                $http({ method: 'GET', url: '/api/user/preference' })
+                    .success(function(response){
+                        $rootScope.Preference = response.Data.Preference;
+                        $rootScope.Preference.WorkingDateUnix = $rootScope.Preference.WorkingDate;
+                        $rootScope.Preference.WorkingDate = new moment.unix($rootScope.Preference.WorkingDate).toDate();
+                        
+                        defer.resolve($rootScope.Preference);
+                    });
+            } else {
+                defer.resolve($rootScope.Preference);
+            }
+
             return defer.promise;
         }
     }
