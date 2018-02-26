@@ -248,13 +248,17 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.originalDocument = $.extend(true, {}, $scope.EditInvoice);
             $scope.documentChanged = true;
 
-            $confirm({text: 'Document signed successfuly', title: 'Sign Result', ok: 'Yes'});
+            alert('Document signed successfuly');
         };
 
         $scope.signError = function(response, status) {
-            $confirm({text: 'Document signed error', title: 'Sign Error', ok: 'Yes'});
+            alert('Document signed error');
             alertsService.RenderErrorMessage(response.Error);
         };
+
+        $scope.sendDocument = function() {
+            
+        }
 
         $scope.getInvoice = function(_ID) {
             var invoiceInquiry = new Object();

@@ -1,5 +1,15 @@
 <div class="modal-header">
-    <button class="btn btn-info pull-right" type="button" ng-click="signDocument()"><span class="icon-note"> </span> Sign Document</button>
+    <button class="btn btn-info pull-right" type="button" ng-click="signDocument()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code"><span class="icon-note"> </span> Sign Document</button>
+    <div class="btn-group pull-right" uib-dropdown>
+        <button id="split-button" class="btn btn-info" type="button"  ng-click="sendDocument()" ng-if="EditInvoice.Status != Constants.InvoiceStatus[0].Code"><span class="icon-envelope"> </span> Send Document</button>
+        <button type="button" class="btn btn-info" uib-dropdown-toggle>
+          <span class="caret"></span>
+          <span class="sr-only">Split button!</span>
+        </button>
+        <ul class="pull-right dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+          <li role="menuitem"><a ng-click="downloadDocument()">Download signed file</a></li>
+        </ul>
+    </div>
     <h3 class="modal-title" id="modal-title" >Invoice Maintenance</h3>
 </div>
 <div class="modal-body row" id="modal-body" ng-init="initializeController()">
@@ -206,8 +216,8 @@
     </div>
 </div>
 <div class="modal-footer" ng-if="isViewState()">
-    <button class="btn btn-info pull-left" type="button" ng-click="report()">Report</button>
-    <button class="btn btn-primary" type="button" ng-click="edit()">Edit</button>
+    <button class="btn btn-info pull-left" type="button" ng-click="report()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code">Report</button>
+    <button class="btn btn-primary" type="button" ng-click="edit()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code">Edit</button>
     <button class="btn btn-warning" type="button" ng-click="close()">Close</button>
 </div>
 <div class="modal-footer" ng-if="isEditState()">
