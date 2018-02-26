@@ -20,5 +20,9 @@ define(['angularAMD', 'ajaxService'], function (angularAMD) {
         this.getInvoice = function (data, successFunction, errorFunction) {
             ajaxService.AjaxGetWithData(data, "/api/einvoice", successFunction, errorFunction);
         };    
+
+        this.getInvoiceForSign = function (data, successFunction, errorFunction) {
+            ajaxService.AjaxGetWithData(data, "/api/einvoicesign", successFunction, errorFunction);
+        }; 
     }]);
 });

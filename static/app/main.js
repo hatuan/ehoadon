@@ -8,7 +8,7 @@ require.config({
 
     baseUrl: "",
 
-    //urlArgs: "bust=" + (new Date()).getTime(),
+    urlArgs: "bust=" + (new Date()).getTime(),
     
     // alias libraries paths
     paths: {
@@ -68,6 +68,7 @@ require.config({
         'alertsService': 'app/common/services/alertsServices',
         'stateConfig': 'app/common/config/stateConfig',
         'myApp.Constants': 'app/common/constants',
+        'myApp.Values': 'app/common/values',
         'myApp.Capitalize': 'app/common/capitalize',
         'myApp.Search': 'app/common/directives/searchForm',
         'myApp.Header': 'app/main/headerController',
@@ -82,7 +83,8 @@ require.config({
         'eInvoiceItemService': 'app/eInvoice/itemService',
         'eInvoiceFormTypeService': 'app/eInvoice/formTypeService',
         'eInvoiceFormReleaseService': 'app/eInvoice/formReleaseService',
-        'eInvoiceService': 'app/eInvoice/invoiceService'
+        'eInvoiceService': 'app/eInvoice/invoiceService',
+        'eInvoiceSignService': 'app/eInvoice/signService',
     },
     // Add angular modules that does not support AMD out of the box, put it in a shim
     shim: {

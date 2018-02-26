@@ -1,4 +1,5 @@
 <div class="modal-header">
+    <button class="btn btn-info pull-right" type="button" ng-click="signDocument()"><span class="icon-note"> </span> Sign Document</button>
     <h3 class="modal-title" id="modal-title" >Invoice Maintenance</h3>
 </div>
 <div class="modal-body row" id="modal-body" ng-init="initializeController()">
@@ -8,8 +9,8 @@
                 <div class="col-xs-6">
                     <div class="col">
                         <div class="form-group">
-                            <label class="control-label" for="FormNumber">Form Number</label>
-                            <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditInvoice.FormReleaseID" ng-options="s.ID as s.Description for s in eInvoiceFormTypes" required ng-disabled="isViewState()">
+                            <label class="control-label" for="FormNumber">Form Release</label>
+                            <select class="form-control" id="FormNumber" name="FormNumber" ng-model="EditInvoice.FormReleaseID" ng-options="s.ID as s.Description for s in FormReleases" required ng-disabled="isViewState()">
                                 <option value="">--Select --</option>
                             </select>
                         </div>

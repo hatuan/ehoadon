@@ -61,10 +61,4 @@ define(['angular'], function (angular) {
             Edit: "Edit",
         }
     })
-
-    constantModule.constant('DocumentStates', {
-        New: "New",
-        View: "View",
-        Edit: "Edit",
-    });
 });

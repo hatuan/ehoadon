@@ -102,6 +102,9 @@ var ErrEInvoiceFatal = errors.New("EInvoice has fatal error")
 // ErrEInvoiceValidate indicates there was validate error
 var ErrEInvoiceValidate = errors.New("EInvoice has validate error")
 
+// ErrEInvoiceSignFull indicates there was validate error
+var ErrEInvoiceSignFull = errors.New("ErrEInvoiceSignFull")
+
 // Validate checks to make sure there are no invalid fields in a submitted
 func (c *EInvoice) Validate() map[string]InterfaceArray {
 	validationErrors := make(map[string]InterfaceArray)
@@ -583,5 +586,104 @@ func PostEInvoiceFile(postData EInvoiceFile) (EInvoice, TransactionalInformation
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 	}
 
+	invoiceLines, transInfo := GetEInvoiceLinesByHeaderID(*postData.ID)
+	if !transInfo.ReturnStatus {
+		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
+	}
+	getData.InvoiceLines = invoiceLines
+
+	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
+}
+
+// GetEInvoiceByIDForSign returns the EInvoice that the given id corresponds to. If no EInvoice is found, an error is thrown.
+func GetEInvoiceByIDForSign(id int64) (EInvoice, TransactionalInformation) {
+	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
+	if err != nil {
+		log.Error(err)
+		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+	defer db.Close()
+
+	tx := db.MustBegin()
+
+	//get invoice data
+	getData := EInvoice{}
+	err = tx.Get(&getData, "SELECT ehd_invoice.*, "+
+		" ehd_form_release.release_total as form_release_total, "+
+		" ehd_form_release.release_from as form_release_from, "+
+		" ehd_form_release.release_to as form_release_to, "+
+		" ehd_form_release.release_used as form_release_used, "+
+		" ehd_form_release.release_date as form_release_date, "+
+		" ehd_form_release.start_date as form_release_start_date, "+
+		" ehd_form_release.tax_authorities_status as form_release_tax_authorities_status, "+
+		" ehd_form_release.form_type_id  as form_type_id, "+
+		" ehd_form_type.number_form as form_type_number_form, "+
+		" ehd_form_type.symbol as form_type_symbol, "+
+		" ehd_customer.code as customer_code, "+
+		" user_created.name as rec_created_by_user, "+
+		" user_modified.name as rec_modified_by_user, "+
+		" COALESCE(user_signed.name, '') as signed_by_user, "+
+		" organization.description as organization "+
+		"	FROM ehd_invoice "+
+		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id "+
+		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+
+		"		LEFT JOIN user_profile AS user_signed ON ehd_invoice.signed_by = user_signed.id "+
+		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "+
+		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
+		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id "+
+		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
+		"	WHERE ehd_invoice.id=$1 FOR UPDATE OF ehd_invoice, ehd_form_release", id)
+
+	if err != nil && err == sql.ErrNoRows {
+		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
+	} else if err != nil {
+		log.Error(err)
+		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+	if getData.InvoiceNo == "" {
+		//Check release number
+		formRelease := EInvoiceFormRelease{
+			ID:           &getData.FormReleaseID,
+			ReleaseTotal: getData.FormReleaseTotal,
+			ReleaseFrom:  getData.FormReleaseFrom,
+			ReleaseTo:    getData.FormReleaseTo,
+			ReleaseUsed:  getData.FormReleaseUsed,
+			StartDate:    getData.FormReleaseStartDate,
+		}
+		if success, transInfo := CheckFormReleaseForSign(formRelease); !success {
+			tx.Rollback()
+			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
+		}
+
+		sqlString := "WITH UPDATED AS (UPDATE ehd_form_release SET release_used = release_used + 1 WHERE ehd_form_release.id = $1 RETURNING *)" +
+			" SELECT release_from + release_used -1 FROM UPDATED"
+
+		currentNo := int32(0)
+		err = tx.Get(&currentNo, sqlString, getData.FormReleaseID)
+		if err != nil {
+			tx.Rollback()
+			log.Error(err)
+			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+		}
+
+		sqlString = "UPDATE ehd_invoice SET invoice_no = $1 WHERE ehd_invoice.id = $2"
+		_, err = tx.Exec(sqlString, currentNo, id)
+		if err != nil {
+			tx.Rollback()
+			log.Error(err)
+			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+		}
+
+		getData.InvoiceNo = strconv.FormatInt(int64(currentNo), 10)
+	}
+
+	invoiceLines, transInfo := GetEInvoiceLinesByHeaderID(id)
+	if !transInfo.ReturnStatus {
+		tx.Rollback()
+		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
+	}
+	getData.InvoiceLines = invoiceLines
+
+	tx.Commit()
 	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }

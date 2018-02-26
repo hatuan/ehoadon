@@ -3,14 +3,14 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService'], function(angularAMD, $, BigNumber) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$auth', '$filter' , 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
+define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', 'eInvoiceSignService'], function(angularAMD, $, BigNumber) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$auth', '$filter' , 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', 'eInvoiceSignService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
-    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, $filter, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, $stateParams, $confirm, Constants, editInvoice) {
+    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, $filter, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, eInvoiceSignService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
-            $scope.eInvoiceFormTypes = [];
+            $scope.FormReleases = [];
             $scope.EditInvoice = editInvoice;
             $scope.EditInvoice.InvoiceLines = [];
             $scope.selectViewReport = false;
@@ -31,7 +31,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                 $scope.EditInvoice.InvoiceLines = [];
                 $scope.documentState = $scope.Constants.DocumentStates.New;
             } else {
-                //invoice se duoc lay tai $scope.getInvoice sau khi thuc hien $scope.getFormReleases();    
+                //invoice se duoc lay tai $scope.getInvoice sau khi thuc hien $scope.getFormReleases();
             }
 
             $scope.getFormReleases();
@@ -151,7 +151,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                     $scope.EditInvoice.RecModifiedByID = $rootScope.currentUser.ID;
                     $scope.EditInvoice.RecModified = new Date();
                 }
-                _post = _.assign({}, $scope.EditInvoice);
+                _post = $.extend(true, {}, $scope.EditInvoice);
                 _post.InvoiceDate = new moment(_post.InvoiceDate).unix();
                 _post.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
                 _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
@@ -169,7 +169,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                         invoiceLine.RecModifiedByID = $rootScope.currentUser.ID;
                         invoiceLine.RecModified = new Date();
                     }
-                    _postInvoiceLine = _.assign({}, invoiceLine);
+                    _postInvoiceLine = $.extend(true, {}, invoiceLine);
                     _postInvoiceLine.RecCreated = new moment(invoiceLine.RecCreated).unix();
                     _postInvoiceLine.RecModified = new moment(invoiceLine.RecModified).unix();
 
@@ -177,6 +177,23 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                 }
                 eInvoiceService.updateInvoice(_post, $scope.invoiceUpdateCompleted, $scope.invoiceUpdateError)
             }
+        };
+
+        $scope.invoiceUpdateCompleted = function(response, status) {
+            var _result = {};
+            _result = response.Data.eInvoice;
+            _result.InvoiceDate = new moment.unix(_result.InvoiceDate).toDate();
+            _result.RecCreated = new moment.unix(_result.RecCreated).toDate();
+            _result.RecModified = new moment.unix(_result.RecModified).toDate();
+
+            $scope.EditInvoice = $.extend(true, {}, _result);
+            $scope.originalDocument = $.extend(true, {}, $scope.EditInvoice);
+            $scope.documentState = $scope.Constants.DocumentStates.View;
+            $scope.documentChanged = true;
+        };
+
+        $scope.invoiceUpdateError = function(response, status) {
+            alertsService.RenderErrorMessage(response.Error);
         };
 
         $scope.report = function() {
@@ -189,7 +206,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
 
         $scope.edit = function() {
             $scope.documentChanged = false;
-            $scope.originalDocument = _.assign({}, $scope.EditInvoice);
+            $scope.originalDocument = $.extend(true, {}, $scope.EditInvoice);
             $scope.documentState = $scope.Constants.DocumentStates.Edit;
         };
         
@@ -200,7 +217,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             } else {
                 $scope.documentState = $scope.Constants.DocumentStates.View;
                 //TODO : get document from server
-                $scope.EditInvoice = _.assign({}, $scope.originalDocument);
+                $scope.EditInvoice = $.extend(true, {}, $scope.originalDocument);
             }
         };
 
@@ -209,26 +226,33 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                 $uibModalInstance.dismiss('cancel');
             } else {
                 var _result = {};
-                _result.EditInvoice = _.assign({}, $scope.EditInvoice);
+                _result.EditInvoice = $.extend(true, {}, $scope.EditInvoice);
                 _result.selectViewReport = false;
                 $uibModalInstance.close(_result);    
             }
         };
 
-        $scope.invoiceUpdateCompleted = function(response, status) {
+        $scope.signDocument = function() {
+            var _signDocument = $.extend(true, {}, $scope.EditInvoice);
+            eInvoiceSignService.SignDocument(_signDocument, $scope.signCompleted, $scope.signError)
+        }
+
+        $scope.signCompleted = function(response) {
             var _result = {};
             _result = response.Data.eInvoice;
             _result.InvoiceDate = new moment.unix(_result.InvoiceDate).toDate();
             _result.RecCreated = new moment.unix(_result.RecCreated).toDate();
             _result.RecModified = new moment.unix(_result.RecModified).toDate();
 
-            $scope.EditInvoice = _.assign({}, _result);
-            $scope.originalDocument = _.assign({}, $scope.EditInvoice);
-            $scope.documentState = $scope.Constants.DocumentStates.View;
+            $scope.EditInvoice = $.extend(true,  {}, _result);
+            $scope.originalDocument = $.extend(true, {}, $scope.EditInvoice);
             $scope.documentChanged = true;
+
+            $confirm({text: 'Document signed successfuly', title: 'Sign Result', ok: 'Yes'});
         };
 
-        $scope.invoiceUpdateError = function(response, status) {
+        $scope.signError = function(response, status) {
+            $confirm({text: 'Document signed error', title: 'Sign Error', ok: 'Yes'});
             alertsService.RenderErrorMessage(response.Error);
         };
 
@@ -273,13 +297,13 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             eInvoiceFormReleaseService.getFormReleases(
                 formReleaseInquiry, 
                 function(response, status){
-                    $scope.eInvoiceFormTypes = response.Data.eInvoiceFormReleases;
-                    for (var i = 0, len = $scope.eInvoiceFormTypes.length; i < len; i++) {
-                        $scope.eInvoiceFormTypes[i].ReleaseDate = new moment.unix($scope.eInvoiceFormTypes[i].ReleaseDate).toDate();
-                        $scope.eInvoiceFormTypes[i].StartDate = new moment.unix($scope.eInvoiceFormTypes[i].StartDate).toDate();
+                    $scope.FormReleases = response.Data.eInvoiceFormReleases;
+                    for (var i = 0, len = $scope.FormReleases.length; i < len; i++) {
+                        $scope.FormReleases[i].ReleaseDate = new moment.unix($scope.FormReleases[i].ReleaseDate).toDate();
+                        $scope.FormReleases[i].StartDate = new moment.unix($scope.FormReleases[i].StartDate).toDate();
         
-                        $scope.eInvoiceFormTypes[i].Description = $filter('filter')($scope.Constants.InvoiceTypes, {Code:$scope.eInvoiceFormTypes[i].FormTypeInvoiceType})[0].Name + " - " + $scope.eInvoiceFormTypes[i].FormTypeNumberForm + " - " + $scope.eInvoiceFormTypes[i].FormTypeSymbol;
-                        $scope.eInvoiceFormTypes[i].Description += " (From : " + $scope.eInvoiceFormTypes[i].ReleaseFrom + " - To : " + $scope.eInvoiceFormTypes[i].ReleaseTo + ")";
+                        $scope.FormReleases[i].Description = $filter('filter')($scope.Constants.InvoiceTypes, {Code:$scope.FormReleases[i].FormTypeInvoiceType})[0].Name + " - " + $scope.FormReleases[i].FormTypeNumberForm + " - " + $scope.FormReleases[i].FormTypeSymbol;
+                        $scope.FormReleases[i].Description += " (From : " + $scope.FormReleases[i].ReleaseFrom + " - To : " + $scope.FormReleases[i].ReleaseTo + ")";
                     }
 
                     if (!angular.isUndefinedOrNull($scope.EditInvoice.ID))

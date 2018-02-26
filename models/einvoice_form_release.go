@@ -319,3 +319,12 @@ func DeleteEInvoiceFormReleaseById(orgID int64, ids []string) TransactionalInfor
 	}
 	return TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
+
+func CheckFormReleaseForSign(formRelease EInvoiceFormRelease) (bool, TransactionalInformation) {
+
+	if formRelease.ReleaseUsed == formRelease.ReleaseTotal {
+		return false, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceSignFull.Error()}}
+	}
+
+	return true, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
+}

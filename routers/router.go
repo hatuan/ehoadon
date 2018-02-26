@@ -190,6 +190,12 @@ func InitRoutes() *mux.Router {
 			negroni.HandlerFunc(controllers.API_eInvoice_Id),
 		))
 
+	api.Handle("/einvoicesign",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_eInvoice_Sign),
+		))
+
 	api.Handle("/einvoiceFiles",
 		negroni.New(
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
