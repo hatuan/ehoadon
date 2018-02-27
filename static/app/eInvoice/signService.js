@@ -3,9 +3,9 @@
  */
 define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function (angularAMD, $) {
 
-    var injectParams = ['$auth', '$window', 'moment', '$confirm', 'ajaxService', 'Constants', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'];
+    var injectParams = ['$auth', '$window', '$http', 'moment', '$confirm', 'ajaxService', 'Constants', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'];
 
-    var einvoiceSignFunction = function($auth, $window, moment, $confirm, ajaxService, Constants, clientService, eInvoiceService, eInvoiceFormTypeService) { 
+    var einvoiceSignFunction = function($auth, $window, $http, moment, $confirm, ajaxService, Constants, clientService, eInvoiceService, eInvoiceFormTypeService) { 
         var SignInvoice = {},
             Client = {},
             Token = {},
@@ -165,23 +165,13 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                         'Status' : signedInfo.SignedStatus,
                         'Version' : signedInfo.DocumentVersion
                     };
-    
-                    $.ajax({
-                        url: '/api/einvoiceFiles',
-                        method: "POST",
-                        async: false,
-                        contentType: "application/json;charset=utf-8",
-                        dataType: "json", 
-                        data: JSON.stringify(postData),
-                        beforeSend: function (xhr) {   //Include the bearer token in header
-                            xhr.setRequestHeader("Authorization", signedInfo.JwtToken);
-                        }
+
+                    $http.post('/api/einvoiceFiles', postData)
+                    .success(function (response, status) {
+                        successFunction(response, status);
                     })
-                    .done(function(response) {
-                        successFunction(response)
-                    })
-                    .fail(function(response) {
-                        errorFunction(response)
+                    .error(function (response) {
+                        errorFunction(response);
                     });
                 //}, 50);
             };    

@@ -130,6 +130,7 @@ gulp.task('copy-other', function () {
             '!static/bower_components/**/*.js', 
             'static/jsons/**/*', 
             'static/l10n/**/*', 
+            'static/metronic/**/*',
             'static/reports/**/*', 
             'static/scripts/**/*', 
             '!static/scripts/**/*.js', 

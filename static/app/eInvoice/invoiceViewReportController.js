@@ -36,7 +36,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
             else
                 alert("Report has error : Unknow FormTypeID");
         }
-
+/*
         $scope.signDocument = function() {
             if(!angular.isUndefinedOrNull($scope.report)) {
                 var settings = new Stimulsoft.Report.Export.StiPdfExportSettings();
@@ -109,7 +109,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                 });
             }
         };
-        
+*/
         $scope.cancel = function() {
             $uibModalInstance.dismiss('cancel');
         };
