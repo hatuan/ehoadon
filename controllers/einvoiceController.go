@@ -7,6 +7,7 @@ import (
 	"erpvietnam/ehoadon/log"
 	"erpvietnam/ehoadon/models"
 	"erpvietnam/ehoadon/settings"
+	"erpvietnam/ehoadon/utils"
 	"fmt"
 	"os"
 	"strconv"
@@ -241,5 +242,70 @@ func API_eInvoice_Sign(w http.ResponseWriter, r *http.Request, next http.Handler
 			return
 		}
 		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData}, IsAuthenticated: true}, http.StatusOK)
+	}
+}
+
+func API_eInvoice_Mail(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	switch {
+	case r.Method == "POST":
+		postData := models.EInvoice{}
+		err := json.NewDecoder(r.Body).Decode(&postData)
+		if err != nil {
+			log.Error(err.Error())
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true}, http.StatusBadRequest)
+			return
+		}
+
+		client := models.Client{}
+		err = client.Get(postData.ClientID)
+		if err != nil {
+			log.Error(err.Error())
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true}, http.StatusBadRequest)
+			return
+		}
+
+		mailInvoice := struct {
+			models.EInvoice
+			ClientDescription string
+			ClientVatNumber   string
+			ClientContactName string
+			ClientMobile      string
+		}{
+			EInvoice: models.EInvoice{
+				ID:                  postData.ID,
+				CustomerContactName: postData.CustomerContactName,
+				InvoiceDate:         postData.InvoiceDate,
+				InvoiceNo:           postData.InvoiceNo,
+				TotalPayment:        postData.TotalPayment,
+				InvoiceFileID:       postData.InvoiceFileID,
+			},
+			ClientDescription: client.Description,
+			ClientVatNumber:   client.VatNumber,
+			ClientContactName: client.ContactName,
+			ClientMobile:      client.Mobile,
+		}
+		mailSubject := fmt.Sprintf("Thông báo V/v gửi hóa đơn điện tử, số hóa đơn: %s - %s", postData.InvoiceNo, postData.InvoiceDate)
+		mail := utils.NewMail(postData.CustomerContactEmail, mailSubject, "")
+
+		invoiceFileName := fmt.Sprintf("%s%s.pdf", settings.Settings.InvoiceFilePath, postData.InvoiceFileID.UUID)
+		err = mail.Attach(invoiceFileName)
+		if err != nil {
+			log.Error(err.Error())
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true}, http.StatusInternalServerError)
+			return
+		}
+
+		err = mail.ParseTemplate("./static/templates/mailInvoice.html", mailInvoice)
+		if err != nil {
+			log.Error(err.Error())
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true}, http.StatusInternalServerError)
+			return
+		}
+		ok, err := mail.SendEmail()
+		if !ok {
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true}, http.StatusInternalServerError)
+			return
+		}
+		JSONResponse(w, models.Response{ReturnStatus: true, ReturnMessage: []string{"Mail sended successfully"}, IsAuthenticated: true}, http.StatusOK)
 	}
 }

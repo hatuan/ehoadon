@@ -3,10 +3,10 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', 'eInvoiceSignService'], function(angularAMD, $, BigNumber) {
-    var injectParams = ['$scope', '$rootScope', '$state', '$auth', '$filter' , 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', 'eInvoiceSignService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
+define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', 'eInvoiceSignService', 'einvoiceMailService'], function(angularAMD, $, BigNumber) {
+    var injectParams = ['$scope', '$rootScope', '$state', '$auth', '$filter' , 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'eInvoiceService', 'eInvoiceFormReleaseService', 'eInvoiceCustomerService', 'eInvoiceItemService', 'eInvoiceItemUomService', 'eInvoiceSignService', 'einvoiceMailService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
-    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, $filter, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, eInvoiceSignService, $stateParams, $confirm, Constants, editInvoice) {
+    var invoiceMaintenanceController = function($scope, $rootScope, $state, $auth, $filter, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, eInvoiceService, eInvoiceFormReleaseService, eInvoiceCustomerService, eInvoiceItemService, eInvoiceItemUomService, eInvoiceSignService, einvoiceMailService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
@@ -257,7 +257,19 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
         };
 
         $scope.sendDocument = function() {
+            let _document = $.extend(true, {}, $scope.EditInvoice);
+            _document.InvoiceDate = new moment(_document.InvoiceDate).unix();
+            _document.RecCreated = new moment(_document.RecCreated).unix();
+            _document.RecModified = new moment(_document.RecModified).unix();
+            _document.CustomerContactEmail = "tuanhoanganh@yahoo.com";
             
+            einvoiceMailService.Mail(_document,
+                function(response) {
+                    alert('Document mailed successfuly');
+                }, 
+                function(response) {
+                    alert('Document mailed error');
+                });
         }
 
         $scope.getInvoice = function(_ID) {

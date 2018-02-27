@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>THÔNG BÁO</h1>
+        <h4>V/v cung cấp hóa đơn điện tử</h4>
+        <br/>
+        Kính gửi : {{.CustomerContactName}}<br/>
+        {{.ClientDescription}} (Mã số thuế : {{.ClientVatNumber}}) xin gửi hóa đơn điện tử, thông tin hóa đơn: <br/>
+         - Ngày hóa đơn : {{.InvoiceDate}} <br/>
+         - Số hóa đơn : {{.InvoiceNo}} <br/>
+         - Tổng cộng tiền thanh toán : {{.TotalPayment}} <br/>
+         - Chuỗi xác thực : {{.InvoiceFileID.UUID}} <br/>
+         - Để nhận hóa đơn điện tử : xin hãy kiểm tra file dính kèm <br/>
+         - Để kiểm tra thông tin hóa đơn điện tử nhấn <a href="https://ehoadon.com.vn/">vào đây</a> <br/>
+        <br/> 
+        Thông tin hỗ trợ hóa đơn: <br/>
+         - Đơn vị có thắc mắc xin hãy liên hệ {{.ClientContactName}} - {{.ClientMobile}} <br/>
+        <br/> 
+        Thông tin về hóa đơn điện tử <br/>
+         - Hóa đơn điện tử được quy định theo thông tư số 32/2011/TT-BTC ngày 14/03/2011 của Bộ Tài chính.<br/>
+        <br/>
+        Ghi chú: <br/>
+         - Thông báo này được gửi tự động từ hệ thống quản lý hóa đơn điện tử <a href="https://ehoadon.com.vn/">ehoadon.com.vn</a> đơn vị không trả lời email này.
+    </body>
+</html>

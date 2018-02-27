@@ -85,6 +85,7 @@ require.config({
         'eInvoiceFormReleaseService': 'app/eInvoice/formReleaseService',
         'eInvoiceService': 'app/eInvoice/invoiceService',
         'eInvoiceSignService': 'app/eInvoice/signService',
+        'einvoiceMailService': 'app/eInvoice/mailService',
     },
     // Add angular modules that does not support AMD out of the box, put it in a shim
     shim: {
