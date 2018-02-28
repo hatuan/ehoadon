@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/base64"
+	"erpvietnam/ehoadon/log"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -85,21 +86,6 @@ func (r *Mail) SendEmail() (bool, error) {
 		message.WriteString("--")
 	}
 
-	/*
-		headers := make(map[string]string)
-		headers["From"] = from.String()
-		headers["To"] = to.String()
-		headers["Subject"] = encodeRFC2047(r.subject)
-		headers["MIME-version"] = "1.0"
-		headers["Content-Type"] = "text/html; charset=\"utf-8\""
-
-		// Setup message
-		message := ""
-		for k, v := range headers {
-			message += fmt.Sprintf("%s: %s\r\n", k, v)
-		}
-		message += "\r\n" + r.body
-	*/
 	host, _, _ := net.SplitHostPort(servername)
 
 	auth = smtp.PlainAuth("", r.from, serverpass, host)
@@ -144,10 +130,8 @@ func (r *Mail) SendEmail() (bool, error) {
 	}
 
 	_, err = w.Write(message.Bytes())
-	fmt.Print(fmt.Sprintf("%s", message.Bytes()))
-	//_, err = w.Write([]byte(message))
-	//fmt.Print(fmt.Sprintf("%s", []byte(message)))
 	if err != nil {
+		log.Error(fmt.Sprintf("%s", message.Bytes()))
 		return false, err
 	}
 
