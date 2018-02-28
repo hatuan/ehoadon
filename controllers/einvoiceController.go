@@ -295,6 +295,9 @@ func API_eInvoice_Mail(w http.ResponseWriter, r *http.Request, next http.Handler
 			return
 		}
 
+		logo := fmt.Sprintf("./static/assets/images/logo.png")
+		_ = mail.Attach(logo)
+
 		err = mail.ParseTemplate("./static/templates/mailInvoice.html", mailInvoice)
 		if err != nil {
 			log.Error(err.Error())

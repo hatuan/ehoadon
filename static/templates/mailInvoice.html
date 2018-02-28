@@ -1,39 +1,13 @@
 
-        <style type="text/css">
-            .blank_row {
-                height: 10px !important; /* overwrites any other rules */
-                background-color: #FFFFFF;
-            }
-            .logo {
-                margin-top: -45px;
-                height: 35px;
-                width: 140px
-            }
-            .logo-figure {
-                font-size: x-small;
-                font-style: italic;
-            }
-            .mail-notice {
-                font-size: x-small;
-                font-style: italic;
-            }
-            .td-padding {
-                padding: 10px 0 0 0;
-            }
-            .bullet-small {
-                font-size: small;
-            }
-        </style>
-
         <table border="0" cellpadding="0" cellspacing="0" width="920">
             <tr>
                 <td width="25%">
                     <div>
                         <a href="https://ehoadon.com.vn">
-                            <img alt="Embedded Image" class="logo" src="data:image/png;base64,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" />
+                            <img alt="eInvoiceLogo" style="margin-top: -45px;height: 35px;width: 140px;" src="cid:logo.png" />
                         </a> 
                     </div>  
-                    <div class="logo-figure">
+                    <div style="font-size: x-small;font-style: italic;">
                         Website: ehoadon.com.vn
                     </div>
                 </td>
@@ -45,7 +19,7 @@
                     &nbsp;
                 </td>
             </tr>
-            <tr class="blank_row">
+            <tr style="height: 10px !important;">
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
@@ -53,7 +27,7 @@
                     Kính gửi : {{.CustomerContactName}}
                 </td>
             </tr>
-            <tr class="blank_row">
+            <tr style="height: 10px !important;">
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
@@ -62,89 +36,89 @@
                 </td>
             </tr>
             <tr>
-                <td class="td-padding">
-                    <span class="bullet-small">&#9679;</span> Ngày hóa đơn
+                <td style="padding: 10px 0 0 0;">
+                    <span style="font-size: small;">&#9679;</span> Ngày hóa đơn
                 </td>
-                <td class="td-padding">
+                <td style="padding: 10px 0 0 0;">
                     {{.InvoiceDate}}
                 </td>
             </tr>
             <tr>
-                <td class="td-padding">
-                    <span class="bullet-small">&#9679;</span> Số hóa đơn
+                <td style="padding: 10px 0 0 0;">
+                    <span style="font-size: small;">&#9679;</span> Số hóa đơn
                 </td>
-                <td class="td-padding">
+                <td style="padding: 10px 0 0 0;">
                     {{.InvoiceNo}}
                 </td>
             </tr>
             <tr>
-                <td class="td-padding">
-                    <span class="bullet-small">&#9679;</span> Tổng cộng tiền thanh toán
+                <td style="padding: 10px 0 0 0;">
+                    <span style="font-size: small;">&#9679;</span> Tổng cộng tiền thanh toán
                 </td>
-                <td class="td-padding">
+                <td style="padding: 10px 0 0 0;">
                     {{.TotalPayment}}
                 </td>
             </tr>
             <tr>
-                <td class="td-padding">
-                    <span class="bullet-small">&#9679;</span> Chuỗi xác thực
+                <td style="padding: 10px 0 0 0;">
+                    <span style="font-size: small;">&#9679;</span> Chuỗi xác thực
                 </td>
-                <td class="td-padding">
+                <td style="padding: 10px 0 0 0;">
                     {{.InvoiceFileID.UUID}}
                 </td>
             </tr>
             <tr>
-                <td class="td-padding">
-                    <span class="bullet-small">&#9679;</span> Để nhận hóa đơn điện tử
+                <td style="padding: 10px 0 0 0;">
+                    <span style="font-size: small;">&#9679;</span> Để nhận hóa đơn điện tử
                 </td>
-                <td class="td-padding">
+                <td style="padding: 10px 0 0 0;">
                     xin hãy kiểm tra file dính kèm
                 </td>
             </tr>
             <tr>
-                <td class="td-padding">
-                    <span class="bullet-small">&#9679;</span> Để kiểm tra thông tin hóa đơn
+                <td style="padding: 10px 0 0 0;">
+                    <span style="font-size: small;">&#9679;</span> Để kiểm tra thông tin hóa đơn
                 </td>
-                <td class="td-padding">
+                <td style="padding: 10px 0 0 0;">
                     nhấn <a href="https://ehoadon.com.vn/">vào đây</a>
                 </td>
             </tr>
-            <tr class="blank_row">
+            <tr style="height: 10px !important;">
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
-                <td colspan="3" class="td-padding">
+                <td colspan="3" style="padding: 10px 0 0 0;">
                     Thông tin hỗ trợ hóa đơn
                 </td>
             </tr>
             <tr>
-                <td colspan="3" class="td-padding">
+                <td colspan="3" style="padding: 10px 0 0 0;">
                     Đơn vị có thắc mắc xin hãy liên hệ {{.ClientContactName}} - {{.ClientMobile}}
                 </td>
             </tr>
-            <tr class="blank_row">
+            <tr style="height: 10px !important;">
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
-                <td colspan="3" class="td-padding">
+                <td colspan="3" style="padding: 10px 0 0 0;">
                     Thông tin về hóa đơn điện tử
                 </td>
             </tr>
             <tr>
-                <td colspan="3" class="td-padding">
+                <td colspan="3" style="padding: 10px 0 0 0;">
                     Hóa đơn điện tử được quy định theo thông tư số 32/2011/TT-BTC ngày 14/03/2011 của Bộ Tài chính.
                 </td>
             </tr>
-            <tr class="blank_row">
+            <tr style="height: 10px !important;">
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
-                <td colspan="3" class="mail-notice">
+                <td colspan="3" style="font-size: x-small;font-style: italic;">
                     Ghi chú
                 </td>
             </tr>
             <tr>
-                <td colspan="3" class="mail-notice">
+                <td colspan="3" style="font-size: x-small;font-style: italic;">
                     Thông báo này được gửi tự động từ hệ thống quản lý hóa đơn điện tử <a href="https://ehoadon.com.vn/">ehoadon.com.vn</a> đơn vị không trả lời email này.
                 </td>
             </tr>

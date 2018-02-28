@@ -74,6 +74,7 @@ func (r *Mail) SendEmail() (bool, error) {
 	if len(r.attachments) > 0 {
 		for k, v := range r.attachments {
 			message.WriteString("\r\n--" + boundary + "\r\n")
+			message.WriteString("Content-ID: <" + k + ">\r\n")
 			message.WriteString("Content-Type: application/octet-stream\r\n")
 			message.WriteString("Content-Transfer-Encoding: base64\r\n")
 			message.WriteString("Content-Disposition: attachment; filename=\"" + k + "\"\r\n\r\n")
