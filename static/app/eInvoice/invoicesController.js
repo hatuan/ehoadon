@@ -3,7 +3,7 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myApp.Search', 'eInvoiceService', 'digitalsignature', 'reportjs-report', 'reportjs-viewer', 'app/eInvoice/invoiceMaintenanceController', 'app/eInvoice/invoiceViewReportController'], function (angularAMD, $) {
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myApp.Search', 'eInvoiceService', 'digitalsignature', 'reportjs-report', 'reportjs-viewer', 'app/eInvoice/invoiceMaintenanceController', 'app/eInvoice/invoiceViewReportController', , 'app/eInvoice/invoiceSendController'], function (angularAMD, $) {
     var injectParams = ['$scope', '$rootScope', '$state', '$window', 'moment', '$uibModal', '$confirm', 'alertsService', 'Constants', 'eInvoiceService'];
 
     var eInvoicesController = function ($scope, $rootScope, $state, $window, moment, $uibModal, $confirm, alertsService, Constants, eInvoiceService) {
@@ -32,6 +32,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             $scope.isLoading = true;
             $scope.FilteredInvoices = [];
             $scope.selectViewReport = false;
+            $scope.selectSendDocument = false;
             $scope.getInvoices();
         };
 
@@ -149,9 +150,12 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             modalInstance.result.then(function(_result) {
                 var _invoice = _result.EditInvoice;
                 $scope.selectViewReport = _result.selectViewReport;
+                $scope.selectSendDocument = _result.selectSendDocument;
 
                 if($scope.selectViewReport) {
                     $scope.viewReport(_index, _invoice);
+                } else if ($scope.selectSendDocument) {
+                    $scope.sendDocument(_index, _invoice);
                 } else {
                     if (!angular.isUndefinedOrNull(_index)) { //edit
                         angular.copy(_invoice, $scope.eInvoicesDisplay[_index]);
@@ -205,6 +209,36 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 $scope.SortExpression = tableState.sort.predicate;
                 $scope.SortDirection = tableState.sort.reverse ? "DESC":"ASC";   
             }
+        }
+
+        $scope.sendDocument = function (_index, _invoice) {
+            var modalSendDocumentInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                backdrop: 'static', //disables modal closing by click on the backdrop
+                //size:'lg',
+                templateUrl: 'app/eInvoice/invoiceSend.html',
+                controller: 'eInvoiceSendController',
+                resolve: {
+                    editInvoice: function() {
+                        var __invoice = $.extend({}, _invoice);
+                        return __invoice;
+                    }
+                }
+            });
+            modalSendDocumentInstance.rendered.then(function(result) {
+                $('.modal .modal-body').css('overflow-y', 'auto');
+                $('.modal .modal-body').css('margin-right', 0);
+            });
+            modalSendDocumentInstance.result.then(function(_result) { //close
+                $scope.edit(_index, _result.EditInvoice);
+            }, function() { //dismiss
+                $scope.edit(_index, modalSendDocumentInstance.result.EditInvoice);
+            })['finally'](function() {
+                modalSendDocumentInstance = undefined;
+                $scope.selectSendDocument = false;
+            });
         }
     };
 
