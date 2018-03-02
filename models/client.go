@@ -36,6 +36,7 @@ type Client struct {
 	Email                       string          `db:"email"`
 	Fax                         string          `db:"fax"`
 	Website                     string          `db:"website"`
+	Image                       string          `db:"image"`
 	RepresentativeName          string          `db:"representative_name"`
 	RepresentativePosition      string          `db:"representative_position"`
 	ContactName                 string          `db:"contact_name"`
@@ -163,6 +164,7 @@ func (c *Client) Update() TransactionalInformation {
 		" email, " +
 		" fax, " +
 		" website, " +
+		" image, " +
 		" representative_name, " +
 		" representative_position, " +
 		" contact_name, " +
@@ -195,6 +197,7 @@ func (c *Client) Update() TransactionalInformation {
 		" :email, " +
 		" :fax, " +
 		" :website, " +
+		" :image, " +
 		" :representative_name, " +
 		" :representative_position, " +
 		" :contact_name, " +
@@ -227,6 +230,7 @@ func (c *Client) Update() TransactionalInformation {
 		" email								=	EXCLUDED.email, " +
 		" fax								=	EXCLUDED.fax, " +
 		" website							=	EXCLUDED.website, " +
+		" image								=	EXCLUDED.image, " +
 		" representative_name				=	EXCLUDED.representative_name, " +
 		" representative_position			=	EXCLUDED.representative_position, " +
 		" contact_name						=	EXCLUDED.contact_name, " +

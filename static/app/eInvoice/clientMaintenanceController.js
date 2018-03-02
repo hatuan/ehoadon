@@ -13,7 +13,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
             $scope.Client = {};
             $scope.Token = {};
             $scope.Provinces = [];
-
+            $scope.Image = "/assets/images/no-image.png";
             $scope.getProvinces(function () { //success
                 $scope.getClient();
             });
@@ -37,7 +37,9 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
 
         $scope.clientInquiryCompleted = function(response, status) {
             $scope.Client = response.Data.Client;
-            
+            if($scope.Client.Image != "") {
+                $scope.Image = $scope.Client.Image;
+            }
             $scope.Token = response.Data.eInvoiceClient;
             $scope.Token.TokenCertValidFrom = new moment.unix(response.Data.eInvoiceClient.TokenCertValidFrom).toDate();
             $scope.Token.TokenCertValidTo = new moment.unix(response.Data.eInvoiceClient.TokenCertValidTo).toDate();
@@ -77,7 +79,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
         $scope.update = function(form) {
             if (form.validate()) {
                 var _postClient = new Object();
-
                 _postClient.Client = {};
                 _postClient.eInvoiceClient = {};
 

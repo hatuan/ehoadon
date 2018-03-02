@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS client
   email character varying NOT NULL, -- Email
   fax character varying NOT NULL, -- FAX
   website character varying NOT NULL, -- website
+  image character varying NOT NULL, -- image base64 "data:image/png;base64,iVBORw0KGg..."
   representative_name character varying NOT NULL, -- nguoi dai dien
   representative_position character varying NOT NULL, -- chuc vu nguoi dai dien
   contact_name character varying NOT NULL, -- nguoi lien he

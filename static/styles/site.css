@@ -177,7 +177,32 @@ span .small-font { font-size:9px; }
 .big-dropdown-width {
     width: 300px !important;
 }
+/***************************/
 
+/********btn-file input*****/
+.btn-file > input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-size: 23px;
+    cursor: pointer;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    direction: ltr;
+}
+/***************************/
+
+/***no-image ****/
+.no-image {
+    background-image: url('/assets/images/no-image.png');
+    background-position: center;
+    overflow: hidden;
+    background-size: cover;
+}
+/****************/
 .thumbnail .selected {
     border: 2px solid black;
 }

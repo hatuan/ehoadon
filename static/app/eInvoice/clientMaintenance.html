@@ -123,6 +123,21 @@
                                                             </select>
                                                         </div>
                                                     </div>
+                                                    <div class="row">
+                                                        <div class="col-xs-6">
+                                                            <div class="fileinput fileinput-new">
+                                                                <div class="fileinput-new thumbnail" style="width: 250px; height: 100px;">
+                                                                    <img id="clientImage" src="{{Image}}" alt="Image" style="width: 100%; height: 100%;"/>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <span class="btn green btn-file">
+                                                                    <span class="fileinput-new"> Select image (250x100 px) </span>
+                                                                    <input type="file" name="selectImage" onchange="encodeImageFileAsURL(this, selectedImage);"> 
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -174,5 +189,24 @@
     <!-- END MAIN CONTENT -->
     <!-- BEGIN MAIN JS-->
     <script>
+        function encodeImageFileAsURL(element, callback) {
+            var file = element.files[0];
+            var reader = new FileReader();
+            reader.onloadend  = function(e) {
+                var base64 = btoa(reader.result);
+                console.log('RESULT', reader.result);
+                callback(reader.result);
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function selectedImage(base64) {
+            if(base64.indexOf("data:image/png;") == 0 || base64.indexOf("data:image/gif;") == 0 || base64.indexOf("data:image/jpg;") == 0 || base64.indexOf("data:image/jpeg;") == 0) {
+                $("#clientImage").attr('src', base64);
+                angular.element("#ClientMaintenanceForm").scope().Client.Image = base64;
+            }
+            else 
+                alert("Please select *.png|*.gif|*.jpg|*.jpeg");
+        }
     </script>
     <!-- BEGIN MAIN JS -->
