@@ -4,24 +4,20 @@ import (
 	"os"
 
 	"github.com/Gurpartap/logrus-stack"
+	// "github.com/onrik/logrus/filename"
+	//"github.com/onrik/logrus/sentry"
 	log "github.com/sirupsen/logrus"
 )
 
-var logger = log.New()
+var logger *log.Logger
 
 type Fields map[string]interface{}
 
 func init() {
-	// Log as JSON instead of the default ASCII formatter.
+	logger = log.New()
 	logger.Formatter = &log.JSONFormatter{}
-
-	// Output to stderr instead of stdout, could also be a file.
 	logger.Out = os.Stderr
-
-	// Add the stack hook.
-	log.AddHook(logrus_stack.StandardHook())
-
-	// Only log the warning severity or above.
+	logger.AddHook(logrus_stack.StandardHook())
 	logger.Level = log.DebugLevel
 }
 

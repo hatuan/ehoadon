@@ -142,7 +142,7 @@ func GetEInvoiceFormTypes(orgID int64, searchCondition string, infiniteScrolling
 		sqlLimit += fmt.Sprintf(" LIMIT %s ", infiniteScrollingInformation.FetchSize)
 	}
 	sqlString += sqlWhere + sqlOrder + sqlLimit
-	log.Debug(sqlString)
+	log.WithFields(log.Fields{"sql": map[string]interface{}{"string": sqlString, "$1": orgID}}).Debug("GetEInvoiceFormTypes")
 
 	getDatas := []EInvoiceFormType{}
 	err = db.Select(&getDatas, sqlString, orgID)
