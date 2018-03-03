@@ -3,7 +3,7 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function(angularAMD, $) {
+define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function(angularAMD, $, require) {
     var injectParams = ['$scope', '$rootScope', '$state', '$sce', '$auth', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
     var invoiceViewReportController = function($scope, $rootScope, $state, $sce, $auth, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, clientService, eInvoiceService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editInvoice) {
@@ -182,7 +182,20 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
             ds.Invoice = $scope.EditInvoice;
             ds.InvoiceLines = $scope.EditInvoice.InvoiceLines;
             ds.Vars = $scope.FormVars;
-
+           
+            var qr = new QRious({
+                level: 'H',
+                value: $scope.FormVars.NumberForm + 
+                    "|" + $scope.FormVars.CompanyVatNumber + 
+                    "|" + $scope.FormVars.Symbol + 
+                    "|" + ($scope.EditInvoice.InvoiceNo === "" ? ds.Vars.InvoiceNo : $scope.EditInvoice.InvoiceNo) + 
+                    "|" + $scope.EditInvoice.CustomerVatNumber + 
+                    "|" + $scope.EditInvoice.TotalPayment + 
+                    "|" + $scope.EditInvoice.TotalVat +
+                    "|" + moment($scope.EditInvoice.InvoiceDate).format("YYYY-MM-DD")
+            });
+            ds.Vars.InvoiceImageQR = qr.toDataURL();
+            
             for(var _i = ds.InvoiceLines.length; _i < 10; _i++ ) {
                 ds.InvoiceLines.push({LineNo: _i + 1});
             }

@@ -1,14 +1,17 @@
 {
     "Vars": {
+	    "InvoiceType": "",
         "NumberForm": "",
         "Symbol": "",
+	    "InvoiceNo": "0000000",
         "CompanyName": "",
         "CompanyVatNumber": "",
         "CompanyAddress": "",
         "CompanyPhone": "",
         "CompanyEmail": "",
         "CompanyURL": "",
-        "ImageHeader": ""
+        "CompanyImageHeader": "",
+        "InvoiceImageQR": ""
 	},
     "Invoice": {
         "ID": "",

@@ -8,6 +8,7 @@
         "CompanyPhone": "",
         "CompanyEmail": "",
         "CompanyURL": "",
-        "ImageHeader": ""
+        "ImageHeader": "",
+        "ImageQR": ""
 	}
 }

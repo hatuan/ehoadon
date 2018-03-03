@@ -154,6 +154,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
 
         $scope.setFormVars = function() {
             if(angular.isUndefinedOrNull($scope.EditFormType.FormVars)) {
+                $scope.FormVars.InvoiceType = $scope.EditFormType.InvoiceType; 
                 $scope.FormVars.NumberForm = $scope.EditFormType.NumberForm;
                 $scope.FormVars.Symbol = $scope.EditFormType.Symbol;
                 $scope.FormVars.CompanyName = $scope.Client.Description;
@@ -162,6 +163,21 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                 $scope.FormVars.CompanyPhone = $scope.Client.Telephone;
                 $scope.FormVars.CompanyEmail = $scope.Client.Email;
                 $scope.FormVars.CompanyURL = $scope.Client.Website;
+                $scope.FormVars.CompanyImageHeader = $scope.Client.Image;
+                $scope.FormVars.InvoiceNo = "0000000";
+
+                var qr = new QRious({
+                    level: 'H',
+                    value: $scope.FormVars.NumberForm + 
+                        "|" + $scope.FormVars.CompanyVatNumber + 
+                        "|" + $scope.FormVars.Symbol + 
+                        "|" + $scope.FormVars.InvoiceNo + 
+                        "|" + "" + //CustomerVatNumber
+                        "|" + "0" + //TotalPayment
+                        "|" + "0" + //TotalVat
+                        "|" + "" //InvoiceDate
+                });
+                $scope.FormVars.InvoiceImageQR = qr.toDataURL();
             }
         }
         
@@ -193,17 +209,17 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
             var dataSet = new Stimulsoft.System.Data.DataSet("Invoice");
             response.Vars = $scope.FormVars;
             dataSet.readJson(response);
-
-            var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
-            viewer.options.toolbar.visible = false;
-            viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
-            viewer.options.toolbar.zoom = 75;
-            viewer.options.appearance.scrollbarsMode = true;
-            viewer.options.width = "100%";
-            viewer.options.height = $("#modal-body").height() + "px";
-            viewer.renderHtml('reportviewer');
-
+            
             setTimeout(function () {
+                var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
+                viewer.options.toolbar.visible = false;
+                viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
+                viewer.options.toolbar.zoom = 75;
+                viewer.options.appearance.scrollbarsMode = true;
+                viewer.options.width = "100%";
+                viewer.options.height = $("#modal-body").height() + "px";
+                viewer.renderHtml('reportviewer');
+            
 				var report = new $window.Stimulsoft.Report.StiReport();
                 report.load($scope.EditFormType.FormFile);
                 $scope.EditFormType.FormFile = report.saveToJsonString();
@@ -215,7 +231,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
 
 				// Assign the report to the viewer
 				viewer.report = report;
-			}, 100);
+			}, 10);
         };
 
         $scope.getReportDataErrorFunction = function(response, status) {

@@ -55,6 +55,7 @@
     "devextreme": "^17.2.5",
     "angular-ui-grid": "^4.2.4",
     "angular-smart-table": "^2.1.11",
-    "lodash": "^4.17.5"
+    "lodash": "^4.17.5",
+    "qrious": "^4.0.2"
   }
 }
