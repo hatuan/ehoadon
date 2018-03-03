@@ -63,6 +63,7 @@ require.config({
         'angular-ui-grid': 'bower_components/angular-ui-grid/ui-grid.min',
         'angular-smart-table': 'bower_components/angular-smart-table/dist/smart-table.min',
         'lodash': 'bower_components/lodash/dist/lodash.min',
+        'qrious': 'bower_components/qrious/dist/qrious.min',
         'digitalsignature': 'scripts/digitalsignature',
         'ajaxService': 'app/common/services/ajaxServices',
         'alertsService': 'app/common/services/alertsServices',
