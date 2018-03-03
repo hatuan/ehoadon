@@ -29,7 +29,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
             $uibModalInstance.dismiss('cancel');
         };
 
-        $scope.displayReport = function(formFileName, formFile){
+        $scope.displayReport = function(){
             if(!angular.isUndefinedOrNull($scope.EditFormType.FormFile)) {
                 ajaxService.AjaxGet("/reports/invoice.json", $scope.getReportDataSuccessFunction, $scope.getReportDataErrorFunction);     
             } else if(!angular.isUndefinedOrNull($scope.EditFormType.FormFileName)) {
@@ -51,15 +51,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
             response.Vars = $scope.FormVars;
             dataSet.readJson(response);
 
-            var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
-            viewer.options.toolbar.visible = false;
-            viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
-            viewer.options.appearance.scrollbarsMode = true;
-            viewer.options.width = "100%";
-            viewer.options.height = $("#modal-body").height() + "px";
-            viewer.renderHtml('reportviewer');
-
             setTimeout(function () {
+                var viewer = new $window.Stimulsoft.Viewer.StiViewer(null, 'StiViewer', false);
+                viewer.options.toolbar.visible = false;
+                viewer.options.toolbar.viewMode = Stimulsoft.Viewer.StiWebViewMode.WholeReport;
+                viewer.options.appearance.scrollbarsMode = true;
+                viewer.options.width = "100%";
+                viewer.options.height = $("#modal-body").height() + "px";
+                viewer.renderHtml('reportviewer');
+            
 				var report = new $window.Stimulsoft.Report.StiReport();
                 report.load($scope.EditFormType.FormFile);
 
@@ -69,8 +69,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'eInvoiceFormTyp
                 report.regData(dataSet.dataSetName, "", dataSet);
 
 				// Assign the report to the viewer
-				viewer.report = report;
-			}, 100);
+                viewer.report = report;
+			}, 10);
         };
 
         $scope.getReportDataErrorFunction = function(response, status) {
