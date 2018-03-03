@@ -1,7 +1,7 @@
 <div class="modal-header">
     <button class="btn btn-info pull-right" type="button" ng-click="signDocument()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code"><span class="icon-note"> </span> Sign Document</button>
-    <div class="btn-group pull-right" uib-dropdown>
-        <button id="split-button" class="btn btn-info" type="button"  ng-click="sendDocument()" ng-if="EditInvoice.Status != Constants.InvoiceStatus[0].Code"><span class="icon-envelope"> </span> Send Document</button>
+    <div class="btn-group pull-right" uib-dropdown ng-if="EditInvoice.Status != Constants.InvoiceStatus[0].Code">
+        <button id="split-button" class="btn btn-info" type="button"  ng-click="sendDocument()"><span class="icon-envelope"> </span> Send Document</button>
         <button type="button" class="btn btn-info" uib-dropdown-toggle>
           <span class="caret"></span>
           <span class="sr-only">Split button!</span>
