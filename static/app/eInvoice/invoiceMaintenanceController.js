@@ -576,6 +576,8 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.EditInvoice.TotalVat10 = totalVat10;
 
             $scope.EditInvoice.TotalPayment = totalPayment;
+            var _numberToWords = NumberToWords(totalPayment);
+            $scope.EditInvoice.TotalPaymentWords = _numberToWords.charAt(0).toUpperCase() + _numberToWords.slice(1) + " đồng chẵn";
         }; //$scope.updateTotal
 
         $scope.validLine = function(_colName, _invoiceLine) {
