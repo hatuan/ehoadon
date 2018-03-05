@@ -23,7 +23,7 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                         Token.TokenCertValidFrom = new moment.unix(response.Data.eInvoiceClient.TokenCertValidFrom).toDate();
                         Token.TokenCertValidTo = new moment.unix(response.Data.eInvoiceClient.TokenCertValidTo).toDate();
 
-                        getFormType(SignInvoice.FormTypeID);
+                        getFormType(document.FormTypeID);
                     }, 
                     function(response) { //error
                         errorFunction(response);
@@ -49,8 +49,11 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                         }
                         if(SignInvoice.InvoiceNo === "") 
                             getInvoice(SignInvoice.ID);
-                        else
+                        else {
+                            SignInvoice.InvoiceDate = SignInvoice.InvoiceDate.toJSON(); //convert datetime to "2018-03-05T05:00:14.510Z" before use in report
+                            SignInvoice.Vat = SignInvoice.InvoiceLines[0] && SignInvoice.InvoiceLines[0].Vat ? SignInvoice.InvoiceLines[0].Vat : "";
                             getReport(FormType.FormFileName, FormType.FormFile);
+                        }
                     },
                     function(response) { //error
                         errorFunction(response);
@@ -66,10 +69,8 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                     function(response, status) { //success
     
                         SignInvoice = $.extend(true, {},response.Data.eInvoice);
-                        SignInvoice.InvoiceDate = new moment.unix(SignInvoice.InvoiceDate).toDate();
-                        SignInvoice.RecCreated = new moment.unix(SignInvoice.RecCreated).toDate();
-                        SignInvoice.RecModified = new moment.unix(SignInvoice.RecModified).toDate();
-    
+                        SignInvoice.InvoiceDate = new moment.unix(SignInvoice.InvoiceDate).toJSON(); //convert datetime to "2018-03-05T05:00:14.510Z" before use in report
+                        SignInvoice.Vat = SignInvoice.InvoiceLines[0] && SignInvoice.InvoiceLines[0].Vat ? SignInvoice.InvoiceLines[0].Vat : "";
                         getReport(FormType.FormFileName, FormType.FormFile);
                     },
                     function(response) { //error

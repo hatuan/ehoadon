@@ -3,14 +3,14 @@
  */
 "use strict";
 
-define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function(angularAMD, $, require) {
+define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'], function(angularAMD, $) {
     var injectParams = ['$scope', '$rootScope', '$state', '$sce', '$auth', '$window', 'moment', '$uibModal', '$uibModalInstance', 'ajaxService', 'alertsService', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService', '$stateParams', '$confirm', 'Constants', 'editInvoice'];
 
     var invoiceViewReportController = function($scope, $rootScope, $state, $sce, $auth, $window, moment, $uibModal, $uibModalInstance, ajaxService, alertsService, clientService, eInvoiceService, eInvoiceFormTypeService, $stateParams, $confirm, Constants, editInvoice) {
        
         $scope.initializeController = function() {
             $scope.Constants = Constants;
-            $scope.EditInvoice = editInvoice;
+            $scope.EditInvoice = $.extend(true, {}, editInvoice);
             $scope.FormType = {};
             $scope.FormVars = {};
             $scope.Client = {};
@@ -18,7 +18,7 @@ define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clie
 
             $scope.report = null;
 
-            if(!angular.isUndefinedOrNull($scope.EditInvoice.FormTypeID))
+            if(!angular.isUndefinedOrNull(editInvoice.FormTypeID))
                 clientService.getClient(
                     function(response, status) { //success
                         $scope.Client = response.Data.Client;
@@ -27,7 +27,7 @@ define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clie
                         $scope.Token.TokenCertValidFrom = new moment.unix(response.Data.eInvoiceClient.TokenCertValidFrom).toDate();
                         $scope.Token.TokenCertValidTo = new moment.unix(response.Data.eInvoiceClient.TokenCertValidTo).toDate();
 
-                        $scope.getFormType($scope.EditInvoice.FormTypeID);
+                        $scope.getFormType(editInvoice.FormTypeID);
                     }, 
                     function(response) { //error
                         alertsService.RenderErrorMessage(response.Error);
@@ -36,86 +36,13 @@ define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clie
             else
                 alert("Report has error : Unknow FormTypeID");
         }
-/*
-        $scope.signDocument = function() {
-            if(!angular.isUndefinedOrNull($scope.report)) {
-                var settings = new Stimulsoft.Report.Export.StiPdfExportSettings();
-                // Create an PDF service instance.
-                var service = new Stimulsoft.Report.Export.StiPdfExportService();
-            
-                // Create a MemoryStream object.
-                var stream = new Stimulsoft.System.IO.MemoryStream();
-                // Export PDF using MemoryStream.
-                service.exportTo($scope.report, stream, settings);
-            
-                // Get PDF data from MemoryStream object
-                var data = stream.toArray(); //or var data = $scope.report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf);
-                var dataBase64 = arrayBufferToBase64(data);
-                var myAx;
-                try {
-                    myAx = new ActiveXObject("EInvoiceSignPlugin.EInvoiceSignActiveX");
-                } catch (ex) {
-                    alert("Chức năng đọc chữ ký số chỉ hoạt động trên IE với Sercurity level : low và đã cài đặt plugin");
-                    return;
-                }
 
-                try
-                {
-                    var signedInfo = myAx.SignDocument(dataBase64, 
-                        $scope.Token.TokenSerialNumber, 
-                        $scope.EditInvoice.ID, 
-                        $scope.EditInvoice.Version + '', 
-                        $scope.Constants.InvoiceStatus[1].Code + '', 
-                        $auth.getToken());
-                } catch(err) {
-                    settings = null;
-                    stream = null;
-                    service = null;
-                    data = null;
-                    dataBase64 = null;
-                    
-                    alert(err.message);
-                    return;
-                }     
-                settings = null;
-                stream = null;
-                service = null;
-                data = null;
-                dataBase64 = null;
-
-                var postData = {
-                    'InvoiceID' : signedInfo.DocumentID,
-                    'PDFBase64' : signedInfo.SignedContent,
-                    'PDFBase64MD5' : signedInfo.SignedContentMD5,
-                    'Status' : signedInfo.SignedStatus,
-                    'Version' : signedInfo.DocumentVersion
-                };
-                $.ajax({
-                    url: '/api/einvoiceFiles',
-                    method: "POST",
-                    async: false,
-                    contentType: "application/json;charset=utf-8",
-                    dataType: "json", 
-                    data: JSON.stringify(postData),
-                    beforeSend: function (xhr) {   //Include the bearer token in header
-                        xhr.setRequestHeader("Authorization", signedInfo.JwtToken);
-                    }
-                })
-                .done(function(response) {
-                    alert( "POST einvoiceFile" );
-                })
-                .fail(function(response) {
-                    alert( "POST einvoiceFile error" );
-                });
-            }
-        };
-*/
         $scope.cancel = function() {
             $uibModalInstance.dismiss('cancel');
         };
         
         $scope.$on('modal.closing', function(event, reason, closed){
-            $uibModalInstance.result.EditInvoice = $scope.EditInvoice;
+            $uibModalInstance.result.EditInvoice = editInvoice;
         });
 
         $scope.getFormType = function(_ID) {
@@ -150,7 +77,10 @@ define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clie
             eInvoiceService.getInvoice(
                 invoiceInquiry, 
                 function(response, status) { //success
-                    $scope.EditInvoice = response.Data.eInvoice;
+                    $scope.EditInvoice = $.extend(true, {},response.Data.eInvoice);
+                    $scope.EditInvoice.InvoiceDate = new moment.unix($scope.EditInvoice.InvoiceDate).toJSON();
+                    $scope.EditInvoice.Vat = $scope.EditInvoice.InvoiceLines[0] && $scope.EditInvoice.InvoiceLines[0].Vat ? $scope.EditInvoice.InvoiceLines[0].Vat : "";
+
                     $scope.getReport($scope.FormType.FormFileName, $scope.FormType.FormFile);        
                 },
                 function(response) { //error
@@ -179,7 +109,7 @@ define(['angularAMD', 'jquery', 'require', 'ajaxService', 'alertsService', 'clie
         $scope.renderReport = function() {
             var dataSet = new Stimulsoft.System.Data.DataSet("Invoice");
             var ds = {};
-            ds.Invoice = $scope.EditInvoice;
+            ds.Invoice = $.extend(true, {}, $scope.EditInvoice);
             ds.InvoiceLines = $scope.EditInvoice.InvoiceLines;
             ds.Vars = $scope.FormVars;
            

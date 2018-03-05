@@ -15,9 +15,9 @@
 	},
     "Invoice": {
         "ID": "",
-        "CreatedDate": "",
         "InvoiceDate": "",
         "InvoiceNo": "",
+        "InvoiceFileID": "",
         "PayType": "",
         "CurrencyID": "",
         "ExchangeRateAmount": "",
@@ -30,6 +30,7 @@
         "CustomerBankAccount": "",
         "CustomerBankName": "",
         "TotalAmount": "",
+        "Vat": "",
         "TotalAmountNoVat": "",
         "TotalAmountVat0": "",
         "TotalAmountVat5": "",
