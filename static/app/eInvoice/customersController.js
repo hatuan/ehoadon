@@ -14,8 +14,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             
             $scope.Constants = Constants;
 
-            $scope.Search = "";
-            $scope.isSearched = false;
+            $scope.SearchCustomer = "";
+            $scope.SearchVatNumber = "";
             $scope.SortExpression = "Code";
             $scope.SortDirection = "ASC";
             $scope.FetchSize = 100;
@@ -23,22 +23,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.PageSize = 9;
             $scope.TotalRows = 0;
             $scope.Selection=[];
-
-            $scope.searchConditionObjects = [];
-            $scope.searchConditionObjects.push({
-                ID: "ehd_customer.code",
-                Name: "Code",
-                Type: "CODE", //CODE, FREE, DATE
-                ValueIn: "eInvoiceCustomers",
-                Value: ""
-            },
-            {
-                ID: "ehd_customer.description",
-                Name: "Description",
-                Type: "FREE", //CODE, FREE, DATE
-                ValueIn: "",
-                Value: ""
-            });
 
             $scope.eInvoiceCustomers = [];
             $scope.eInvoiceCustomersDisplay = [];
@@ -48,18 +32,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.getCustomers();
         };
 
-        $scope.refresh = function () {
-            $scope.getCustomers();
+        $scope.search = function (form) {
+            if(form.validate()) {
+                $scope.getCustomers();
+            }
         }
 
-        $scope.showSearch = function () {
-            $scope.isSearched = !$scope.isSearched;
-        }
-
-        $scope.selectAll = function () {
-            $scope.Selection=[];
-            for(var i = 0; i < $scope.FilteredItems.length; i++) {
-                $scope.Selection.push($scope.FilteredItems[i]["ID"]);
+        $scope.searchValidationOptions = {
+            rules: {
             }
         }
 
@@ -92,9 +72,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
              }
         };
 
-        $scope.getCustomers = function (searchSqlCondition) {
-            if(!angular.isUndefinedOrNull(searchSqlCondition))
-                $scope.Search = searchSqlCondition;
+        $scope.getCustomers = function () {
             var eInvoiceCustomerInquiry = $scope.createCustomerObject();
             eInvoiceCustomerService.getCustomers(eInvoiceCustomerInquiry, $scope.einvoiceCustomersInquiryCompleted, $scope.einvoiceCustomersInquiryError);
         };
@@ -117,7 +95,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.createCustomerObject = function () {
             var eInvoiceCustomerInquiry = new Object();
 
-            eInvoiceCustomerInquiry.Search = $scope.Search;
+            eInvoiceCustomerInquiry.SearchCustomer = $scope.SearchCustomer;
+            eInvoiceCustomerInquiry.SearchVatNumber = $scope.SearchVatNumber;
             eInvoiceCustomerInquiry.SortExpression = $scope.SortExpression;
             eInvoiceCustomerInquiry.SortDirection = $scope.SortDirection;
             eInvoiceCustomerInquiry.FetchSize = $scope.FetchSize;

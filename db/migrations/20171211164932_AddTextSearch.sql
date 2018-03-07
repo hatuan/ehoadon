@@ -41,6 +41,17 @@ BEGIN
                 
                 RETURN NEW;
             END IF;
+        WHEN 'ehd_customer' THEN
+            IF (TG_OP = 'DELETE') THEN
+                DELETE FROM textsearch WHERE textsearch_object = TG_TABLE_NAME AND id = OLD.id;
+                RETURN OLD;
+            ELSE
+                INSERT INTO textsearch(id, textsearch_object, textsearch_value, client_id, organization_id) VALUES
+                (NEW.id, TG_TABLE_NAME, to_tsvector('simple', coalesce(NEW.code, '') || ' ' || coalesce(NEW.description, '') || ' ' || coalesce(NEW.vat_number, '')), NEW.client_id, NEW.organization_id)
+                ON CONFLICT ON CONSTRAINT pk_textsearch DO UPDATE SET textsearch_value = to_tsvector('simple', coalesce(NEW.code, '') || ' ' || coalesce(NEW.description, '') || ' ' || coalesce(NEW.vat_number, ''));
+                
+                RETURN NEW;
+            END IF;
         ELSE
             IF (TG_OP = 'DELETE') THEN
                 DELETE FROM textsearch WHERE textsearch_object = TG_TABLE_NAME AND id = OLD.id;

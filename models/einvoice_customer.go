@@ -94,7 +94,7 @@ func (c *EInvoiceCustomer) Validate() map[string]InterfaceArray {
 	return validationErrors
 }
 
-func GetEInvoiceCustomers(orgID int64, searchCondition string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceCustomer, TransactionalInformation) {
+func GetEInvoiceCustomers(orgID int64, searchCustomer string, searchVatNumber string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceCustomer, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -110,8 +110,18 @@ func GetEInvoiceCustomers(orgID int64, searchCondition string, infiniteScrolling
 		" INNER JOIN organization as organization ON ehd_customer.organization_id = organization.id "
 
 	sqlWhere := " WHERE ehd_customer.organization_id = $1"
-	if len(searchCondition) > 0 {
-		sqlWhere += fmt.Sprintf(" AND %s", searchCondition)
+	if len(searchCustomer) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (1=0")
+		_searchCustomer := ""
+		for _, _word := range strings.Fields(searchCustomer) {
+			_searchCustomer = _searchCustomer + fmt.Sprintf(" %s:* &", strings.ToLower(_word))
+		}
+		_searchCustomer = _searchCustomer[:len(_searchCustomer)-1]
+		sqlWhere += fmt.Sprintf(" OR ehd_customer.id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_customer' AND organization_id = $1 AND textsearch_value @@ tsquery('%s'))", _searchCustomer)
+		sqlWhere += fmt.Sprintf(" )")
+	}
+	if len(searchVatNumber) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_customer.vat_number like '%s%%')", searchVatNumber)
 	}
 
 	var sqlOrder string
