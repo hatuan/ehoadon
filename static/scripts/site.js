@@ -143,7 +143,7 @@ function NumberToWords(_number) {
         "7": "bảy",
         "6": "sáu",
         "5": "năm",
-        "4": "tư",
+        "4": "bốn",
         "3": "ba",
         "2": "hai",
         "1": "một",

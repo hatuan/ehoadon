@@ -14,9 +14,13 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             
             $scope.Constants = Constants;
 
-            $scope.Search = "";
-            $scope.isSearched = false;
-            $scope.SortExpression = "rec_created_at";
+            $scope.SearchNumberForm ="";
+            $scope.SearchSymbol = "";
+            $scope.SearchFromDate = null;
+            $scope.SearchToDate = null;
+            $scope.SearchCustomer = "";
+            $scope.SearchStatus = "";
+            $scope.SortExpression = "invoice_date";
             $scope.SortDirection = "DESC";
             $scope.FetchSize = 100;
             $scope.CurrentPage = 1;
@@ -36,18 +40,20 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             $scope.getInvoices();
         };
 
-        $scope.refresh = function () {
-            $scope.getInvoices();
+        $scope.search = function (form) {
+            if(form.validate()) {
+                $scope.getInvoices();
+            }
         }
 
-        $scope.showSearch = function () {
-            $scope.isSearched = !$scope.isSearched;
-        }
-
-        $scope.selectAll = function () {
-            $scope.Selection=[];
-            for(var i = 0; i < $scope.FilteredInvoices.length; i++) {
-                $scope.Selection.push($scope.FilteredInvoices[i]["ID"]);
+        $scope.searchValidationOptions = {
+            rules: {
+                FromDate: {
+                    date: true,
+                },
+                ToDate: {
+                    date: true,
+                }
             }
         }
 
@@ -80,9 +86,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
              }
         };
 
-        $scope.getInvoices = function (searchSqlCondition) {
-            if(!angular.isUndefinedOrNull(searchSqlCondition))
-                $scope.Search = searchSqlCondition;
+        $scope.getInvoices = function () {
             var eInvoicesInquiry = $scope.createInvoiceObject();
             eInvoiceService.getInvoices(eInvoicesInquiry, $scope.eInvoicesInquiryCompleted, $scope.eInvoicesInquiryError);
         };
@@ -110,7 +114,13 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
         $scope.createInvoiceObject = function () {
             var eInvoicesInquiry = new Object();
 
-            eInvoicesInquiry.Search = $scope.Search;
+            eInvoicesInquiry.SearchNumberForm = $scope.SearchNumberForm;
+            eInvoicesInquiry.SearchSymbol =  $scope.SearchSymbol;
+            eInvoicesInquiry.SearchFromDate =  ($scope.SearchFromDate != null) ? new moment($scope.SearchFromDate).format('YYYY-MM-DD') : "";
+            eInvoicesInquiry.SearchToDate = ($scope.SearchToDate != null) ? new moment($scope.SearchToDate).format('YYYY-MM-DD') : "";
+            eInvoicesInquiry.SearchCustomer = $scope.SearchCustomer;
+            eInvoicesInquiry.SearchStatus = $scope.SearchStatus;
+
             eInvoicesInquiry.SortExpression = $scope.SortExpression;
             eInvoicesInquiry.SortDirection = $scope.SortDirection;
             eInvoicesInquiry.FetchSize = $scope.FetchSize;

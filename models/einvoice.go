@@ -125,7 +125,7 @@ func (c *EInvoice) Validate() map[string]InterfaceArray {
 	return validationErrors
 }
 
-func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoice, TransactionalInformation) {
+func GetEInvoices(orgID int64, searchNumberForm string, searchSymbol string, searchFromDate string, searchToDate string, searchCustomer string, searchStatus string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoice, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -159,8 +159,26 @@ func GetEInvoices(orgID int64, searchCondition string, infiniteScrollingInformat
 		" INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "
 
 	sqlWhere := " WHERE ehd_invoice.organization_id = $1"
-	if len(searchCondition) > 0 {
-		sqlWhere += fmt.Sprintf(" AND %s", searchCondition)
+	if len(searchNumberForm) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_type.number_form = '%s')", searchNumberForm)
+	}
+	if len(searchSymbol) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_type.symbol = '%s')", searchSymbol)
+	}
+	if len(searchFromDate) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_invoice.invoice_date >= '%s')", searchFromDate)
+	}
+	if len(searchToDate) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_invoice.invoice_date <= '%s')", searchToDate)
+	}
+	if len(searchStatus) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_invoice.status = %s)", searchStatus)
+	}
+	if len(searchCustomer) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (1=0")
+		sqlWhere += fmt.Sprintf(" OR ehd_invoice.id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_invoice' AND organization_id = $1 AND textsearch_value @@ plainto_tsquery('%s'))", searchCustomer)
+		sqlWhere += fmt.Sprintf(" OR ehd_invoice.customer_id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_customer' AND organization_id = $1 AND textsearch_value @@ plainto_tsquery('%s'))", searchCustomer)
+		sqlWhere += fmt.Sprintf(" )")
 	}
 
 	var sqlOrder string

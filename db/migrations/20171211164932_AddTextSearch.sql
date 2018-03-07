@@ -30,8 +30,17 @@ $BODY$
 DECLARE
 BEGIN
     CASE TG_TABLE_NAME
-        WHEN 'xxx' THEN
-            RETURN NEW;
+        WHEN 'ehd_invoice' THEN
+            IF (TG_OP = 'DELETE') THEN
+                DELETE FROM textsearch WHERE textsearch_object = TG_TABLE_NAME AND id = OLD.id;
+                RETURN OLD;
+            ELSE
+                INSERT INTO textsearch(id, textsearch_object, textsearch_value, client_id, organization_id) VALUES
+                (NEW.id, TG_TABLE_NAME, to_tsvector('simple', coalesce(NEW.customer_name, '') || ' ' || coalesce(NEW.customer_vat_number, '')), NEW.client_id, NEW.organization_id)
+                ON CONFLICT ON CONSTRAINT pk_textsearch DO UPDATE SET textsearch_value = to_tsvector('simple', coalesce(NEW.customer_name, '') || ' ' || coalesce(NEW.customer_vat_number, ''));
+                
+                RETURN NEW;
+            END IF;
         ELSE
             IF (TG_OP = 'DELETE') THEN
                 DELETE FROM textsearch WHERE textsearch_object = TG_TABLE_NAME AND id = OLD.id;
@@ -97,6 +106,12 @@ CREATE TRIGGER textsearch_udate
   FOR EACH ROW
   EXECUTE PROCEDURE textsearch_udate_trigger();
 
+CREATE TRIGGER textsearch_udate
+  AFTER INSERT OR UPDATE OR DELETE
+  ON ehd_invoice
+  FOR EACH ROW
+  EXECUTE PROCEDURE textsearch_udate_trigger();
+
 -- +goose Down
 -- SQL section 'Down' is executed when this migration is rolled back
 DROP TABLE textsearch;
@@ -109,5 +124,6 @@ DROP TRIGGER IF EXISTS textsearch_udate ON ehd_customer;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_uom;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item;
 DROP TRIGGER IF EXISTS textsearch_udate ON ehd_item_group;
+DROP TRIGGER IF EXISTS textsearch_udate ON ehd_invoice;
 DROP FUNCTION textsearch_udate_trigger;
 
