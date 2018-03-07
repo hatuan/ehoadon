@@ -200,9 +200,10 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
     rec_created_at timestamp with time zone NOT NULL,
     CONSTRAINT pk_ehd_invoice PRIMARY KEY (id)
 );
-CREATE INDEX IF NOT EXISTS idx_ehd_invoice_no ON ehd_invoice USING btree (invoice_no, client_id);
+CREATE INDEX IF NOT EXISTS idx_ehd_invoice_no ON ehd_invoice USING btree (invoice_no, organization_id);
 CREATE INDEX IF NOT EXISTS idx_ehd_invoice_form_release_id ON ehd_invoice USING btree (form_release_id, client_id);
 CREATE INDEX IF NOT EXISTS idx_ehd_invoice_invoice_file_id ON ehd_invoice USING btree (invoice_file_id);
+CREATE INDEX IF NOT EXISTS idx_ehd_invoice_customer_vat_number ON ehd_invoice USING btree (customer_vat_number, organization_id);
 
 CREATE TABLE IF NOT EXISTS ehd_invoice_line
 (

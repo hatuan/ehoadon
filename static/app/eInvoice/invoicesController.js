@@ -19,6 +19,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             $scope.SearchFromDate = null;
             $scope.SearchToDate = null;
             $scope.SearchCustomer = "";
+            $scope.SearchCustomerVatNumber = "";
             $scope.SearchStatus = "";
             $scope.SortExpression = "invoice_date";
             $scope.SortDirection = "DESC";
@@ -30,6 +31,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
 
             $scope.searchConditionObjects = [];
 
+            $scope.NumberForms = [];
+            $scope.Symbols = [];
             $scope.eInvoices = [];
             $scope.eInvoicesDisplay = [];
             $scope.selectedRow = null;
@@ -93,6 +96,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
 
         $scope.eInvoicesInquiryCompleted = function (response, status) {
             alertsService.RenderSuccessMessage(response.ReturnMessage);
+            $scope.NumberForms = response.Data.NumberForms;
+            $scope.Symbols = response.Data.Symbols;
             $scope.eInvoices = response.Data.eInvoices;
             for (var i = 0, len = $scope.eInvoices.length; i < len; i++) {
                 $scope.eInvoices[i].InvoiceDate = new moment.unix($scope.eInvoices[i].InvoiceDate).toDate();
@@ -119,6 +124,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             eInvoicesInquiry.SearchFromDate =  ($scope.SearchFromDate != null) ? new moment($scope.SearchFromDate).format('YYYY-MM-DD') : "";
             eInvoicesInquiry.SearchToDate = ($scope.SearchToDate != null) ? new moment($scope.SearchToDate).format('YYYY-MM-DD') : "";
             eInvoicesInquiry.SearchCustomer = $scope.SearchCustomer;
+            eInvoicesInquiry.SearchCustomerVatNumber = $scope.SearchCustomerVatNumber;
             eInvoicesInquiry.SearchStatus = $scope.SearchStatus;
 
             eInvoicesInquiry.SortExpression = $scope.SortExpression;

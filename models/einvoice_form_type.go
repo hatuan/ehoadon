@@ -324,3 +324,51 @@ func DeleteEInvoiceFormTypeById(orgID int64, ids []string) TransactionalInformat
 	}
 	return TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
+
+func GetEInvoiceNumberForms(orgID int64) ([]string, TransactionalInformation) {
+	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
+	if err != nil {
+		log.Error(err)
+		return []string{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+	defer db.Close()
+
+	sqlString := "SELECT DISTINCT ehd_form_type.number_form " +
+		" FROM ehd_form_type " +
+		" WHERE ehd_form_type.organization_id = $1 " +
+		" ORDER BY ehd_form_type.number_form "
+
+	getDatas := []string{}
+	err = db.Select(&getDatas, sqlString, orgID)
+
+	if err != nil {
+		log.Error(err)
+		return getDatas, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+
+	return getDatas, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{strconv.Itoa(len(getDatas)) + " records found"}}
+}
+
+func GetEInvoiceSymbols(orgID int64) ([]string, TransactionalInformation) {
+	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
+	if err != nil {
+		log.Error(err)
+		return []string{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+	defer db.Close()
+
+	sqlString := "SELECT DISTINCT ehd_form_type.symbol " +
+		" FROM ehd_form_type " +
+		" WHERE ehd_form_type.organization_id = $1 " +
+		" ORDER BY ehd_form_type.symbol"
+
+	getDatas := []string{}
+	err = db.Select(&getDatas, sqlString, orgID)
+
+	if err != nil {
+		log.Error(err)
+		return getDatas, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
+	}
+
+	return getDatas, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{strconv.Itoa(len(getDatas)) + " records found"}}
+}

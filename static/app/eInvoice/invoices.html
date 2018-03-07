@@ -20,13 +20,17 @@
                             <div class="form-group col-sm-12 col-md-6">
                                 <label for="NumberForm" class="col-sm-4 control-label">Number Form</label>
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control" id="NumberForm" ng-model="SearchNumberForm" capitalize>
+                                    <select class="form-control" id="NumberForm" name="NumberForm" ng-model="SearchNumberForm" ng-options="s as s for s in NumberForms">
+                                        <option value=""> </option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group col-sm-12 col-md-6">
                                 <label for="Symbol" class="col-sm-4 control-label">Symbol</label>
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control" id="Symbol" ng-model="SearchSymbol" capitalize>
+                                    <select class="form-control" id="Symbol" name="Symbol" ng-model="SearchSymbol" ng-options="s as s for s in Symbols">
+                                        <option value=""> </option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -51,6 +55,14 @@
                                     <input type="text" class="form-control" id="Customer" ng-model="SearchCustomer">
                                 </div>
                             </div>
+                            <div class="form-group col-sm-12 col-md-6">
+                                <label for="CustomerVatNumber" class="col-sm-4 control-label">Customer Vat</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="CustomerVatNumber" ng-model="SearchCustomerVatNumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="form-group col-sm-12 col-md-6">
                                 <label for="Status" class="col-sm-4 control-label">Status</label>
                                 <div class="col-sm-6">

@@ -125,7 +125,7 @@ func (c *EInvoice) Validate() map[string]InterfaceArray {
 	return validationErrors
 }
 
-func GetEInvoices(orgID int64, searchNumberForm string, searchSymbol string, searchFromDate string, searchToDate string, searchCustomer string, searchStatus string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoice, TransactionalInformation) {
+func GetEInvoices(orgID int64, searchNumberForm string, searchSymbol string, searchFromDate string, searchToDate string, searchCustomer string, searchCustomerVatNumber string, searchStatus string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoice, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -176,9 +176,17 @@ func GetEInvoices(orgID int64, searchNumberForm string, searchSymbol string, sea
 	}
 	if len(searchCustomer) > 0 {
 		sqlWhere += fmt.Sprintf(" AND (1=0")
-		sqlWhere += fmt.Sprintf(" OR ehd_invoice.id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_invoice' AND organization_id = $1 AND textsearch_value @@ plainto_tsquery('%s'))", searchCustomer)
-		sqlWhere += fmt.Sprintf(" OR ehd_invoice.customer_id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_customer' AND organization_id = $1 AND textsearch_value @@ plainto_tsquery('%s'))", searchCustomer)
+		_searchCustomer := ""
+		for _, _word := range strings.Fields(searchCustomer) {
+			_searchCustomer = _searchCustomer + fmt.Sprintf(" %s:* &", strings.ToLower(_word))
+		}
+		_searchCustomer = _searchCustomer[:len(_searchCustomer)-1]
+		sqlWhere += fmt.Sprintf(" OR ehd_invoice.id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_invoice' AND organization_id = $1 AND textsearch_value @@ tsquery('%s'))", _searchCustomer)
+		sqlWhere += fmt.Sprintf(" OR ehd_invoice.customer_id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_customer' AND organization_id = $1 AND textsearch_value @@ tsquery('%s'))", _searchCustomer) //Neu cap nhat ma khach hang
 		sqlWhere += fmt.Sprintf(" )")
+	}
+	if len(searchCustomerVatNumber) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_invoice.customer_vat_number like '%s%%')", searchCustomerVatNumber)
 	}
 
 	var sqlOrder string
