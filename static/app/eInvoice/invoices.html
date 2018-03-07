@@ -20,7 +20,7 @@
                             <div class="form-group col-sm-12 col-md-6">
                                 <label for="NumberForm" class="col-sm-4 control-label">Number Form</label>
                                 <div class="col-sm-6">
-                                    <select class="form-control" id="NumberForm" name="NumberForm" ng-model="SearchNumberForm" ng-options="s as s for s in NumberForms">
+                                    <select class="form-control" id="NumberForm" name="NumberForm" ng-model="SearchNumberForm" ng-options="s for s in NumberForms track by s">
                                         <option value=""> </option>
                                     </select>
                                 </div>
@@ -28,7 +28,7 @@
                             <div class="form-group col-sm-12 col-md-6">
                                 <label for="Symbol" class="col-sm-4 control-label">Symbol</label>
                                 <div class="col-sm-6">
-                                    <select class="form-control" id="Symbol" name="Symbol" ng-model="SearchSymbol" ng-options="s as s for s in Symbols">
+                                    <select class="form-control" id="Symbol" name="Symbol" ng-model="SearchSymbol" ng-options="s for s in Symbols track by s">
                                         <option value=""> </option>
                                     </select>
                                 </div>
