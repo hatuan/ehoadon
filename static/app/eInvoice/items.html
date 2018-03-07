@@ -1,5 +1,33 @@
 <div class="row" ng-init="initializeController()">
     <div class="col-md-12">
+        <div class="portlet light">
+            <div class="portlet-title">
+                <div class="caption font-green-sharp">
+                    <i class="icon-magnifier font-green-sharp"></i>
+                    <span class="caption-subject bold uppercase">Search</span>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-outline green" ng-click="search(searchForm)">
+                        <i class="fa fa-search"></i>
+                        <span class="hidden-480"> Search </span>
+                    </a>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <form id="searchForm" name="searchForm" role="form" ng-validate="searchValidationOptions" class="form-horizontal">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="form-group col-sm-12 col-md-6">
+                                <label for="Item" class="col-sm-4 control-label">Item</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="Item" ng-model="SearchItem">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
         <!-- BEGIN: ACCORDION DEMO -->
         <div class="portlet light portlet-fit portlet-datatable bordered">
             <div class="portlet-title">

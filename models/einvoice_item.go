@@ -90,7 +90,7 @@ func (c *EInvoiceItem) Validate() map[string]InterfaceArray {
 	return validationErrors
 }
 
-func GetEInvoiceItems(orgID int64, searchCondition string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceItem, TransactionalInformation) {
+func GetEInvoiceItems(orgID int64, searchItem string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceItem, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -112,8 +112,15 @@ func GetEInvoiceItems(orgID int64, searchCondition string, infiniteScrollingInfo
 		" LEFT JOIN ehd_item_uom as ehd_item_uom ON ehd_item.item_uom_id = ehd_item_uom.id "
 
 	sqlWhere := " WHERE ehd_item.organization_id = $1"
-	if len(searchCondition) > 0 {
-		sqlWhere += fmt.Sprintf(" AND %s", searchCondition)
+	if len(searchItem) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (1=0")
+		_searchItem := ""
+		for _, _word := range strings.Fields(searchItem) {
+			_searchItem = _searchItem + fmt.Sprintf(" %s:* &", strings.ToLower(_word))
+		}
+		_searchItem = _searchItem[:len(_searchItem)-1]
+		sqlWhere += fmt.Sprintf(" OR ehd_item.id IN (SELECT id FROM textsearch WHERE textsearch_object='ehd_item' AND organization_id = $1 AND textsearch_value @@ tsquery('%s'))", _searchItem)
+		sqlWhere += fmt.Sprintf(" )")
 	}
 
 	var sqlOrder string

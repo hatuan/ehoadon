@@ -14,7 +14,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             
             $scope.Constants = Constants;
 
-            $scope.Search = "";
+            $scope.SearchItem = "";
             $scope.isSearched = false;
             $scope.SortExpression = "Code";
             $scope.SortDirection = "ASC";
@@ -24,22 +24,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.TotalRows = 0;
             $scope.Selection=[];
 
-            $scope.searchConditionObjects = [];
-            $scope.searchConditionObjects.push({
-                ID: "ehd_item.code",
-                Name: "Code",
-                Type: "CODE", //CODE, FREE, DATE
-                ValueIn: "eInvoiceItems",
-                Value: ""
-            },
-            {
-                ID: "ehd_item.description",
-                Name: "Description",
-                Type: "FREE", //CODE, FREE, DATE
-                ValueIn: "",
-                Value: ""
-            });
-
             $scope.eInvoiceItems = [];
             $scope.eInvoiceItemsDisplay = [];
             $scope.selectedRow = null;
@@ -48,18 +32,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.getItems();
         };
 
-        $scope.refresh = function () {
-            $scope.getItems();
+        $scope.search = function (form) {
+            if(form.validate()) {
+                $scope.getItems();
+            }
         }
 
-        $scope.showSearch = function () {
-            $scope.isSearched = !$scope.isSearched;
-        }
-
-        $scope.selectAll = function () {
-            $scope.Selection=[];
-            for(var i = 0; i < $scope.FilteredItems.length; i++) {
-                $scope.Selection.push($scope.FilteredItems[i]["ID"]);
+        $scope.searchValidationOptions = {
+            rules: {
             }
         }
 
@@ -82,9 +62,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             });
         }
 
-        $scope.getItems = function (searchSqlCondition) {
-            if(!angular.isUndefinedOrNull(searchSqlCondition))
-                $scope.Search = searchSqlCondition;
+        $scope.getItems = function () {
             var eInvoiceItemInquiry = $scope.createItemObject();
             eInvoiceItemService.getItems(eInvoiceItemInquiry, $scope.einvoiceItemsInquiryCompleted, $scope.einvoiceItemsInquiryError);
         };
@@ -107,7 +85,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.createItemObject = function () {
             var eInvoiceItemInquiry = new Object();
 
-            eInvoiceItemInquiry.Search = $scope.Search;
+            eInvoiceItemInquiry.SearchItem = $scope.SearchItem;
             eInvoiceItemInquiry.SortExpression = $scope.SortExpression;
             eInvoiceItemInquiry.SortDirection = $scope.SortDirection;
             eInvoiceItemInquiry.FetchSize = $scope.FetchSize;

@@ -31,7 +31,7 @@ func API_eInvoiceItems(w http.ResponseWriter, r *http.Request, next http.Handler
 			SortDirection:  r.URL.Query().Get("SortDirection"),
 			SortExpression: r.URL.Query().Get("SortExpression")}
 
-		einvoiceItem, tranInfor := models.GetEInvoiceItems(user.OrganizationID, r.URL.Query().Get("Search"), infiniteScrollingInformation)
+		einvoiceItem, tranInfor := models.GetEInvoiceItems(user.OrganizationID, r.URL.Query().Get("SearchItem"), infiniteScrollingInformation)
 		if tranInfor.ReturnStatus == false {
 			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceItems": []models.EInvoiceItem{}}}, http.StatusBadRequest)
 			return

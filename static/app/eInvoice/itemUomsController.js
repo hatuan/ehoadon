@@ -15,30 +15,13 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.Constants = Constants;
 
             $scope.Search = "";
-            $scope.isSearched = false;
             $scope.SortExpression = "Code";
             $scope.SortDirection = "ASC";
-            $scope.FetchSize = 100;
+            $scope.FetchSize = ""; //load all
             $scope.CurrentPage = 1;
             $scope.PageSize = 9;
             $scope.TotalRows = 0;
             $scope.Selection=[];
-
-            $scope.searchConditionObjects = [];
-            $scope.searchConditionObjects.push({
-                ID: "ehd_item_uom.code",
-                Name: "Code",
-                Type: "CODE", //CODE, FREE, DATE
-                ValueIn: "eInvoiceItemUoms",
-                Value: ""
-            },
-            {
-                ID: "ehd_item_uom.description",
-                Name: "Description",
-                Type: "FREE", //CODE, FREE, DATE
-                ValueIn: "",
-                Value: ""
-            });
 
             $scope.eInvoiceItemUomsDisplay = [];
             $scope.eInvoiceItemUoms = [];
@@ -47,21 +30,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.isLoading = true;
             $scope.getItemUoms();
         };
-
-        $scope.refresh = function () {
-            $scope.getItemUoms();
-        }
-
-        $scope.showSearch = function () {
-            $scope.isSearched = !$scope.isSearched;
-        }
-
-        $scope.selectAll = function () {
-            $scope.Selection=[];
-            for(var i = 0; i < $scope.FilteredItems.length; i++) {
-                $scope.Selection.push($scope.FilteredItems[i]["ID"]);
-            }
-        }
 
         $scope.delete = function (_index, _item) {
             $confirm({text: 'Are you sure you want to delete?', title: 'Delete', ok: 'Yes', cancel: 'No'})
@@ -93,9 +61,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
              }
         };
 
-        $scope.getItemUoms = function (searchSqlCondition) {
-            if(!angular.isUndefinedOrNull(searchSqlCondition))
-                $scope.Search = searchSqlCondition;
+        $scope.getItemUoms = function () {
             var eInvoiceItemUomInquiry = $scope.createItemUomObject();
             eInvoiceItemUomService.getItemUoms(eInvoiceItemUomInquiry, $scope.einvoiceItemUomsInquiryCompleted, $scope.einvoiceItemUomsInquiryError);
         };
