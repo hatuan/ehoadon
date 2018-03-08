@@ -157,8 +157,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             });
             modalInstance.rendered.then(function(result) {
                 $('.modal .modal-body').css('overflow-y', 'auto');
-                $('.modal .modal-body').css('max-height', $(window).height() * 0.8);
-                $('.modal .modal-body').css('height', $(window).height() * 0.8);
+                $('.modal .modal-body').css('max-height', $(window).height() * 0.75);
+                $('.modal .modal-body').css('height', $(window).height() * 0.75);
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
