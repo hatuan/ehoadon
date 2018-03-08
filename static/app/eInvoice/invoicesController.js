@@ -29,8 +29,6 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             $scope.TotalRows = 0;
             $scope.Selection=[];
 
-            $scope.searchConditionObjects = [];
-
             $scope.NumberForms = [];
             $scope.Symbols = [];
             $scope.eInvoices = [];

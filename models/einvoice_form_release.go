@@ -92,7 +92,7 @@ func (c *EInvoiceFormRelease) Validate() map[string]InterfaceArray {
 	return validationErrors
 }
 
-func GetEInvoiceFormReleases(orgID int64, searchCondition string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceFormRelease, TransactionalInformation) {
+func GetEInvoiceFormReleases(orgID int64, searchNumberForm string, searchSymbol string, searchFromDateRelease string, searchToDateRelease string, searchFromDateStart string, searchToDateStart string, searchStatus string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceFormRelease, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -114,8 +114,26 @@ func GetEInvoiceFormReleases(orgID int64, searchCondition string, infiniteScroll
 		" INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "
 
 	sqlWhere := " WHERE ehd_form_release.organization_id = $1"
-	if len(searchCondition) > 0 {
-		sqlWhere += fmt.Sprintf(" AND %s", searchCondition)
+	if len(searchNumberForm) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_type.number_form = '%s')", searchNumberForm)
+	}
+	if len(searchSymbol) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_type.symbol = '%s')", searchSymbol)
+	}
+	if len(searchFromDateRelease) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_release.release_date >= '%s')", searchFromDateRelease)
+	}
+	if len(searchToDateRelease) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_release.release_date <= '%s')", searchToDateRelease)
+	}
+	if len(searchFromDateStart) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_release.start_date >= '%s')", searchFromDateStart)
+	}
+	if len(searchToDateStart) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_release.start_date <= '%s')", searchToDateStart)
+	}
+	if len(searchStatus) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_release.status = %s)", searchStatus)
 	}
 
 	var sqlOrder string

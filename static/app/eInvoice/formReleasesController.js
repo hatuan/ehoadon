@@ -14,8 +14,13 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             
             $scope.Constants = Constants;
 
-            $scope.Search = "";
-            $scope.isSearched = false;
+            $scope.SearchNumberForm ="";
+            $scope.SearchSymbol = "";
+            $scope.SearchFromDateRelease = null;
+            $scope.SearchToDateRelease = null;
+            $scope.SearchFromDateStart = null;
+            $scope.SearchToDateStart = null;
+            $scope.SearchStatus = "";
             $scope.SortExpression = "release_date";
             $scope.SortDirection = "ASC";
             $scope.FetchSize = 100;
@@ -24,8 +29,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.TotalRows = 0;
             $scope.Selection=[];
 
-            $scope.searchConditionObjects = [];
-            
+            $scope.NumberForms = [];
+            $scope.Symbols = [];
             $scope.eInvoiceFormReleases = [];
             $scope.eInvoiceFormReleasesDisplay = [];
             $scope.selectedRow = null;
@@ -35,18 +40,26 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.getFormReleases();
         };
 
-        $scope.refresh = function () {
-            $scope.getFormReleases();
+        $scope.search = function (form) {
+            if(form.validate()) {
+                $scope.getFormReleases();
+            }
         }
 
-        $scope.showSearch = function () {
-            $scope.isSearched = !$scope.isSearched;
-        }
-
-        $scope.selectAll = function () {
-            $scope.Selection=[];
-            for(var i = 0; i < $scope.FilteredFormReleases.length; i++) {
-                $scope.Selection.push($scope.FilteredFormReleases[i]["ID"]);
+        $scope.searchValidationOptions = {
+            rules: {
+                FromDateRelease: {
+                    date: true,
+                },
+                ToDateRelease: {
+                    date: true,
+                },
+                FromDateStart: {
+                    date: true,
+                },
+                ToDateStart: {
+                    date: true,
+                },
             }
         }
 
@@ -79,15 +92,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
              }
         };
 
-        $scope.getFormReleases = function (searchSqlCondition) {
-            if(!angular.isUndefinedOrNull(searchSqlCondition))
-                $scope.Search = searchSqlCondition;
+        $scope.getFormReleases = function () {
             var eInvoiceFormReleaseInquiry = $scope.createFormReleaseObject();
             eInvoiceFormReleaseService.getFormReleases(eInvoiceFormReleaseInquiry, $scope.einvoiceFormReleasesInquiryCompleted, $scope.einvoiceFormReleasesInquiryError);
         };
 
         $scope.einvoiceFormReleasesInquiryCompleted = function (response, status) {
             alertsService.RenderSuccessMessage(response.ReturnMessage);
+            $scope.NumberForms = response.Data.NumberForms;
+            $scope.Symbols = response.Data.Symbols;
             $scope.eInvoiceFormReleases = response.Data.eInvoiceFormReleases;
             for (var i = 0, len = $scope.eInvoiceFormReleases.length; i < len; i++) {
                 $scope.eInvoiceFormReleases[i].ReleaseDate = new moment.unix($scope.eInvoiceFormReleases[i].ReleaseDate).toDate();
@@ -111,7 +124,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.createFormReleaseObject = function () {
             var eInvoiceFormReleaseInquiry = new Object();
 
-            eInvoiceFormReleaseInquiry.Search = $scope.Search;
+            eInvoiceFormReleaseInquiry.SearchNumberForm = $scope.SearchNumberForm;
+            eInvoiceFormReleaseInquiry.SearchSymbol =  $scope.SearchSymbol;
+            eInvoiceFormReleaseInquiry.SearchFromDateRelease =  ($scope.SearchFromDateRelease != null) ? new moment($scope.SearchFromDateRelease).format('YYYY-MM-DD') : "";
+            eInvoiceFormReleaseInquiry.SearchToDateRelease = ($scope.SearchToDateRelease != null) ? new moment($scope.SearchToDateRelease).format('YYYY-MM-DD') : "";
+            eInvoiceFormReleaseInquiry.SearchFromDateStart =  ($scope.SearchFromDateStart != null) ? new moment($scope.SearchFromDateStart).format('YYYY-MM-DD') : "";
+            eInvoiceFormReleaseInquiry.SearchToDateStart = ($scope.SearchToDateStart != null) ? new moment($scope.SearchToDateStart).format('YYYY-MM-DD') : "";
+            eInvoiceFormReleaseInquiry.SearchStatus = $scope.SearchStatus;
+
             eInvoiceFormReleaseInquiry.SortExpression = $scope.SortExpression;
             eInvoiceFormReleaseInquiry.SortDirection = $scope.SortDirection;
             eInvoiceFormReleaseInquiry.FetchSize = $scope.FetchSize;

@@ -31,12 +31,22 @@ func API_eInvoiceFormReleases(w http.ResponseWriter, r *http.Request, next http.
 			SortDirection:  r.URL.Query().Get("SortDirection"),
 			SortExpression: r.URL.Query().Get("SortExpression")}
 
-		einvoiceFormRelease, tranInfor := models.GetEInvoiceFormReleases(user.OrganizationID, r.URL.Query().Get("Search"), infiniteScrollingInformation)
+		einvoiceFormRelease, tranInfor := models.GetEInvoiceFormReleases(user.OrganizationID, r.URL.Query().Get("SearchNumberForm"), r.URL.Query().Get("SearchSymbol"), r.URL.Query().Get("SearchFromDateRelease"), r.URL.Query().Get("SearchToDateRelease"), r.URL.Query().Get("SearchFromDateStart"), r.URL.Query().Get("SearchToDateStart"), r.URL.Query().Get("SearchStatus"), infiniteScrollingInformation)
 		if tranInfor.ReturnStatus == false {
-			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormReleases": []models.EInvoiceFormRelease{}}}, http.StatusBadRequest)
+			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormReleases": []models.EInvoiceFormRelease{}, "NumberForms": []string{}, "Symbols": []string{}}}, http.StatusBadRequest)
 			return
 		}
-		JSONResponse(w, models.Response{ReturnStatus: true, TotalRows: len(einvoiceFormRelease), Data: map[string]interface{}{"eInvoiceFormReleases": einvoiceFormRelease}, IsAuthenticated: true}, http.StatusOK)
+		numberForms, tranInfor := models.GetEInvoiceNumberForms(user.OrganizationID)
+		if tranInfor.ReturnStatus == false {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormReleases": []models.EInvoiceFormRelease{}, "NumberForms": []string{}, "Symbols": []string{}}}, http.StatusBadRequest)
+			return
+		}
+		symbols, tranInfor := models.GetEInvoiceSymbols(user.OrganizationID)
+		if tranInfor.ReturnStatus == false {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfor.ReturnStatus, ReturnMessage: tranInfor.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoiceFormReleases": []models.EInvoiceFormRelease{}, "NumberForms": []string{}, "Symbols": []string{}}}, http.StatusBadRequest)
+			return
+		}
+		JSONResponse(w, models.Response{ReturnStatus: true, TotalRows: len(einvoiceFormRelease), Data: map[string]interface{}{"eInvoiceFormReleases": einvoiceFormRelease, "NumberForms": numberForms, "Symbols": symbols}, IsAuthenticated: true}, http.StatusOK)
 
 	case r.Method == "POST":
 		einvoiceFormRelease := models.EInvoiceFormRelease{}
