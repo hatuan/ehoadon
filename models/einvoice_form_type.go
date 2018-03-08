@@ -99,7 +99,7 @@ func (c *EInvoiceFormType) Validate() map[string]InterfaceArray {
 	return validationErrors
 }
 
-func GetEInvoiceFormTypes(orgID int64, searchCondition string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceFormType, TransactionalInformation) {
+func GetEInvoiceFormTypes(orgID int64, searchNumberForm string, searchSymbol string, infiniteScrollingInformation InfiniteScrollingInformation) ([]EInvoiceFormType, TransactionalInformation) {
 	db, err := sqlx.Connect(settings.Settings.Database.DriverName, settings.Settings.GetDbConn())
 	if err != nil {
 		log.Error(err)
@@ -117,8 +117,11 @@ func GetEInvoiceFormTypes(orgID int64, searchCondition string, infiniteScrolling
 		" INNER JOIN organization as organization ON ehd_form_type.organization_id = organization.id "
 
 	sqlWhere := " WHERE ehd_form_type.organization_id = $1"
-	if len(searchCondition) > 0 {
-		sqlWhere += fmt.Sprintf(" AND %s", searchCondition)
+	if len(searchNumberForm) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_type.number_form = '%s')", searchNumberForm)
+	}
+	if len(searchSymbol) > 0 {
+		sqlWhere += fmt.Sprintf(" AND (ehd_form_type.symbol = '%s')", searchSymbol)
 	}
 
 	var sqlOrder string

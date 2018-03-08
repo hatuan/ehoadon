@@ -131,6 +131,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
             var _result = new Object();
             _result.SelectReports = false;
             _result.EditFormType = response.Data.eInvoiceFormType;
+            _result.NumberForms = response.Data.NumberForms;
+            _result.Symbols = response.Data.Symbols;
 
             $uibModalInstance.close(_result);
         };

@@ -14,8 +14,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             
             $scope.Constants = Constants;
 
-            $scope.Search = "";
-            $scope.isSearched = false;
+            $scope.SearchNumberForm ="";
+            $scope.SearchSymbol = "";
             $scope.SortExpression = "rec_created_at";
             $scope.SortDirection = "DESC";
             $scope.FetchSize = 100;
@@ -24,8 +24,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.TotalRows = 0;
             $scope.Selection=[];
 
-            $scope.searchConditionObjects = [];
-            
+            $scope.NumberForms = [];
+            $scope.Symbols = [];
             $scope.eInvoiceFormTypes = [];
             $scope.eInvoiceFormTypesDisplay = [];
             $scope.selectedRow = null;
@@ -35,18 +35,14 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
             $scope.getFormTypes();
         };
 
-        $scope.refresh = function () {
-            $scope.getFormTypes();
+        $scope.search = function (form) {
+            if(form.validate()) {
+                $scope.getFormTypes();
+            }
         }
 
-        $scope.showSearch = function () {
-            $scope.isSearched = !$scope.isSearched;
-        }
-
-        $scope.selectAll = function () {
-            $scope.Selection=[];
-            for(var i = 0; i < $scope.FilteredFormTypes.length; i++) {
-                $scope.Selection.push($scope.FilteredFormTypes[i]["ID"]);
+        $scope.searchValidationOptions = {
+            rules: {
             }
         }
 
@@ -61,6 +57,9 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                             $scope.Selection = [];
                             $scope.eInvoiceFormTypes.splice($scope.eInvoiceFormTypes.indexOf(_item), 1);
                             $scope.eInvoiceFormTypesDisplay.splice($scope.eInvoiceFormTypesDisplay.indexOf(_item), 1);
+                            
+                            $scope.NumberForms = response.Data.NumberForms;
+                            $scope.Symbols = response.Data.Symbols;
                         }, 
                         function (response, status){
                             $scope.Selection = [];
@@ -79,15 +78,15 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
              }
         };
 
-        $scope.getFormTypes = function (searchSqlCondition) {
-            if(!angular.isUndefinedOrNull(searchSqlCondition))
-                $scope.Search = searchSqlCondition;
+        $scope.getFormTypes = function () {
             var eInvoiceFormTypeInquiry = $scope.createFormTypeObject();
             eInvoiceFormTypeService.getFormTypes(eInvoiceFormTypeInquiry, $scope.einvoiceFormTypesInquiryCompleted, $scope.einvoiceFormTypesInquiryError);
         };
 
         $scope.einvoiceFormTypesInquiryCompleted = function (response, status) {
             alertsService.RenderSuccessMessage(response.ReturnMessage);
+            $scope.NumberForms = response.Data.NumberForms;
+            $scope.Symbols = response.Data.Symbols;
             $scope.eInvoiceFormTypes = response.Data.eInvoiceFormTypes;
             for (var i = 0, len = $scope.eInvoiceFormTypes.length; i < len; i++) {
                 $scope.eInvoiceFormTypes[i].RecCreated = new moment.unix($scope.eInvoiceFormTypes[i].RecCreated).toDate();
@@ -108,7 +107,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
         $scope.createFormTypeObject = function () {
             var eInvoiceFormTypeInquiry = new Object();
 
-            eInvoiceFormTypeInquiry.Search = $scope.Search;
+            eInvoiceFormTypeInquiry.SearchNumberForm = $scope.SearchNumberForm;
+            eInvoiceFormTypeInquiry.SearchSymbol =  $scope.SearchSymbol;
             eInvoiceFormTypeInquiry.SortExpression = $scope.SortExpression;
             eInvoiceFormTypeInquiry.SortDirection = $scope.SortDirection;
             eInvoiceFormTypeInquiry.FetchSize = $scope.FetchSize;
@@ -157,6 +157,8 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'myApp.Search', 
                         $scope.eInvoiceFormTypesDisplay.push(_formType);
                         $scope.selectedRow = _formType; 
                     }
+                    $scope.NumberForms = _result.NumberForms;
+                    $scope.Symbols = _result.Symbols;
                 }
             }, function(_result) {
                 //dismissed 
