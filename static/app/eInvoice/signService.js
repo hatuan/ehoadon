@@ -102,7 +102,20 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                 ds.Invoice = $.extend(true, {},SignInvoice);
                 ds.InvoiceLines = ds.Invoice.InvoiceLines;
                 ds.Vars = FormVars;
-    
+                
+                var qr = new QRious({
+                    level: 'H',
+                    value: FormVars.NumberForm + 
+                        "|" + FormVars.CompanyVatNumber + 
+                        "|" + FormVars.Symbol + 
+                        "|" + (SignInvoice.InvoiceNo === "" ? ds.Vars.InvoiceNo : SignInvoice.InvoiceNo) + 
+                        "|" + SignInvoice.CustomerVatNumber + 
+                        "|" + SignInvoice.TotalPayment + 
+                        "|" + SignInvoice.TotalVat +
+                        "|" + moment(SignInvoice.InvoiceDate).format("YYYY-MM-DD")
+                });
+                ds.Vars.InvoiceImageQR = qr.toDataURL();
+
                 for(var _i = ds.InvoiceLines.length; _i < 10; _i++ ) {
                     ds.InvoiceLines.push({LineNo: _i + 1});
                 }
@@ -129,51 +142,42 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                     var service = new Stimulsoft.Report.Export.StiPdfExportService();
                     // Create a MemoryStream object.
                     var stream = new Stimulsoft.System.IO.MemoryStream();
-                    // Export PDF using MemoryStream.
-                    service.exportTo(report, stream, settings);
-                    // Get PDF data from MemoryStream object
-                    var data = stream.toArray(); //or var data = $scope.report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf);
-                    var dataBase64 = arrayBufferToBase64(data);
-    
-                    try
-                    {
-                        var signedInfo = myAx.SignDocument(dataBase64, 
-                            Token.TokenSerialNumber, 
-                            SignInvoice.ID, 
-                            SignInvoice.Version + '', 
-                            Constants.InvoiceStatus[1].Code + '', 
-                            $auth.getToken());
-                    } catch(err) {
-                        settings = null;
-                        stream = null;
-                        service = null;
-                        data = null;
-                        dataBase64 = null;
-                        
-                        alert(err.message);
-                        return;
-                    }     
-                    settings = null;
-                    stream = null;
-                    service = null;
-                    data = null;
-                    dataBase64 = null;
-    
-                    var postData = {
-                        'InvoiceID' : signedInfo.DocumentID,
-                        'PDFBase64' : signedInfo.SignedContent,
-                        'PDFBase64MD5' : signedInfo.SignedContentMD5,
-                        'Status' : signedInfo.SignedStatus,
-                        'Version' : signedInfo.DocumentVersion
-                    };
+                    
+                    report.renderAsync(function () {
+                        service.exportToAsync(function () {
+                            const data = report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf); //or data = stream.toArray();
+                            const dataBase64 = arrayBufferToBase64(data);
+                            
+                            try
+                            {
+                                var signedInfo = myAx.SignDocument(dataBase64, 
+                                    Token.TokenSerialNumber, 
+                                    SignInvoice.ID, 
+                                    SignInvoice.Version + '', 
+                                    Constants.InvoiceStatus[1].Code + '', 
+                                    $auth.getToken());
+                            } catch(err) {
+                                alert(err.message);
+                                return;
+                            }     
+            
+                            var postData = {
+                                'InvoiceID' : signedInfo.DocumentID,
+                                'PDFBase64' : signedInfo.SignedContent,
+                                'PDFBase64MD5' : signedInfo.SignedContentMD5,
+                                'Status' : signedInfo.SignedStatus,
+                                'Version' : signedInfo.DocumentVersion
+                            };
 
-                    $http.post('/api/einvoiceFiles', postData)
-                    .success(function (response, status) {
-                        successFunction(response, status);
-                    })
-                    .error(function (response) {
-                        errorFunction(response);
-                    });
+                            $http.post('/api/einvoiceFiles', postData)
+                            .success(function (response, status) {
+                                successFunction(response, status);
+                            })
+                            .error(function (response) {
+                                errorFunction(response);
+                            });
+                        }, report, stream, settings);
+                    }, false);
                 //}, 50);
             };    
         };
