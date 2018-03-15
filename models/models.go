@@ -43,6 +43,7 @@ type LoginDTO struct {
 type TransactionalInformation struct {
 	ReturnStatus     bool
 	ReturnMessage    []string
+	ReturnError      error
 	ValidationErrors map[string]InterfaceArray
 	TotalPages       int
 	TotalRows        int

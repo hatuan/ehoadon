@@ -3,13 +3,12 @@
  */
 define(['angularAMD'], function (angularAMD) {
 
-    angularAMD.service('alertsService', ['$rootScope', 'toastr', function ($rootScope, toastr) {
+    angularAMD.service('alertsService', ['$rootScope', 'ngToast', function ($rootScope, ngToast) {
 
         $rootScope.alerts = [];
         $rootScope.MessageBox = "";
 
         this.SetValidationErrors = function (scope, validationErrors) {
-
             for (var prop in validationErrors) {
                 var property = prop + "InputError";
                 scope[property] = true;
@@ -18,31 +17,37 @@ define(['angularAMD'], function (angularAMD) {
 
         this.RenderFloatErrorMessage = function(message) {
             var messageBox = formatMessage(message);
-            toastr.error(messageBox, 'Error');
+            ngToast.danger({
+                content: messageBox
+            });
         };
 
         this.RenderFloatSuccessMessage = function(message) {
             var messageBox = formatMessage(message);
-            toastr.success(messageBox, 'Success');
+            ngToast.success({
+                content: messageBox
+            });
         };
 
         this.RenderFloatWarningMessage = function(message) {
             var messageBox = formatMessage(message);
-            toastr.warning(messageBox, 'Warning');
+            ngToast.warning({
+                content: messageBox
+            });
         };
 
-        this.RenderFloatInformationMessage = function(message) {
+        this.RenderFloatInformationMessage = function(message, options) {
             var messageBox = formatMessage(message);
-            toastr.info(messageBox, 'Information');
+            ngToast.info({
+                content: messageBox
+            });
         };
 
         this.RenderErrorMessage = function (message) {
-
             var messageBox = formatMessage(message);
             $rootScope.alerts = [];
             $rootScope.MessageBox = messageBox;
             $rootScope.alerts.push({ 'type': 'danger', 'msg': '' });
-
         };
 
         this.RenderSuccessMessage = function (message) {

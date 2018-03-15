@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS ehd_invoice
     customer_contact_email character varying NOT NULL,
     customer_bank_account character varying NOT NULL,
     customer_bank_name character varying NOT NULL,
-    process_invoice_status smallint NOT NULL DEFAULT 0, /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh  */
+    process_invoice_status smallint NOT NULL DEFAULT 0, /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh, 3: Hoa don bi thay the, 4: Hoa don thay the */
     process_adjusted_form smallint NOT NULL DEFAULT 0, /* Hinh thuc dieu chinh 0: khong dieu chinh, 1: Dieu chinh tang, 2: Dieu chinh giam, 3: Dieu chinh khong thay doi tien, 4: Dieu chinh khac */
     process_adjusted_type smallint NOT NULL DEFAULT 0, /* Loai dieu chinh 0: khong dieu chinh; Neu process_adjusted_form = 1,2 => 1: Hang hoa dich vu; process_adjusted_form = 3 => 2: Ma so thue, 3: Tien chu, 4: Ten khach, Dia chi; Neu process_adjusted_form = 4 => 5: Khac*/
     total_amount numeric(38, 20) NOT NULL,

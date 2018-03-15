@@ -30,7 +30,7 @@
     "ng-load": "^1.0.2",
     "angular-translate": "^2.11.0",
     "jquery": "2.2.3",
-    "angular-toastr": "^1.7.0",
+    "angular-toastr": "^2.1.1",
     "moment": "^2.13.0",
     "angular-moment": "^0.10.3",
     "angular-bootstrap": "^2.3.0",
@@ -56,6 +56,7 @@
     "angular-ui-grid": "^4.2.4",
     "angular-smart-table": "^2.1.11",
     "lodash": "^4.17.5",
-    "qrious": "^4.0.2"
+    "qrious": "^4.0.2",
+    "ngToast": "ngtoast#^2.0.0"
   }
 }

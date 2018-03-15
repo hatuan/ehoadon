@@ -59,6 +59,27 @@ define(['angular'], function (angular) {
             New: "New",
             View: "View",
             Edit: "Edit",
+        },
+        NumberPadding: "0000000",
+        ProcessInvoiceStatus: { /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh, 3: Hoa don bi thay the, 4: Hoa don thay the */
+            "HD_GOC" : 0,
+            "HD_BI_DIEU_CHINH": 1,
+            "HD_DIEU_CHINH": 2,
+            "HD_BI_THAY_THE": 3,
+            "HD_THAY_THE": 4,
+        },
+        ProcessInvoiceStatusDescription: {
+            0: "Hóa đơn gốc",
+            1: "Hóa đơn bị điều chỉnh",
+            2: "Hóa đơn điều chỉnh",
+            3: "Hóa đơn bị thay thế",
+            4: "Hóa đơn thay thế",
+        },
+        DocumentAdjTypes: {
+            1: "Điều chỉnh tăng",
+            2: "Điều chỉnh giảm",
+            3: "Điều chỉnh thông tin",
+            4: "Thay thế hóa đơn"
         }
     })
 });

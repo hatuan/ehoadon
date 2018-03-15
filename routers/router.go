@@ -190,6 +190,12 @@ func InitRoutes() *mux.Router {
 			negroni.HandlerFunc(controllers.API_eInvoice_Id),
 		))
 
+	api.Handle("/einvoice/{InvoiceNo:[0-9]+}",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_eInvoice_InvoiceNo),
+		))
+
 	api.Handle("/einvoicesign",
 		negroni.New(
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
@@ -206,6 +212,12 @@ func InitRoutes() *mux.Router {
 		negroni.New(
 			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
 			negroni.HandlerFunc(controllers.API_eInvoiceFiles),
+		))
+
+	api.Handle("/einvoicesAdj",
+		negroni.New(
+			negroni.HandlerFunc(middleware.RequireTokenAuthentication),
+			negroni.HandlerFunc(controllers.API_eInvoicesAdj),
 		))
 
 	// Setup static file serving

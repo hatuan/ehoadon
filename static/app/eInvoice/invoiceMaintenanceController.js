@@ -12,12 +12,12 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.Constants = Constants;
             $scope.FormReleases = [];
             $scope.EditInvoice = editInvoice;
-            $scope.EditInvoice.InvoiceLines = [];
+            $scope.EditInvoice.InvoiceLines = editInvoice.InvoiceLines ? editInvoice.InvoiceLines : [];
             $scope.selectViewReport = false;
             $scope.documentChanged = false;
             $scope.documentState = $scope.Constants.DocumentStates.View;
             $scope.originalDocument = {};
-
+debugger;
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                 $scope.EditInvoice.InvoiceDate = $rootScope.Preference.WorkingDate;
                 $scope.EditInvoice.Status = $scope.Constants.InvoiceStatus[0].Code;
@@ -28,7 +28,6 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                 $scope.EditInvoice.RecModifiedByUser = $rootScope.currentUser.Name;
                 $scope.EditInvoice.RecModified = new Date();
 
-                $scope.EditInvoice.InvoiceLines = [];
                 $scope.documentState = $scope.Constants.DocumentStates.New;
             } else {
                 //invoice se duoc lay tai $scope.getInvoice sau khi thuc hien $scope.getFormReleases();
@@ -153,6 +152,7 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                 }
                 _post = $.extend(true, {}, $scope.EditInvoice);
                 _post.InvoiceDate = new moment(_post.InvoiceDate).unix();
+                _post.OriginalInvoiceDate = new moment(_post.OriginalInvoiceDate).unix();
                 _post.RecCreated = new moment($scope.EditInvoice.RecCreated).unix();
                 _post.RecModified = new moment($scope.EditInvoice.RecModified).unix();
                 
@@ -316,6 +316,21 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
 
                     if (!angular.isUndefinedOrNull($scope.EditInvoice.ID))
                         $scope.getInvoice($scope.EditInvoice.ID);
+                    else if ($scope.EditInvoice.InvoiceLines && $scope.EditInvoice.InvoiceLines.length > 0) { //trong truong hop dieu chinh thay the hoa don
+                        setTimeout(function() {
+                            for(var i = 0, len = $scope.EditInvoice.InvoiceLines.length; i < len; i ++) {
+                                var _invoiceLine = $scope.EditInvoice.InvoiceLines[i];
+                                $scope.SetItemSelect2ToObject("#ItemID_" + _invoiceLine.LineNo);
+                                $scope.SetItemUomSelect2ToObject("#UomID_" + _invoiceLine.LineNo);
+    
+                                var newOptionItem = new Option(_invoiceLine.ItemCode, _invoiceLine.ItemID, true, true);
+                                $("#ItemID_" + _invoiceLine.LineNo).empty().append(newOptionItem);
+    
+                                var newOptionUom = new Option(_invoiceLine.UomCode, _invoiceLine.UomID, true, true);
+                                $("#UomID_" + _invoiceLine.LineNo).empty().append(newOptionUom);
+                            }
+                        }, 100);
+                    }
                 },
                 function(response){
                     alertsService.RenderErrorMessage(response.Error);

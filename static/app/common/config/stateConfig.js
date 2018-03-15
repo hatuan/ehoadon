@@ -187,6 +187,21 @@ define(['angularAMD'], function (angularAMD) {
                     Preference: _getPreference,
                 }
             })
+            .state('eInvoicesAdj', {
+                url: "/eInvoicesAdj",
+                data: {pageTitle: 'Invoices Adj'},
+                views: {
+                    "master": angularAMD.route({
+                        templateUrl: 'app/eInvoice/invoicesAdj.html',
+                        controller: 'eInvoicesAdjController',
+                        controllerUrl: 'app/eInvoice/invoicesAdjController',
+                    })
+                },
+                resolve: {
+                    redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
+                    Preference: _getPreference,
+                }
+            })
             ;
 
         function _skipIfAuthenticated($q, $state, $auth) {

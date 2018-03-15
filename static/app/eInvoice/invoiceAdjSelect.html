@@ -1,0 +1,46 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title" >Invoice Select</h3>
+</div>
+<div class="modal-body row" id="modal-body" ng-init="initializeController()">
+    <div class="col-xs-12">
+        <form id="InvoiceSelectForm" name="InvoiceSelectForm" role="form" ng-validate="validationOptions">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group  col-md-8">
+                        <label for="NumberForm" class="control-label">Number Form</label>
+                        <select class="form-control" id="NumberForm" name="NumberForm" ng-model="SearchNumberForm" ng-options="s for s in NumberForms track by s">
+                            <option value=""> </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group  col-md-8">
+                        <label for="Symbol" class="control-label">Symbol</label>
+                        <select class="form-control" id="Symbol" name="Symbol" ng-model="SearchSymbol" ng-options="s for s in Symbols track by s">
+                            <option value=""> </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group  col-md-8">
+                        <label for="InvoiceNo" class="control-label">Invoice No</label>
+                        <input class="form-control" id="InvoiceNo" name="InvoiceNo" ng-model="SearchInvoiceNo" maxlength="7"/>
+                    </div>
+                </div>  
+                <div class="row">
+                    <div class="form-group  col-md-8">
+                        <label for="AdjType" class="control-label">Process</label>
+                        <select class="form-control" id="AdjType" name="AdjType" ng-model="AdjType" ng-options="k as v for (k, v) in Constants.DocumentAdjTypes">
+                            <option value=""> </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok(InvoiceSelectForm)">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

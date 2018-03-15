@@ -74,3 +74,6 @@ func API_SQLParse(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 
 // ErrIDParameterNotFound is thrown when do not found ID in request
 var ErrIDParameterNotFound = errors.New("ID Parameter Not Found")
+
+// ErrParameterNotFound is thrown when do not found ID in request
+var ErrParameterNotFound = errors.New("Parameter Not Found")

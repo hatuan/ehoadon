@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bufio"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"erpvietnam/ehoadon/log"
@@ -17,6 +18,7 @@ import (
 	"time"
 
 	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -138,6 +140,40 @@ func API_eInvoice_Id(w http.ResponseWriter, r *http.Request, next http.HandlerFu
 			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusBadRequest)
 			return
 		}
+		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData}, IsAuthenticated: true}, http.StatusOK)
+	}
+}
+
+func API_eInvoice_InvoiceNo(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	requestUser := context.Get(r, "user").(models.User)
+
+	switch {
+	case r.Method == "GET":
+		user, err := models.GetUser(*requestUser.ID)
+		if err != nil {
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{err.Error()}, IsAuthenticated: true, Data: map[string]interface{}{"eInvoices": []models.EInvoice{}}}, http.StatusBadRequest)
+			return
+		}
+
+		vars := mux.Vars(r)
+		invoiceNo := vars["InvoiceNo"]
+		symbol := r.URL.Query().Get("Symbol")
+		numberForm := r.URL.Query().Get("NumberForm")
+
+		if numberForm == "" || symbol == "" || invoiceNo == "" {
+			JSONResponse(w, models.Response{ReturnStatus: false, ReturnMessage: []string{ErrParameterNotFound.Error()}, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusBadRequest)
+			return
+		}
+
+		getData, tranInfo := models.GetEInvoiceByNo(user.OrganizationID, numberForm, symbol, invoiceNo)
+		if !tranInfo.ReturnStatus && tranInfo.ReturnError == sql.ErrNoRows {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusNotFound)
+			return
+		} else if !tranInfo.ReturnStatus {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusInternalServerError)
+			return
+		}
+
 		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData}, IsAuthenticated: true}, http.StatusOK)
 	}
 }

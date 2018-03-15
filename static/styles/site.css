@@ -203,6 +203,13 @@ span .small-font { font-size:9px; }
     background-size: cover;
 }
 /****************/
+
+/*** ngToast **/
+.ng-toast {
+    z-index: 10080 !important; 
+}
+/**************/
+
 .thumbnail .selected {
     border: 2px solid black;
 }

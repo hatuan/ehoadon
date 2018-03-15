@@ -7,10 +7,11 @@
 		"allowSyntheticDefaultImports": true
 	},
 	"exclude": [
-		"node_modules",
-		"bower_components",
-		"jspm_packages",
-		"tmp",
-		"temp"
+		"**/node_modules/*",
+		"**/bower_components/*",
+		"**/vendor/*",
+		"**/jspm_packages/*",
+		"**/tmp/*",
+		"**/temp/*"
 	]
 }

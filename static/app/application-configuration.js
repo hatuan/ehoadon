@@ -3,8 +3,8 @@
  */
 "use strict";
 //'kendo.core.min', 'kendo.angular.min', 'kendo.numerictextbox.min', 'kendo.culture.en', 'kendo.culture.us', 'kendo.culture.vi', 'kendo.culture.vn', 'angular-sanitize', 'angular-touch', 'metronic-app', 'metronic-layout'
-define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'angular-sanitize', 'angular-touch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'toastr', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'metronic-app', 'metronic-layout', 'bootstrap-hover-dropdown', 'angular-ui-grid', 'angular-smart-table', 'lodash', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants', 'myApp.Values'], function(angularAMD, $) {
-    var app = angular.module("myApp", ['ngSanitize', 'ngTouch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'toastr', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'smart-table', 'ui.grid', 'ui.grid.selection', 'ui.grid.pagination', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants', 'myApp.Values']);
+define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', 'bootstrap', 'ui-bootstrap',  'angular-validate', 'angular-globalize-wrapper', 'jquery-validation-globalize', 'angular-sanitize', 'angular-touch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'stateConfig', 'ngToast', 'angular-moment', 'ngInfiniteScroll', 'bootstrap-switch', 'angular-bootstrap-switch', 'angular-confirm-modal', 'angular-dynamic-number', 'metronic-app', 'metronic-layout', 'bootstrap-hover-dropdown', 'angular-ui-grid', 'angular-smart-table', 'lodash', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants', 'myApp.Values'], function(angularAMD, $) {
+    var app = angular.module("myApp", ['ngSanitize', 'ngTouch', 'ui.router', 'satellizer', 'pascalprecht.translate', 'blockUI', 'ngToast', 'angularMoment', 'ui.bootstrap', 'ngValidate', 'globalizeWrapper', 'infinite-scroll', 'frapontillo.bootstrap-switch', 'angular-confirm', 'dynamicNumber', 'smart-table', 'ui.grid', 'ui.grid.selection', 'ui.grid.pagination', 'myApp.Header', 'myApp.Capitalize', 'myApp.Constants', 'myApp.Values']);
 
     app.config(function(blockUIConfig) {
 
@@ -26,16 +26,13 @@ define(['angularAMD', 'jquery', 'jquery.validate', 'jquery.validation.extend', '
         $authProvider.tokenName = "Token";
     }]);
 
-    //https://github.com/Foxandxss/angular-toastr
-    app.config(function(toastrConfig) {
-        angular.extend(toastrConfig, {
-            allowHtml: true,
-            closeButton: true,
-            closeHtml: '<button>&times;</button>',
-            extendedTimeOut: 1000,
-            timeOut: 5000,
+    app.config(['ngToastProvider', function(ngToast) {
+        ngToast.configure({
+            dismissButton: true,
+            horizontalPosition: 'center',
+            maxNumber: 3
         });
-    });
+    }]);
 
     app.config(stateConfig);
 

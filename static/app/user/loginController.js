@@ -4,9 +4,9 @@
 "use strict";
 
 define(['application-configuration', 'alertsService'], function (app) {
-    var injectParams = ['$scope', '$rootScope', '$auth', 'alertsService', 'toastr', '$state', '$http', '$window'];
+    var injectParams = ['$scope', '$rootScope', '$auth', 'alertsService', '$state', '$http', '$window'];
 
-    var LoginController = function ($scope, $rootScope, $auth, alertsService, toastr, $state, $http, $window) {
+    var LoginController = function ($scope, $rootScope, $auth, alertsService, $state, $http, $window) {
 
         $rootScope.closeAlert = alertsService.closeAlert;
         $rootScope.alerts = [];
@@ -21,9 +21,6 @@ define(['application-configuration', 'alertsService'], function (app) {
 
             $scope.UserName = "";
             $scope.Password = "";
-
-            alertsService.RenderSuccessMessage("Please register if you do not have an account.");
-
         };
 
         $scope.login = function () {
@@ -41,15 +38,15 @@ define(['application-configuration', 'alertsService'], function (app) {
                     
                     // Show Message Alert
                     if (response.status == 422) {
-                        toastr.error('Please Enter Your Email And Password');
+                        alertsService.RenderFloatErrorMessage('Please Enter Your Email And Password');
                     }
                     else if (response.status == 401) {
-                        toastr.error(response.data.ReturnMessage[0]);
+                        alertsService.RenderFloatErrorMessage(response.data.ReturnMessage[0]);
                     }
                 })
                 .then(function (response) {
                     if (response !== undefined) {
-                        toastr.success('You have successfully signed in!');
+                        alertsService.RenderFloatSuccessMessage('You have successfully signed in!');
 
                         $rootScope.currentUser = (response !== undefined) ? response.data : {};
                         $window.localStorage.setItem("currentUser", JSON.stringify($rootScope.currentUser));
@@ -61,26 +58,20 @@ define(['application-configuration', 'alertsService'], function (app) {
                 })
                 .catch(function (error) {
                     $scope.clearValidationErrors();
-                    toastr.error(error.data.message, error.status);
+                    alertsService.RenderFloatErrorMessage(error.status + ":" + error.data.message);
                 });
         };
 
         $scope.clearValidationErrors = function () {
-
             $scope.UserNameInputError = false;
             $scope.PasswordInputError = false;
-
         };
 
         $scope.createLoginCredentials = function () {
-
             var user = new Object();
-
             user.username = $scope.UserName;
             user.password = $scope.Password;
-
             return user;
-
         }
 
     };

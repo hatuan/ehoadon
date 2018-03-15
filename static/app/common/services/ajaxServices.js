@@ -11,10 +11,10 @@ define(['angularAMD'], function (angularAMD) {
                 .success(function (response, status, headers, config) {
                     blockUI.stop();
                     successFunction(response, status);
-                }).error(function (response) {
+                }).error(function (response, status) {
                     blockUI.stop();                   
                     if (response.IsAuthenicated == false) { $state.go('login'); }
-                    errorFunction(response);
+                    errorFunction(response, status);
                 });
         }
 
@@ -24,9 +24,9 @@ define(['angularAMD'], function (angularAMD) {
                 .success(function (response, status, headers, config) {
                     blockUI.stop();
                     successFunction(response, status);
-                }).error(function (response) {
+                }).error(function (response, status) {
                     blockUI.stop();                 
-                    errorFunction(response);
+                    errorFunction(response, status);
                 });
         }
 
@@ -35,19 +35,19 @@ define(['angularAMD'], function (angularAMD) {
             $http({ method: 'GET', url: route }).success(function (response, status, headers, config) {
                 blockUI.stop();
                 successFunction(response, status);
-            }).error(function (response) {
+            }).error(function (response, status) {
                 blockUI.stop();
                 if (response.IsAuthenicated == false) { $state.go('login'); }
-                errorFunction(response);
+                errorFunction(response, status);
             });
         }
 
         this.AjaxGetNoBlock = function (route, successFunction, errorFunction) {
             $http({ method: 'GET', url: route }).success(function (response, status, headers, config) {
                 successFunction(response, status);
-            }).error(function (response) {
+            }).error(function (response, status) {
                 if (response.IsAuthenicated == false) { $state.go('login'); }
-                errorFunction(response);
+                errorFunction(response, status);
             });
         }
 
@@ -56,10 +56,10 @@ define(['angularAMD'], function (angularAMD) {
             $http({ method: 'GET', url: route, params: data }).success(function (response, status, headers, config) {
                 blockUI.stop();
                 successFunction(response, status);
-            }).error(function (response) {
+            }).error(function (response, status) {
                 blockUI.stop();
                 if (response.IsAuthenicated == false) { $state.go('login'); }
-                errorFunction(response);
+                errorFunction(response, status);
             });
         }
 
@@ -67,18 +67,18 @@ define(['angularAMD'], function (angularAMD) {
         this.AjaxGetWithDataNoBlock = function (data, route, successFunction, errorFunction) {            
             $http({ method: 'GET', url: route, params: data }).success(function (response, status, headers, config) {                 
                 successFunction(response, status);
-            }).error(function (response) {
+            }).error(function (response, status) {
                 if (response.IsAuthenicated == false) { $state.go('login'); }
-                errorFunction(response);
+                errorFunction(response, status);
             });
         }
 
         this.AjaxDelete = function (data, route, successFunction, errorFunction) {            
             $http({ method: 'DELETE', url: route, params: data }).success(function (response, status, headers, config) {                 
                 successFunction(response, status);
-            }).error(function (response) {
+            }).error(function (response, status) {
                 if (response.IsAuthenicated == false) { $state.go('login'); }
-                errorFunction(response);
+                errorFunction(response, status);
             });
         }
     }]);
