@@ -145,8 +145,8 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                     
                     report.renderAsync(function () {
                         service.exportToAsync(function () {
-                            const data = report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf); //or data = stream.toArray();
-                            const dataBase64 = arrayBufferToBase64(data);
+                            var data = report.exportDocument(Stimulsoft.Report.StiExportFormat.Pdf); //or data = stream.toArray();
+                            var dataBase64 = arrayBufferToBase64(data);
                             
                             try
                             {

@@ -17,7 +17,6 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             $scope.documentChanged = false;
             $scope.documentState = $scope.Constants.DocumentStates.View;
             $scope.originalDocument = {};
-debugger;
             if (angular.isUndefinedOrNull($scope.EditInvoice.ID)) {
                 $scope.EditInvoice.InvoiceDate = $rootScope.Preference.WorkingDate;
                 $scope.EditInvoice.Status = $scope.Constants.InvoiceStatus[0].Code;
@@ -262,7 +261,22 @@ debugger;
             _result.selectSendDocument = true;
 
             $uibModalInstance.close(_result);
-        }
+        };
+
+        $scope.downloadDocument = function() {
+            var fileName;
+            if ($scope.EditInvoice && $scope.EditInvoice.InvoiceFileID) {
+                if (typeof $scope.EditInvoice.InvoiceFileID === 'string' || $scope.EditInvoice.InvoiceFileID instanceof String) { // plain string,
+                    fileName = $scope.EditInvoice.InvoiceFileID;
+                } else if ((typeof $scope.EditInvoice.InvoiceFileID === 'object' || typeof $scope.EditInvoice.InvoiceFileID instanceof Object)
+                        && $scope.EditInvoice.InvoiceFileID.UUID
+                        && (typeof $scope.EditInvoice.InvoiceFileID.UUID === 'string' || $scope.EditInvoice.InvoiceFileID.UUID instanceof String))
+                    fileName = $scope.EditInvoice.InvoiceFileID.UUID;
+                
+                if(fileName)
+                    window.open('/invoice_files/' + fileName + '.pdf') 
+            }
+        };
 
         $scope.getInvoice = function(_ID) {
             var invoiceInquiry = new Object();

@@ -24,7 +24,7 @@ define(['angularAMD', 'jquery', 'einvoiceMailService'], function(angularAMD, $) 
 
         $scope.sendDocument = function(form) {
             if (form.validate()) {
-                let _document = $.extend(true, {}, $scope.EditInvoice);
+                var _document = $.extend(true, {}, $scope.EditInvoice);
 
                 _document.InvoiceDate = new moment(_document.InvoiceDate).unix();
                 _document.RecCreated = new moment(_document.RecCreated).unix();

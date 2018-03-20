@@ -117,7 +117,7 @@
                                 <td>{{eInvoice.OriginalFormTypeSymbol}}</td>
                                 <td>{{eInvoice.OriginalInvoiceDate | date:'dd/MM/yyyy'}}</td>
                                 <td >
-                                    <a ng-click="$event.stopPropagation(); edit($index, eInvoice);" class="btn btn-outline btn-circle btn-sm purple">
+                                    <a ng-click="$event.stopPropagation(); viewOriginalInvoice($index, eInvoice);" class="btn btn-outline btn-circle btn-sm purple">
                                         <i class="fa fa-edit"></i></a>
                                 </td>
                                 <td>{{eInvoice.InvoiceNo}}</td>

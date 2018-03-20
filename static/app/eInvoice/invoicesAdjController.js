@@ -258,6 +258,47 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
             });
         };
 
+        $scope.viewOriginalInvoice = function (_index, _invoice) {
+            var modalInstance = $uibModal.open({
+                animation: true,
+                ariaLabelledBy: 'modal-title',
+                ariaDescribedBy: 'modal-body',
+                backdrop: 'static', //disables modal closing by click on the backdrop
+                size:'lg',
+                windowClass: 'my-modal-fullscreen', //set style in .my-modal-fullscreen .modal-lg {} in site.css
+                templateUrl: 'app/eInvoice/invoiceMaintenance.html',
+                controller: 'eInvoiceMaintenanceController',
+                resolve: {
+                    editInvoice: function() {
+                        var __invoice = $.extend(true, {}, _invoice);
+                        __invoice.ID = __invoice.OriginalInvoiceID;
+                        return __invoice;
+                    }
+                }
+            });
+            modalInstance.rendered.then(function(result) {
+                $('.modal .modal-body').css('overflow-y', 'auto');
+                $('.modal .modal-body').css('max-height', $(window).height() * 0.75);
+                $('.modal .modal-body').css('height', $(window).height() * 0.75);
+                $('.modal .modal-body').css('margin-right', 0);
+            });
+            modalInstance.result.then(function(_result) {
+                var _invoice = _result.EditInvoice;
+                $scope.selectViewReport = _result.selectViewReport;
+                $scope.selectSendDocument = _result.selectSendDocument;
+
+                if($scope.selectViewReport) {
+                    $scope.viewReport(_index, _invoice);
+                } else if ($scope.selectSendDocument) {
+                    $scope.sendDocument(_index, _invoice);
+                };
+            }, function(_result) {
+                //dismissed 
+            })['finally'](function() {
+                modalInstance = undefined;
+            });    
+        };
+
         $scope.tableChange = function(tableState){
             if (!$scope.isLoading && tableState.sort) {
                 $scope.SortExpression = tableState.sort.predicate;

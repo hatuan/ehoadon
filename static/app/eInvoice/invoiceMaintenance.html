@@ -217,6 +217,7 @@
 </div>
 <div class="modal-footer" ng-if="isViewState()">
     <button class="btn btn-info pull-left" type="button" ng-click="report()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code">Report</button>
+    <button class="btn btn-info pull-left" type="button" ng-click="downloadDocument()" ng-if="EditInvoice.Status != Constants.InvoiceStatus[0].Code">Download signed file</button>
     <button class="btn btn-primary" type="button" ng-click="edit()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code">Edit</button>
     <button class="btn btn-warning" type="button" ng-click="close()">Close</button>
 </div>
