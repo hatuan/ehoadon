@@ -80,6 +80,10 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'clientService',
                     $scope.EditInvoice = $.extend(true, {},response.Data.eInvoice);
                     $scope.EditInvoice.InvoiceDate = new moment.unix($scope.EditInvoice.InvoiceDate).toJSON();
                     $scope.EditInvoice.Vat = $scope.EditInvoice.InvoiceLines[0] && $scope.EditInvoice.InvoiceLines[0].Vat ? $scope.EditInvoice.InvoiceLines[0].Vat : "";
+                    if (!angular.isUndefinedOrNull($scope.EditInvoice.OriginalInvoiceID)) {
+                        $scope.EditInvoice.OriginalInvoice = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                        $scope.EditInvoice.OriginalInvoice += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment.unix($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
+                    }
 
                     $scope.getReport($scope.FormType.FormFileName, $scope.FormType.FormFile);        
                 },

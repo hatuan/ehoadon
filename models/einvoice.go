@@ -37,9 +37,9 @@ type EInvoice struct {
 	FormTypeSymbol             string          `db:"form_type_symbol"`      //EY/17E
 	OriginalInvoiceID          *int64          `db:"original_invoice_id" json:",string"`
 	OriginalInvoiceDate        *Timestamp      `db:"original_invoice_date"`
-	OriginalInvoiceNo          string          `db:"original_invoice_no"`
-	OriginalFormTypeNumberForm string          `db:"original_form_type_number_form"` //01GTKT0/000
-	OriginalFormTypeSymbol     string          `db:"original_form_type_symbol"`      //EY/17E
+	OriginalInvoiceNo          *string         `db:"original_invoice_no"`
+	OriginalFormTypeNumberForm *string         `db:"original_form_type_number_form"` //01GTKT0/000
+	OriginalFormTypeSymbol     *string         `db:"original_form_type_symbol"`      //EY/17E
 	InvoiceFileID              uuid.NullUUID   `db:"invoice_file_id" json:",string"`
 	SignedByID                 *int64          `db:"signed_by" json:",string"`
 	SignedByUser               string          `db:"signed_by_user"`
@@ -145,18 +145,25 @@ func GetEInvoices(orgID int64, searchNumberForm string, searchSymbol string, sea
 		" ehd_form_type.number_form as form_type_number_form, " +
 		" ehd_form_type.symbol as form_type_symbol, " +
 		" ehd_customer.code as customer_code, " +
+		" original_ehd_invoice.invoice_date as original_invoice_date, " +
+		" original_ehd_invoice.invoice_no as original_invoice_no, " +
+		" original_ehd_form_type.number_form as original_form_type_number_form, " +
+		" original_ehd_form_type.symbol as original_form_type_symbol, " +
 		" user_created.name as rec_created_by_user, " +
 		" user_modified.name as rec_modified_by_user, " +
 		" COALESCE(user_signed.name, '') as signed_by_user, " +
 		" organization.description as organization " +
 		" FROM ehd_invoice " +
-		" INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
-		" INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id " +
-		" LEFT JOIN user_profile AS user_signed ON ehd_invoice.signed_by = user_signed.id " +
-		" INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id " +
-		" INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id " +
-		" INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id " +
-		" INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "
+		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id " +
+		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id " +
+		"		LEFT JOIN user_profile AS user_signed ON ehd_invoice.signed_by = user_signed.id " +
+		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id " +
+		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id " +
+		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id " +
+		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id " +
+		"		LEFT JOIN ehd_invoice as original_ehd_invoice ON original_ehd_invoice.id = ehd_invoice.original_invoice_id " +
+		"		LEFT JOIN ehd_form_release as original_ehd_form_release ON original_ehd_invoice.form_release_id = original_ehd_form_release.id " +
+		"		LEFT JOIN ehd_form_type as original_ehd_form_type ON original_ehd_form_release.form_type_id = original_ehd_form_type.id "
 
 	sqlWhere := " WHERE ehd_invoice.organization_id = $1"
 	if len(searchNumberForm) > 0 {
@@ -488,6 +495,10 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 		" ehd_form_type.number_form as form_type_number_form, "+
 		" ehd_form_type.symbol as form_type_symbol, "+
 		" ehd_customer.code as customer_code, "+
+		" original_ehd_invoice.invoice_date as original_invoice_date, "+
+		" original_ehd_invoice.invoice_no as original_invoice_no, "+
+		" original_ehd_form_type.number_form as original_form_type_number_form, "+
+		" original_ehd_form_type.symbol as original_form_type_symbol, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" COALESCE(user_signed.name, '') as signed_by_user, "+
@@ -500,6 +511,9 @@ func GetEInvoiceByID(id int64) (EInvoice, TransactionalInformation) {
 		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
 		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id "+
 		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
+		"		LEFT JOIN ehd_invoice as original_ehd_invoice ON original_ehd_invoice.id = ehd_invoice.original_invoice_id "+
+		"		LEFT JOIN ehd_form_release as original_ehd_form_release ON original_ehd_invoice.form_release_id = original_ehd_form_release.id "+
+		"		LEFT JOIN ehd_form_type as original_ehd_form_type ON original_ehd_form_release.form_type_id = original_ehd_form_type.id "+
 		"	WHERE ehd_invoice.id=$1", id)
 
 	if err != nil && err == sql.ErrNoRows {
@@ -539,6 +553,10 @@ func GetEInvoiceByNo(orgID int64, numberForm, symbol, invoiceNo string) (EInvoic
 		" ehd_form_type.number_form as form_type_number_form, "+
 		" ehd_form_type.symbol as form_type_symbol, "+
 		" ehd_customer.code as customer_code, "+
+		" original_ehd_invoice.invoice_date as original_invoice_date, "+
+		" original_ehd_invoice.invoice_no as original_invoice_no, "+
+		" original_ehd_form_type.number_form as original_form_type_number_form, "+
+		" original_ehd_form_type.symbol as original_form_type_symbol, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" COALESCE(user_signed.name, '') as signed_by_user, "+
@@ -551,6 +569,9 @@ func GetEInvoiceByNo(orgID int64, numberForm, symbol, invoiceNo string) (EInvoic
 		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
 		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id "+
 		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
+		"		LEFT JOIN ehd_invoice as original_ehd_invoice ON original_ehd_invoice.id = ehd_invoice.original_invoice_id "+
+		"		LEFT JOIN ehd_form_release as original_ehd_form_release ON original_ehd_invoice.form_release_id = original_ehd_form_release.id "+
+		"		LEFT JOIN ehd_form_type as original_ehd_form_type ON original_ehd_form_release.form_type_id = original_ehd_form_type.id "+
 		"	WHERE ehd_invoice.organization_id=$1 AND ehd_form_type.number_form=$2 AND ehd_form_type.symbol=$3 AND ehd_invoice.invoice_no=$4", orgID, numberForm, symbol, invoiceNo)
 
 	if err != nil && err == sql.ErrNoRows {
@@ -627,43 +648,7 @@ func PostEInvoiceFile(postData EInvoiceFile) (EInvoice, TransactionalInformation
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
 	}
 
-	getData := EInvoice{}
-	err = db.Get(&getData, "SELECT ehd_invoice.*, "+
-		" ehd_form_release.release_total as form_release_total, "+
-		" ehd_form_release.release_from as form_release_from, "+
-		" ehd_form_release.release_to as form_release_to, "+
-		" ehd_form_release.release_used as form_release_used, "+
-		" ehd_form_release.start_date as form_release_start_date, "+
-		" ehd_form_release.form_type_id  as form_type_id, "+
-		" ehd_form_type.number_form as form_type_number_form, "+
-		" ehd_form_type.symbol as form_type_symbol, "+
-		" ehd_customer.code as customer_code, "+
-		" user_created.name as rec_created_by_user, "+
-		" user_modified.name as rec_modified_by_user, "+
-		" COALESCE(user_signed.name, '') as signed_by_user, "+
-		" organization.description as organization "+
-		"	FROM ehd_invoice "+
-		"		INNER JOIN user_profile as user_created ON ehd_invoice.rec_created_by = user_created.id "+
-		"		INNER JOIN user_profile as user_modified ON ehd_invoice.rec_modified_by = user_modified.id "+
-		"		LEFT JOIN user_profile AS user_signed ON ehd_invoice.signed_by = user_signed.id "+
-		"		INNER JOIN organization as organization ON ehd_invoice.organization_id = organization.id "+
-		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
-		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id "+
-		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
-		"	WHERE ehd_invoice.id = $1", *postData.ID)
-
-	if err != nil && err == sql.ErrNoRows {
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
-	} else if err != nil {
-		log.Error(err)
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
-	}
-
-	invoiceLines, transInfo := GetEInvoiceLinesByHeaderID(*postData.ID)
-	if !transInfo.ReturnStatus {
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
-	}
-	getData.InvoiceLines = invoiceLines
+	getData, _ := GetEInvoiceByID(*postData.ID)
 
 	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
@@ -691,6 +676,10 @@ func GetEInvoiceByIDForSign(id int64) (EInvoice, TransactionalInformation) {
 		" ehd_form_type.number_form as form_type_number_form, "+
 		" ehd_form_type.symbol as form_type_symbol, "+
 		" ehd_customer.code as customer_code, "+
+		" original_ehd_invoice.invoice_date as original_invoice_date, "+
+		" original_ehd_invoice.invoice_no as original_invoice_no, "+
+		" original_ehd_form_type.number_form as original_form_type_number_form, "+
+		" original_ehd_form_type.symbol as original_form_type_symbol, "+
 		" user_created.name as rec_created_by_user, "+
 		" user_modified.name as rec_modified_by_user, "+
 		" COALESCE(user_signed.name, '') as signed_by_user, "+
@@ -703,11 +692,16 @@ func GetEInvoiceByIDForSign(id int64) (EInvoice, TransactionalInformation) {
 		"		INNER JOIN ehd_customer as ehd_customer ON ehd_invoice.customer_id = ehd_customer.id "+
 		"		INNER JOIN ehd_form_release as ehd_form_release ON ehd_invoice.form_release_id = ehd_form_release.id "+
 		"		INNER JOIN ehd_form_type as ehd_form_type ON ehd_form_release.form_type_id = ehd_form_type.id "+
+		"		LEFT JOIN ehd_invoice as original_ehd_invoice ON original_ehd_invoice.id = ehd_invoice.original_invoice_id "+
+		"		LEFT JOIN ehd_form_release as original_ehd_form_release ON original_ehd_invoice.form_release_id = original_ehd_form_release.id "+
+		"		LEFT JOIN ehd_form_type as original_ehd_form_type ON original_ehd_form_release.form_type_id = original_ehd_form_type.id "+
 		"	WHERE ehd_invoice.id=$1 FOR UPDATE OF ehd_invoice, ehd_form_release", id)
 
 	if err != nil && err == sql.ErrNoRows {
+		tx.Rollback()
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}}
 	} else if err != nil {
+		tx.Rollback()
 		log.Error(err)
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 	}
@@ -726,36 +720,19 @@ func GetEInvoiceByIDForSign(id int64) (EInvoice, TransactionalInformation) {
 			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
 		}
 
-		sqlString := "WITH UPDATED AS (UPDATE ehd_form_release SET release_used = release_used + 1 WHERE ehd_form_release.id = $1 RETURNING *)" +
-			" SELECT release_from + release_used -1 FROM UPDATED"
+		sqlString := " WITH UPDATED AS (UPDATE ehd_form_release SET release_used = release_used + 1 WHERE ehd_form_release.id = $1 RETURNING *) " +
+			" UPDATE ehd_invoice SET invoice_no = LPAD(UPDATED.release_from + UPDATED.release_used - 1::text, 7, '0') WHERE ehd_invoice.id = $2 RETURNING invoice_no"
 
 		currentNo := int32(0)
-		err = tx.Get(&currentNo, sqlString, getData.FormReleaseID)
+		err = tx.Get(&currentNo, sqlString, getData.FormReleaseID, *getData.ID)
 		if err != nil {
 			tx.Rollback()
 			log.Error(err)
 			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 		}
-
-		sqlString = "UPDATE ehd_invoice SET invoice_no = $1 WHERE ehd_invoice.id = $2"
-		_, err = tx.Exec(sqlString, currentNo, id)
-		if err != nil {
-			tx.Rollback()
-			log.Error(err)
-			return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
-		}
-
-		getData.InvoiceNo = strconv.FormatInt(int64(currentNo), 10)
+		tx.Commit()
 	}
-
-	invoiceLines, transInfo := GetEInvoiceLinesByHeaderID(id)
-	if !transInfo.ReturnStatus {
-		tx.Rollback()
-		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: transInfo.ReturnMessage}
-	}
-	getData.InvoiceLines = invoiceLines
-
-	tx.Commit()
+	getData, _ = GetEInvoiceByID(id)
 	return getData, TransactionalInformation{ReturnStatus: true, ReturnMessage: []string{"Successfully"}}
 }
 

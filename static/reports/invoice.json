@@ -41,7 +41,8 @@
         "TotalVat": "",
         "TotalOther": "",
         "TotalPayment": "",
-        "TotalPaymentWords": ""
+        "TotalPaymentWords": "",
+        "OriginalInvoice": ""
     },
     "InvoiceLines": [{
             "ID": "",

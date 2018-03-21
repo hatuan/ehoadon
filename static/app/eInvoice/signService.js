@@ -70,6 +70,10 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
     
                         SignInvoice = $.extend(true, {},response.Data.eInvoice);
                         SignInvoice.InvoiceDate = new moment.unix(SignInvoice.InvoiceDate).toJSON(); //convert datetime to "2018-03-05T05:00:14.510Z" before use in report
+                        if (!angular.isUndefinedOrNull($scope.SignInvoice.OriginalInvoiceID)) {
+                            $scope.SignInvoice.OriginalInvoice = $scope.SignInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                            $scope.SignInvoice.OriginalInvoice += " của hóa đơn số " + $scope.SignInvoice.OriginalInvoiceNo + " ngày " + moment.unix($scope.SignInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.SignInvoice.OriginalFormTypeSymbol;
+                        }
                         SignInvoice.Vat = SignInvoice.InvoiceLines[0] && SignInvoice.InvoiceLines[0].Vat ? SignInvoice.InvoiceLines[0].Vat : "";
                         getReport(FormType.FormFileName, FormType.FormFile);
                     },

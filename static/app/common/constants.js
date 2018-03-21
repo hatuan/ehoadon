@@ -78,8 +78,7 @@ define(['angular'], function (angular) {
         DocumentAdjTypes: {
             1: "Điều chỉnh tăng",
             2: "Điều chỉnh giảm",
-            3: "Điều chỉnh thông tin",
-            4: "Thay thế hóa đơn"
+            3: "Điều chỉnh thông tin"
         }
     })
 });

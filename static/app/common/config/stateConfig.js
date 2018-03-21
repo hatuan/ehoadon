@@ -189,12 +189,31 @@ define(['angularAMD'], function (angularAMD) {
             })
             .state('eInvoicesAdj', {
                 url: "/eInvoicesAdj",
-                data: {pageTitle: 'Invoices Adj'},
+                data: {
+                    pageTitle: 'Invoices Adj',
+                },
                 views: {
                     "master": angularAMD.route({
                         templateUrl: 'app/eInvoice/invoicesAdj.html',
                         controller: 'eInvoicesAdjController',
                         controllerUrl: 'app/eInvoice/invoicesAdjController',
+                    })
+                },
+                resolve: {
+                    redirectIfNotAuthenticated: _redirectIfNotAuthenticated,
+                    Preference: _getPreference,
+                }
+            })
+            .state('eInvoicesReplace', {
+                url: "/eInvoicesReplace",
+                data: {
+                    pageTitle: 'Invoices Replace',
+                },
+                views: {
+                    "master": angularAMD.route({
+                        templateUrl: 'app/eInvoice/invoicesReplace.html',
+                        controller: 'eInvoicesReplaceController',
+                        controllerUrl: 'app/eInvoice/invoicesReplaceController',
                     })
                 },
                 resolve: {
