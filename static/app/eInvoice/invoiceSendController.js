@@ -27,6 +27,7 @@ define(['angularAMD', 'jquery', 'einvoiceMailService'], function(angularAMD, $) 
                 var _document = $.extend(true, {}, $scope.EditInvoice);
 
                 _document.InvoiceDate = new moment(_document.InvoiceDate).unix();
+                _document.OriginalInvoiceDate = new moment(_document.OriginalInvoiceDate).unix();
                 _document.RecCreated = new moment(_document.RecCreated).unix();
                 _document.RecModified = new moment(_document.RecModified).unix();
                 _document.CustomerContactEmail = $scope.MailAddress;

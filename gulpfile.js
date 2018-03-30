@@ -136,6 +136,7 @@ gulp.task('copy-other', function () {
             '!static/scripts/**/*.js', 
             'static/styles/**/*',
             '!static/styles/**/*.js',
+            'static/templates/**/*',
             'db/migrations/*', 
             'goose'], {
         base:"."
