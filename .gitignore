@@ -8,6 +8,7 @@ _obj
 _test
 invoice_files
 dist
+!static/bower_components/**/dist
 node_modules
 .vagrant
 .idea
