@@ -122,7 +122,7 @@ function NumberToWords(_number) {
         "17": "mười bảy",
         "16": "mười sáu",
         "15": "mười lăm",
-        "14": "mười tư",
+        "14": "mười bốn",
         "13": "mười ba",
         "12": "mười hai",
         "11": "mười một",
@@ -138,6 +138,7 @@ function NumberToWords(_number) {
         "01": "lẻ một",
         "00": "",
         "00_remove": "không trăm lẻ",
+        "00_remove_4": "không trăm lẻ tư",
         "9": "chín",
         "8": "tám",
         "7": "bảy",
@@ -181,6 +182,7 @@ function NumberToWords(_number) {
         return "*****************";
     }
     var _removeLeftStr = words_of_number["00_remove"];
+    var _removeLeftStr4 = words_of_number["00_remove_4"];
     var MyNumber = "" + _number;
     var Count = 1;
     var unitNames = ['', 
@@ -189,7 +191,7 @@ function NumberToWords(_number) {
         ' ' + words_of_number["1000000000"] + ' ',
         ' ' + words_of_number["1000"] + ' ',
         ' ' + words_of_number["1000000"] + ' '];
-    
+
     while(MyNumber != '') {
         Temp = GetHundreds(('000' + MyNumber).substring(('000' + MyNumber).length - 3));
         if(Temp != '')
@@ -204,8 +206,10 @@ function NumberToWords(_number) {
         Count++;
     }
 
-    if(_result.substring(0, _removeLeftStr.length) == _removeLeftStr) 
-        _result = _result.substring(_removeLeftStr.length);
+    if(_result.substring(0, _removeLeftStr4.length) == _removeLeftStr4)
+        _result = words_of_number["4"] + _result.substring(_removeLeftStr4.length); //khong tram le tu -> bon
+    else if(_result.substring(0, _removeLeftStr.length) == _removeLeftStr) 
+        _result = _result.substring(_removeLeftStr.length); //khong tram le -> ''
     
     return _result.trim();
 }

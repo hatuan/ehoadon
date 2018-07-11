@@ -5,14 +5,15 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
 
     var injectParams = ['$auth', '$window', '$http', 'moment', '$confirm', 'ajaxService', 'Constants', 'clientService', 'eInvoiceService', 'eInvoiceFormTypeService'];
 
-    var einvoiceSignFunction = function($auth, $window, $http, moment, $confirm, ajaxService, Constants, clientService, eInvoiceService, eInvoiceFormTypeService) { 
+    var einvoiceSignFunction = function( $auth, $window, $http, moment, $confirm, ajaxService, Constants, clientService, eInvoiceService, eInvoiceFormTypeService) { 
         var SignInvoice = {},
             Client = {},
             Token = {},
             FormType = {},
             FormVars = {};
-
+        
         this.SignDocument = function(document, successFunction, errorFunction) {
+            
             SignInvoice = $.extend(true, {}, document);
             if(!angular.isUndefinedOrNull(document.FormTypeID))
                 clientService.getClient(
@@ -51,6 +52,11 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
                             getInvoice(SignInvoice.ID);
                         else {
                             SignInvoice.InvoiceDate = SignInvoice.InvoiceDate.toJSON(); //convert datetime to "2018-03-05T05:00:14.510Z" before use in report
+                            SignInvoice.InvoiceAdjDescription = "";
+                            if (!angular.isUndefinedOrNull(SignInvoice.OriginalInvoiceID)) {
+                                SignInvoice.InvoiceAdjDescription = SignInvoice.ProcessInvoiceStatus == Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                                SignInvoice.InvoiceAdjDescription += " của hóa đơn số " + SignInvoice.OriginalInvoiceNo + " ngày " + moment.unix(SignInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + SignInvoice.OriginalFormTypeSymbol;
+                            }
                             SignInvoice.Vat = SignInvoice.InvoiceLines[0] && SignInvoice.InvoiceLines[0].Vat ? SignInvoice.InvoiceLines[0].Vat : "";
                             getReport(FormType.FormFileName, FormType.FormFile);
                         }
@@ -70,9 +76,10 @@ define(['angularAMD', 'jquery', 'reportjs-report', 'reportjs-viewer', 'ajaxServi
     
                         SignInvoice = $.extend(true, {},response.Data.eInvoice);
                         SignInvoice.InvoiceDate = new moment.unix(SignInvoice.InvoiceDate).toJSON(); //convert datetime to "2018-03-05T05:00:14.510Z" before use in report
-                        if (!angular.isUndefinedOrNull($scope.SignInvoice.OriginalInvoiceID)) {
-                            $scope.SignInvoice.OriginalInvoice = $scope.SignInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
-                            $scope.SignInvoice.OriginalInvoice += " của hóa đơn số " + $scope.SignInvoice.OriginalInvoiceNo + " ngày " + moment.unix($scope.SignInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.SignInvoice.OriginalFormTypeSymbol;
+                        SignInvoice.InvoiceAdjDescription = "";
+                        if (!angular.isUndefinedOrNull(SignInvoice.OriginalInvoiceID)) {
+                            SignInvoice.InvoiceAdjDescription = SignInvoice.ProcessInvoiceStatus == Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                            SignInvoice.InvoiceAdjDescription += " của hóa đơn số " + SignInvoice.OriginalInvoiceNo + " ngày " + moment.unix(SignInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + SignInvoice.OriginalFormTypeSymbol;
                         }
                         SignInvoice.Vat = SignInvoice.InvoiceLines[0] && SignInvoice.InvoiceLines[0].Vat ? SignInvoice.InvoiceLines[0].Vat : "";
                         getReport(FormType.FormFileName, FormType.FormFile);

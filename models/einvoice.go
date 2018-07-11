@@ -92,6 +92,9 @@ type EInvoice struct {
 // ErrEInvoiceNotFound indicates there was no EInvoice
 var ErrEInvoiceNotFound = errors.New("EInvoice not found")
 
+// ErrOriginalInvoiceNotFound indicates there was no Original Invoice
+var ErrOriginalInvoiceNotFound = errors.New("Original Invoice not found")
+
 // ErrEInvoiceCustomerAddressNotSpecified indicates there was no name given by the user
 var ErrEInvoiceCustomerAddressNotSpecified = errors.New("EInvoice's Customer Address Not Specified")
 
@@ -469,6 +472,27 @@ func PostEInvoice(postData EInvoice) (EInvoice, TransactionalInformation) {
 			return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{err.Error()}}
 		}
 	}
+
+	if postData.OriginalInvoiceID != nil {
+		var updOriginalInvoiceResult sql.Result
+		var updOriginalInvoiceErr error
+
+		switch postData.ProcessInvoiceStatus {
+		case 2: //ADJ Invoice
+			updOriginalInvoiceResult, updOriginalInvoiceErr = tx.Exec("UPDATE ehd_invoice SET process_invoice_status = $1 WHERE id = $2", 1, *postData.OriginalInvoiceID)
+		case 3: //CANCEL Invoice
+			updOriginalInvoiceResult, updOriginalInvoiceErr = tx.Exec("UPDATE ehd_invoice SET process_invoice_status = $1 WHERE id = $2", 4, *postData.OriginalInvoiceID)
+		}
+		if updOriginalInvoiceErr != nil {
+			tx.Rollback()
+			log.Error(updOriginalInvoiceErr)
+			return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{updOriginalInvoiceErr.Error()}}
+		}
+		if changes, _ := updOriginalInvoiceResult.RowsAffected(); changes != 1 {
+			tx.Rollback()
+			return postData, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrOriginalInvoiceNotFound.Error()}}
+		}
+	}
 	tx.Commit()
 
 	postData, _ = GetEInvoiceByID(*postData.ID)
@@ -572,7 +596,7 @@ func GetEInvoiceByNo(orgID int64, numberForm, symbol, invoiceNo string) (EInvoic
 		"		LEFT JOIN ehd_invoice as original_ehd_invoice ON original_ehd_invoice.id = ehd_invoice.original_invoice_id "+
 		"		LEFT JOIN ehd_form_release as original_ehd_form_release ON original_ehd_invoice.form_release_id = original_ehd_form_release.id "+
 		"		LEFT JOIN ehd_form_type as original_ehd_form_type ON original_ehd_form_release.form_type_id = original_ehd_form_type.id "+
-		"	WHERE ehd_invoice.organization_id=$1 AND ehd_form_type.number_form=$2 AND ehd_form_type.symbol=$3 AND ehd_invoice.invoice_no=$4", orgID, numberForm, symbol, invoiceNo)
+		"	WHERE ehd_invoice.organization_id=$1 AND ehd_form_type.number_form=$2 AND ehd_form_type.symbol=$3 AND ehd_invoice.invoice_no=LPAD($4, 7, '0')", orgID, numberForm, symbol, invoiceNo)
 
 	if err != nil && err == sql.ErrNoRows {
 		return EInvoice{}, TransactionalInformation{ReturnStatus: false, ReturnMessage: []string{ErrEInvoiceNotFound.Error()}, ReturnError: sql.ErrNoRows}
@@ -721,9 +745,9 @@ func GetEInvoiceByIDForSign(id int64) (EInvoice, TransactionalInformation) {
 		}
 
 		sqlString := " WITH UPDATED AS (UPDATE ehd_form_release SET release_used = release_used + 1 WHERE ehd_form_release.id = $1 RETURNING *) " +
-			" UPDATE ehd_invoice SET invoice_no = LPAD(UPDATED.release_from + UPDATED.release_used - 1::text, 7, '0') WHERE ehd_invoice.id = $2 RETURNING invoice_no"
+			" UPDATE ehd_invoice SET invoice_no = LPAD((UPDATED.release_from + UPDATED.release_used - 1)::text, 7, '0') FROM UPDATED WHERE ehd_invoice.id = $2 RETURNING invoice_no"
 
-		currentNo := int32(0)
+		currentNo := ""
 		err = tx.Get(&currentNo, sqlString, getData.FormReleaseID, *getData.ID)
 		if err != nil {
 			tx.Rollback()

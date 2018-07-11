@@ -28,7 +28,7 @@ define(['angularAMD', 'jquery', 'alertsService', 'eInvoiceService'], function(an
                     digits: true,
                     maxlength: 7,
                 },
-                "AdjType": {
+                "InvoiceProcessType": {
                     required: true
                 },
             }
@@ -51,7 +51,7 @@ define(['angularAMD', 'jquery', 'alertsService', 'eInvoiceService'], function(an
             _editInvoice.RecCreated = new moment.unix(_editInvoice.RecCreated).toDate();
             _editInvoice.RecModified = new moment.unix(_editInvoice.RecModified).toDate();
             if (_editInvoice.ProcessInvoiceStatus != $scope.Constants.ProcessInvoiceStatus["HD_GOC"]) {
-                alertsService.RenderFloatErrorMessage('Invoice: ' + $scope.SearchInvoiceNo + ' đã bị điều chỉnh hoặc thay thế, không phải hóa đơn gốc');
+                alertsService.RenderFloatErrorMessage('Hóa đơn: ' + $scope.SearchInvoiceNo + ' đã bị điều chỉnh hoặc thay thế, không phải hóa đơn gốc');
                 return;
             }
             _editInvoice.OriginalInvoice = $.extend(true, {}, _editInvoice);
@@ -80,16 +80,37 @@ define(['angularAMD', 'jquery', 'alertsService', 'eInvoiceService'], function(an
                 var _invoiceLine = _editInvoice.InvoiceLines[i];
                 _invoiceLine.ID = null;
             }
+            switch(Number($scope.InvoiceProcessType)) {
+                case $scope.Constants.InvoiceProcessTypes["DC_TANG"]:
+                    _editInvoice.ProcessInvoiceStatus = $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"];
+                    _editInvoice.ProcessAdjustedForm = $scope.Constants.ProcessAdjustedForms["DC_TANG"];
+                    _editInvoice.ProcessAdjustedType = $scope.Constants.ProcessAdjustedTypes["DC_HHDV"];
+                    break;
+                case $scope.Constants.InvoiceProcessTypes["DC_GIAM"]:
+                    _editInvoice.ProcessInvoiceStatus = $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"];
+                    _editInvoice.ProcessAdjustedForm = $scope.Constants.ProcessAdjustedForms["DC_GIAM"];
+                    _editInvoice.ProcessAdjustedType = $scope.Constants.ProcessAdjustedTypes["DC_HHDV"];
+                    break;
+                case $scope.Constants.InvoiceProcessTypes["DC_THONG_TIN"]:
+                    _editInvoice.ProcessInvoiceStatus = $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"];
+                    _editInvoice.ProcessAdjustedForm = $scope.Constants.ProcessAdjustedForms["DC_THONG_TIN"];
+                    _editInvoice.ProcessAdjustedType = $scope.Constants.ProcessAdjustedTypes["DC_MST"];
+                    break;
+                case $scope.Constants.InvoiceProcessTypes["DC_THAY_THE"]:
+                    _editInvoice.ProcessInvoiceStatus = $scope.Constants.ProcessInvoiceStatus["HD_THAY_THE"];
+                    _editInvoice.ProcessAdjustedForm = $scope.Constants.ProcessAdjustedForms["KHONG_DC"];
+                    _editInvoice.ProcessAdjustedType = $scope.Constants.ProcessAdjustedTypes["KHONG_DC"];
+                    break;
+            }
 
             var _result = new Object();
             _result.EditInvoice = _editInvoice;
-            _result.AdjType = $scope.AdjType;
             $uibModalInstance.close(_result);
         };
 
         $scope.getInvoiceError = function(response, status) {
             if(status = 404) {
-                alertsService.RenderFloatErrorMessage('Invoice: ' + $scope.SearchInvoiceNo + ' not found!' );
+                alertsService.RenderFloatErrorMessage('Hóa đơn: ' + $scope.SearchInvoiceNo + ' không tìm thấy!' );
             } else {
                 alertsService.RenderFloatErrorMessage( response.ReturnMessage );
             }

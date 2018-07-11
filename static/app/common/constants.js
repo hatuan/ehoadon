@@ -61,24 +61,56 @@ define(['angular'], function (angular) {
             Edit: "Edit",
         },
         NumberPadding: "0000000",
-        ProcessInvoiceStatus: { /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh, 3: Hoa don bi thay the, 4: Hoa don thay the */
+        ProcessInvoiceStatus: { /* 0 : Hoa don goc, 1 : Hoa don bi dieu chinh, 2 : Hoa don dieu chinh, 3: Hoa don thay the, 4: Hoa don huy */
             "HD_GOC" : 0,
             "HD_BI_DIEU_CHINH": 1,
             "HD_DIEU_CHINH": 2,
-            "HD_BI_THAY_THE": 3,
-            "HD_THAY_THE": 4,
+            "HD_THAY_THE": 3,
+            "HD_HUY": 4,
         },
         ProcessInvoiceStatusDescription: {
             0: "Hóa đơn gốc",
             1: "Hóa đơn bị điều chỉnh",
             2: "Hóa đơn điều chỉnh",
-            3: "Hóa đơn bị thay thế",
-            4: "Hóa đơn thay thế",
+            3: "Hóa đơn thay thế",
+            4: "Hóa đơn hủy",
         },
-        DocumentAdjTypes: {
+        ProcessAdjustedForms: { /* Hinh thuc dieu chinh 0: khong dieu chinh, 1: Dieu chinh tang, 2: Dieu chinh giam, 3: Dieu chinh khong thay doi tien, 4: Dieu chinh khac */
+            "KHONG_DC": 0,
+            "DC_TANG": 1,
+            "DC_GIAM": 2,
+            "DC_THONG_TIN": 3
+        },
+        ProcessAdjustedFormsDescription: { 
+            0: "Không điều chỉnh",
             1: "Điều chỉnh tăng",
             2: "Điều chỉnh giảm",
             3: "Điều chỉnh thông tin"
+        },
+        ProcessAdjustedTypes: { /* Loai dieu chinh 0: khong dieu chinh; Neu process_adjusted_form = 1,2 => 1: Hang hoa dich vu; process_adjusted_form = 3 => 2: Ma so thue, 3: Tien chu, 4: Ten khach, Dia chi; Neu process_adjusted_form = 4 => 5: Khac*/
+            "KHONG_DC": 0,
+            "DC_HHDV": 1,
+            "DC_MST": 2,
+            "DC_TIEN_CHU": 3,
+            "DC_TEN_DIACHI": 4,
+        },
+        ProcessAdjustedTypesDescription: { 
+            1: "Hàng hóa dịch vụ",
+            2: "Mã số thuế",
+            3: "Số tiền bằng chữ",
+            4: "Tên khách - Địa chỉ",
+        },
+        InvoiceProcessTypes: {
+            "DC_TANG": 1,
+            "DC_GIAM": 2,
+            "DC_THONG_TIN": 3,
+            "DC_THAY_THE": 4,
+        },
+        InvoiceProcessTypesDescription: {
+            1: "Điều chỉnh tăng",
+            2: "Điều chỉnh giảm",
+            3: "Điều chỉnh thông tin",
+            4: "Thay thế hóa đơn",
         }
     })
 });

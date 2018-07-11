@@ -42,7 +42,7 @@
         "TotalOther": "",
         "TotalPayment": "",
         "TotalPaymentWords": "",
-        "OriginalInvoice": ""
+        "InvoiceAdjDescription": ""
     },
     "InvoiceLines": [{
             "ID": "",

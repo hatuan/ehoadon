@@ -136,10 +136,22 @@ func API_eInvoice_Id(w http.ResponseWriter, r *http.Request, next http.HandlerFu
 			return
 		}
 		getData, tranInfo := models.GetEInvoiceByID(ID)
-		if !tranInfo.ReturnStatus {
-			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusBadRequest)
+
+		if !tranInfo.ReturnStatus && tranInfo.ReturnError == sql.ErrNoRows {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusNotFound)
+			return
+		} else if !tranInfo.ReturnStatus {
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, IsAuthenticated: true, Data: map[string]interface{}{"eInvoice": models.EInvoice{}}}, http.StatusInternalServerError)
 			return
 		}
+
+		var originalInvoice models.EInvoice
+		if getData.OriginalInvoiceID != nil {
+			originalInvoice, _ = models.GetEInvoiceByID(*getData.OriginalInvoiceID)
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData, "eInvoiceOriginal": originalInvoice}, IsAuthenticated: true}, http.StatusOK)
+			return
+		}
+
 		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData}, IsAuthenticated: true}, http.StatusOK)
 	}
 }
@@ -174,6 +186,12 @@ func API_eInvoice_InvoiceNo(w http.ResponseWriter, r *http.Request, next http.Ha
 			return
 		}
 
+		var originalInvoice models.EInvoice
+		if getData.OriginalInvoiceID != nil {
+			originalInvoice, _ = models.GetEInvoiceByID(*getData.OriginalInvoiceID)
+			JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData, "eInvoiceOriginal": originalInvoice}, IsAuthenticated: true}, http.StatusOK)
+			return
+		}
 		JSONResponse(w, models.Response{ReturnStatus: tranInfo.ReturnStatus, ReturnMessage: tranInfo.ReturnMessage, Data: map[string]interface{}{"eInvoice": getData}, IsAuthenticated: true}, http.StatusOK)
 	}
 }

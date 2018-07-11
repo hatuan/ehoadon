@@ -183,10 +183,15 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             var _result = {};
             _result = response.Data.eInvoice;
             _result.InvoiceDate = new moment.unix(_result.InvoiceDate).toDate();
+            _result.OriginalInvoiceDate =  new moment.unix(_result.OriginalInvoiceDate).toDate();
             _result.RecCreated = new moment.unix(_result.RecCreated).toDate();
             _result.RecModified = new moment.unix(_result.RecModified).toDate();
 
             $scope.EditInvoice = $.extend(true, {}, _result);
+            if (!angular.isUndefinedOrNull($scope.EditInvoice.OriginalInvoiceID)) {
+                $scope.EditInvoice.InvoiceAdjDescription = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                $scope.EditInvoice.InvoiceAdjDescription += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
+            }
             $scope.originalDocument = $.extend(true, {}, $scope.EditInvoice);
             $scope.documentState = $scope.Constants.DocumentStates.View;
             $scope.documentChanged = true;
@@ -241,10 +246,15 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
             var _result = {};
             _result = response.Data.eInvoice;
             _result.InvoiceDate = new moment.unix(_result.InvoiceDate).toDate();
+            _result.OriginalInvoiceDate =  new moment.unix(_result.OriginalInvoiceDate).toDate();
             _result.RecCreated = new moment.unix(_result.RecCreated).toDate();
             _result.RecModified = new moment.unix(_result.RecModified).toDate();
-
+            
             $scope.EditInvoice = $.extend(true,  {}, _result);
+            if (!angular.isUndefinedOrNull($scope.EditInvoice.OriginalInvoiceID)) {
+                $scope.EditInvoice.InvoiceAdjDescription = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                $scope.EditInvoice.InvoiceAdjDescription += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
+            }
             $scope.originalDocument = $.extend(true, {}, $scope.EditInvoice);
             $scope.documentChanged = true;
 
@@ -293,8 +303,8 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                     $scope.EditInvoice = _editInvoice;
                     
                     if (!angular.isUndefinedOrNull($scope.EditInvoice.OriginalInvoiceID)) {
-                        $scope.EditInvoice.OriginalInvoice = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
-                        $scope.EditInvoice.OriginalInvoice += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
+                        $scope.EditInvoice.InvoiceAdjDescription = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                        $scope.EditInvoice.InvoiceAdjDescription += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
                     }
 
                     setTimeout(function() {
@@ -339,8 +349,8 @@ define(['angularAMD', 'jquery', 'bignumber', 'ajaxService', 'alertsService', 'eI
                         $scope.getInvoice($scope.EditInvoice.ID);
                     else if ($scope.EditInvoice.InvoiceLines && $scope.EditInvoice.InvoiceLines.length > 0) { //trong truong hop dieu chinh thay the hoa don
                         if (!angular.isUndefinedOrNull($scope.EditInvoice.OriginalInvoiceID)) {
-                            $scope.EditInvoice.OriginalInvoice = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
-                            $scope.EditInvoice.OriginalInvoice += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
+                            $scope.EditInvoice.InvoiceAdjDescription = $scope.EditInvoice.ProcessInvoiceStatus == $scope.Constants.ProcessInvoiceStatus["HD_DIEU_CHINH"] ? "Hóa đơn điều chỉnh " : "Hóa đơn thay thế ";
+                            $scope.EditInvoice.InvoiceAdjDescription += " của hóa đơn số " + $scope.EditInvoice.OriginalInvoiceNo + " ngày " + moment($scope.EditInvoice.OriginalInvoiceDate).format("DD-MM-YYYY") + " ký hiệu " + $scope.EditInvoice.OriginalFormTypeSymbol;
                         }
 
                         setTimeout(function() {

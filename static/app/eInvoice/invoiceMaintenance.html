@@ -1,14 +1,16 @@
 <div class="modal-header">
-    <button class="btn btn-info pull-right" type="button" ng-click="signDocument()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code"><span class="icon-note"> </span> Sign Document</button>
-    <div class="btn-group pull-right" uib-dropdown ng-if="EditInvoice.Status != Constants.InvoiceStatus[0].Code">
-        <button id="split-button" class="btn btn-info" type="button"  ng-click="sendDocument()"><span class="icon-envelope"> </span> Send Document</button>
-        <button type="button" class="btn btn-info" uib-dropdown-toggle>
-          <span class="caret"></span>
-          <span class="sr-only">Split button!</span>
-        </button>
-        <ul class="pull-right dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
-          <li role="menuitem"><a ng-click="downloadDocument()">Download signed file</a></li>
-        </ul>
+    <div ng-if="isViewState()">
+        <button class="btn btn-info pull-right" type="button" ng-click="signDocument()" ng-if="EditInvoice.Status == Constants.InvoiceStatus[0].Code"><span class="icon-note"> </span> Sign Document</button>
+        <div class="btn-group pull-right" uib-dropdown ng-if="EditInvoice.Status != Constants.InvoiceStatus[0].Code">
+            <button id="split-button" class="btn btn-info" type="button"  ng-click="sendDocument()"><span class="icon-envelope"> </span> Send Document</button>
+            <button type="button" class="btn btn-info" uib-dropdown-toggle>
+            <span class="caret"></span>
+            <span class="sr-only">Split button!</span>
+            </button>
+            <ul class="pull-right dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+            <li role="menuitem"><a ng-click="downloadDocument()">Download signed file</a></li>
+            </ul>
+        </div>
     </div>
     <h3 class="modal-title" id="modal-title" >Invoice</h3>
 </div>
@@ -17,7 +19,6 @@
         <form id="InvoiceMaintenanceForm" name="InvoiceMaintenanceForm" role="form" ng-validate="validationOptions">
             <div class="row">
                 <div class="col-xs-6">
-                    <div class="col">
                         <div class="row">
                             <div class="form-group col-xs-12">
                                 <label class="control-label" for="FormNumber">Form Release</label>
@@ -48,8 +49,6 @@
                             </div>
                             -->
                         </div>
-                    </div>
-                    <div class="col">
                         <div class="row">
                             <div class="form-group col-xs-3">
                                 <label class="control-label" for="CustomerID">Customer</label>
@@ -71,7 +70,6 @@
                                 <input type="text" class="form-control" name="CustomerAddress" id="CustomerAddress" ng-model="EditInvoice.CustomerAddress" required ng-readonly="isViewState()"/>
                             </div>
                         </div>
-                    </div>
                 </div>
                 <div class="col-xs-6">
                     <div class="row">
@@ -116,12 +114,22 @@
                             <input type="text" class="form-control" name="TotalPayment" id="TotalPayment" ng-model="EditInvoice.TotalPayment" awnum="amount" readonly/>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="form-group col-xs-6" ng-if="EditInvoice.OriginalInvoiceID">
+                            <label class="control-label" for="OriginalTotalPaymentWords">Original Total Payment Words</label>
+                            <input type="text" class="form-control" style="font-size: 12px;" name="OriginalTotalPaymentWords" id="OriginalTotalPaymentWords" ng-model="EditInvoice.OriginalTotalPaymentWords" readonly/>
+                        </div>
+                        <div class="form-group col-xs-6">
+                            <label class="control-label" for="TotalPaymentWords">Total Payment Words</label>
+                            <input type="text" class="form-control" style="font-size: 12px;" name="TotalPaymentWords" id="TotalPaymentWords" ng-model="EditInvoice.TotalPaymentWords" ng-readonly="isViewState()"/>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
     </div>
     <div class="col-xs-12" ng-if="EditInvoice.OriginalInvoiceID">
-        <label class="control-label col-xs-12" style="text-align: center;"> <b>{{EditInvoice.OriginalInvoice}}</b></label>
+        <label class="control-label col-xs-12" style="text-align: center; margin-top: 10px; margin-bottom: 0px;"> <b>{{EditInvoice.InvoiceAdjDescription}}</b></label>
     </div>
     <div class="col-xs-12">
         <div class="invoice-lines">

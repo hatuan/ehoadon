@@ -164,8 +164,7 @@ define(['angularAMD', 'jquery', 'ajaxService', 'alertsService', 'select2', 'myAp
                 $('.modal .modal-body').css('margin-right', 0);
             });
             modalInstance.result.then(function(_result) {
-                var _invoice = _result.EditInvoice,
-                    _adjType = _result.AdjType;
+                var _invoice = _result.EditInvoice;
                 
                 $scope.selectViewReport = false;
                 $scope.selectSendDocument = false;
